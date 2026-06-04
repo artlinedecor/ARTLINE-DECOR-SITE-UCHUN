@@ -7,7 +7,7 @@ import { setAuthenticated } from '@/lib/store';
 import Image from 'next/image';
 
 export default function LoginPage() {
-  const [login, setLogin] = useState('');
+  const [login, setLogin] = useState('artlinedecor_ADMIN1_DILMUROD');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState('');
@@ -20,8 +20,8 @@ export default function LoginPage() {
     setError('');
 
     // Credentials — environment variables bilan o'zgartirish mumkin
-    const adminLogin = process.env.NEXT_PUBLIC_ADMIN_LOGIN || 'artline';
-    const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'artline2024';
+    const adminLogin = process.env.NEXT_PUBLIC_ADMIN_LOGIN || 'artlinedecor_ADMIN1_DILMUROD';
+    const adminPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'umar2016';
 
     setTimeout(() => {
       if (login === adminLogin && password === adminPass) {
@@ -185,9 +185,9 @@ export default function LoginPage() {
           border: '1px solid var(--border)', fontSize: '0.78rem',
           color: 'var(--text-muted)', textAlign: 'left',
         }}>
-          <span style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>Demo:</span>{' '}
-          Login: <code style={{ color: 'var(--text-secondary)' }}>artline</code> · Parol:{' '}
-          <code style={{ color: 'var(--text-secondary)' }}>artline2024</code>
+          <span style={{ color: 'var(--accent-gold)', fontWeight: 600 }}>Tizimga kirish uchun:</span>{' '}
+          Login: <code style={{ color: 'var(--text-secondary)', userSelect: 'all' }}>artlinedecor_ADMIN1_DILMUROD</code><br/>
+          Parol: <code style={{ color: 'var(--text-secondary)', userSelect: 'all' }}>umar2016</code>
         </div>
       </form>
 
