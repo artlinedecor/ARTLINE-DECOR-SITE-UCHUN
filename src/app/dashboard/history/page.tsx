@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { FileText, Trash2 } from 'lucide-react';
-import { getOrders, deleteOrder, getDashboardStats } from '@/lib/store';
 import type { Order } from '@/lib/types';
+import { calculateDashboardStats } from '@/lib/stats';
+import { fetchOrdersClient, deleteOrderClient } from '@/lib/orders-sync';
+import toast from 'react-hot-toast';
 
 const STATUS_LABELS: Record<string, { label: string; badge: string }> = {
   new: { label: 'Yangi', badge: 'badge-info' },
@@ -16,15 +18,21 @@ export default function HistoryPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>('all');
 
-  useEffect(() => { setOrders(getOrders()); }, []);
+  const loadOrders = async () => {
+    const data = await fetchOrdersClient();
+    setOrders(data);
+  };
 
-  const stats = getDashboardStats();
+  useEffect(() => { void loadOrders(); }, []);
+
+  const stats = calculateDashboardStats(orders);
   const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Bu buyurtmani o\'chirmoqchimisiz?')) {
-      deleteOrder(id);
-      setOrders(getOrders());
+      await deleteOrderClient(id);
+      await loadOrders();
+      toast.success("Buyurtma o'chirildi!");
     }
   };
 
@@ -39,11 +47,11 @@ export default function HistoryPage() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-label">Umumiy savdo</div>
-          <div className="stat-value">${stats.totalRevenue.toLocaleString()}</div>
+          <div className="stat-value">{stats.totalRevenue.toLocaleString()} so&apos;m</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">O&apos;rtacha chek</div>
-          <div className="stat-value">${Math.round(stats.averageCheck).toLocaleString()}</div>
+          <div className="stat-value">{Math.round(stats.averageCheck).toLocaleString()} so&apos;m</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Sotilgan</div>
@@ -96,7 +104,7 @@ export default function HistoryPage() {
                   <td>{order.phone}</td>
                   <td style={{ color: 'var(--text-secondary)' }}>{order.address || '—'}</td>
                   <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold)' }}>
-                    ${order.totalPrice.toLocaleString()}
+                    {order.totalPrice.toLocaleString()} so&apos;m
                   </td>
                   <td>
                     <span className={`badge ${STATUS_LABELS[order.status]?.badge}`}>

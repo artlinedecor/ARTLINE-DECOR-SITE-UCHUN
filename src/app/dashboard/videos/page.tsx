@@ -6,6 +6,17 @@ import { getVideos, saveVideo, deleteVideo, generateId } from '@/lib/store';
 import { ShowcaseVideo } from '@/lib/types';
 import toast, { Toaster } from 'react-hot-toast';
 
+// YouTube linkini embed formatga o'giradi
+function getYouTubeEmbedUrl(url: string): string | null {
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+  if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+  const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  return null;
+}
+
 export default function VideosDashboard() {
   const [videos, setVideos] = useState<ShowcaseVideo[]>([]);
   const [search, setSearch] = useState('');
@@ -47,21 +58,30 @@ export default function VideosDashboard() {
   };
 
   const handleSave = () => {
-    if (!title.trim() || !src.trim() || !desc.trim()) {
-      toast.error("Iltimos, barcha majburiy maydonlarni to'ldiring!");
+    if (!src.trim()) {
+      toast.error("Iltimos, video havolasini (URL) kiriting!");
       return;
     }
 
     const newVideo: ShowcaseVideo = {
       id: editingVideo ? editingVideo.id : generateId(),
-      title: title.trim(),
-      desc: desc.trim(),
+      title: title.trim() || 'Fasad video',
+      desc: desc.trim() || 'Artline Decor fasad tizimlari obzori',
       src: src.trim(),
-      duration: duration.trim() || 'Noma\'lum',
+      duration: duration.trim() || 'Video obzor',
     };
 
     saveVideo(newVideo);
-    setVideos(getVideos());
+    const allVideos = getVideos();
+    setVideos(allVideos);
+    
+    // Server file systemiga saqlash (mahalliy ishlab chiqish muhiti uchun)
+    fetch('/api/videos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(allVideos)
+    }).catch(err => console.error("Faylga yozishda xatolik:", err));
+
     toast.success(editingVideo ? "Video muvaffaqiyatli yangilandi!" : "Yangi video qo'shildi!");
     handleCloseModal();
   };
@@ -69,7 +89,16 @@ export default function VideosDashboard() {
   const handleDelete = (id: string) => {
     if (confirm("Ushbu videoni haqiqatan ham o'chirmoqchimisiz?")) {
       deleteVideo(id);
-      setVideos(getVideos());
+      const allVideos = getVideos();
+      setVideos(allVideos);
+
+      // Server file systemiga saqlash
+      fetch('/api/videos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(allVideos)
+      }).catch(err => console.error("Faylga yozishda xatolik:", err));
+
       toast.success("Video o'chirildi!");
     }
   };
@@ -119,18 +148,29 @@ export default function VideosDashboard() {
           <div key={video.id} className="glass-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             {/* Video preview dummy/real */}
             <div style={{ width: '100%', aspectRatio: '16/9', background: '#000', position: 'relative' }}>
-              <video 
-                src={video.src}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }}
-                muted
-                preload="metadata"
-              />
-              <div style={{ 
-                position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(0,0,0,0.2)'
-              }}>
-                <Film size={32} color="rgba(255,255,255,0.8)" />
-              </div>
+              {getYouTubeEmbedUrl(video.src) ? (
+                <iframe
+                  src={getYouTubeEmbedUrl(video.src)!}
+                  style={{ width: '100%', height: '100%', border: 'none', opacity: 0.8 }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <>
+                  <video 
+                    src={video.src}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }}
+                    muted
+                    preload="metadata"
+                  />
+                  <div style={{ 
+                    position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(0,0,0,0.2)'
+                  }}>
+                    <Film size={32} color="rgba(255,255,255,0.8)" />
+                  </div>
+                </>
+              )}
               <span className="badge badge-gold" style={{ position: 'absolute', top: 12, right: 12 }}>
                 {video.duration}
               </span>
@@ -204,7 +244,7 @@ export default function VideosDashboard() {
               </div>
               
               <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label">Qisqacha tasnif (Description) *</label>
+                <label className="form-label">Qisqacha tasnif (Description)</label>
                 <textarea 
                   className="form-control" 
                   placeholder="Video haqida qisqacha ma'lumot..."

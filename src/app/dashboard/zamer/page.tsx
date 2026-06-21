@@ -1,28 +1,100 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Trash2, Download, Calculator as CalcIcon, Ruler, Save, User, Phone, MapPin } from 'lucide-react';
-import { FACADE_ELEMENTS, calculateEstimate } from '@/lib/calculator';
+import { calculateEstimate } from '@/lib/calculator';
 import { generateEstimatePDF } from '@/lib/pdf-generator';
-import { saveOrder, generateId } from '@/lib/store';
-import type { FacadeElementType, CalculatorInput, CalculatorResult, Order } from '@/lib/types';
-
-const EMPTY_INPUT: CalculatorInput = {
-  elementType: 'cornice',
-  length: 1,
-  width: 0.15,
-  height: 0.15,
-  quantity: 1,
-};
+import { generateId, getPricing } from '@/lib/store';
+import type { CalculatorInput, CalculatorResult, Order } from '@/lib/types';
+import { saveOrderClient } from '@/lib/orders-sync';
+import toast from 'react-hot-toast';
 
 export default function ZamerPage() {
-  const [inputs, setInputs] = useState<CalculatorInput[]>([{ ...EMPTY_INPUT }]);
+  const [elements, setElements] = useState<any[]>([]);
+  const [inputs, setInputs] = useState<CalculatorInput[]>([{
+    elementType: 'cornice',
+    length: 1,
+    width: 0.15,
+    height: 0.15,
+    quantity: 1,
+  }]);
   const [result, setResult] = useState<CalculatorResult | null>(null);
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [clientAddress, setClientAddress] = useState('');
   const [saved, setSaved] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+
+  useEffect(() => {
+    const pricing = getPricing();
+    if (pricing && pricing.elements) {
+      setElements(pricing.elements);
+      if (pricing.elements.length > 0) {
+        setInputs([{
+          elementType: pricing.elements[0].id,
+          length: 1,
+          width: 0.15,
+          height: 0.15,
+          quantity: 1,
+        }]);
+      }
+    }
+  }, []);
+
+  // Image Upload States
+  const [objectImages, setObjectImages] = useState<string[]>([]);
+  const [calcImages, setCalcImages] = useState<string[]>([]);
+
+  // Client-side image compression down to 800px max dimension
+  const compressImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 800;
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'object' | 'calc') => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        if (base64) {
+          const compressed = await compressImage(base64);
+          if (type === 'object') {
+            setObjectImages((prev) => [...prev, compressed]);
+          } else {
+            setCalcImages((prev) => [...prev, compressed]);
+          }
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   const updateInput = (idx: number, field: keyof CalculatorInput, value: string | number) => {
     setInputs(prev => {
@@ -32,7 +104,16 @@ export default function ZamerPage() {
     });
   };
 
-  const addItem = () => setInputs(prev => [...prev, { ...EMPTY_INPUT }]);
+  const addItem = () => {
+    const defaultType = elements[0]?.id || 'cornice';
+    setInputs(prev => [...prev, {
+      elementType: defaultType,
+      length: 1,
+      width: 0.15,
+      height: 0.15,
+      quantity: 1,
+    }]);
+  };
   const removeItem = (idx: number) => {
     if (inputs.length <= 1) return;
     setInputs(prev => prev.filter((_, i) => i !== idx));
@@ -43,7 +124,7 @@ export default function ZamerPage() {
     setResult(res);
   };
 
-  const handleSaveToKanban = () => {
+  const handleSaveToKanban = async () => {
     if (!result || !clientName || !clientPhone) return;
     const order: Order = {
       id: generateId(),
@@ -51,23 +132,34 @@ export default function ZamerPage() {
       phone: clientPhone,
       address: clientAddress,
       status: 'measurement',
-      items: result.items.map(item => ({
-        id: generateId(),
-        elementType: item.elementType,
-        name: item.name,
-        length: inputs.find(i => i.elementType === item.elementType)?.length ?? 1,
-        width: inputs.find(i => i.elementType === item.elementType)?.width ?? 0.15,
-        height: inputs.find(i => i.elementType === item.elementType)?.height ?? 0.15,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
-      })),
+      items: result.items.map((item, idx) => {
+        const correspondingInput = inputs[idx];
+        return {
+          id: generateId(),
+          elementType: item.elementType,
+          name: item.name,
+          length: Number(correspondingInput?.length) || 1,
+          width: Number(correspondingInput?.width) || 0.15,
+          height: Number(correspondingInput?.height) || 0.15,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+        };
+      }),
       totalPrice: result.total,
       notes: '',
+      objectImages,
+      calcImages,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    saveOrder(order);
+    try {
+      await saveOrderClient(order);
+      toast.success("Mijoz va hisob-kitob Kanban taxtasiga (Zamer bosqichi) saqlandi!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Saqlashda xatolik yuz berdi!");
+    }
 
     // Send Telegram notification
     fetch('/api/telegram', {
@@ -75,9 +167,6 @@ export default function ZamerPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(order),
     }).catch(() => {});
-
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
   };
 
   const handleDownloadPDF = async () => {
@@ -130,45 +219,6 @@ export default function ZamerPage() {
         )}
       </div>
 
-      {/* Gallery: portfolio photos for inspiration */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)',
-        gap: 8, marginBottom: 32, borderRadius: 'var(--radius-lg)', overflow: 'hidden',
-      }}>
-        {[
-          { src: '/portfolio/classic-villa.png', label: 'Klassik Villa' },
-          { src: '/portfolio/classic-mansion.png', label: 'Klassik Mansion' },
-          { src: '/portfolio/modern-house.png', label: 'Modern' },
-          { src: '/portfolio/hitech-facade.png', label: 'Hi-Tech' },
-          { src: '/portfolio/before.png', label: 'Oldin' },
-          { src: '/portfolio/after.png', label: 'Keyin' },
-        ].map(img => (
-          <div key={img.src} style={{
-            position: 'relative', aspectRatio: '4/3',
-            overflow: 'hidden', borderRadius: 'var(--radius-sm)',
-            cursor: 'pointer',
-          }}
-            onClick={() => window.open(img.src, '_blank')}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={img.src}
-              alt={img.label}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }}
-              onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.08)')}
-              onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
-            />
-            <div style={{
-              position: 'absolute', bottom: 0, left: 0, right: 0,
-              padding: '4px 8px',
-              background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-              fontSize: '0.65rem', color: 'rgba(255,255,255,0.8)', fontWeight: 600,
-            }}>
-              {img.label}
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* Main layout */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 28 }}>
@@ -209,54 +259,167 @@ export default function ZamerPage() {
             </div>
           </div>
 
+          {/* Photos Upload Card */}
+          <div className="glass-card">
+            <h3 style={{ fontSize: '0.95rem', marginBottom: 16, color: 'var(--accent-gold)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Plus size={16} /> Obyekt va Hisob-kitob rasmlari
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              {/* Object Photos */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Obyekt rasmlari ({objectImages.length})</label>
+                <div style={{
+                  border: '1px dashed var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '12px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: 'rgba(255,255,255,0.01)'
+                }} onClick={() => document.getElementById('object-upload')?.click()}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Yuklash uchun bosing</span>
+                  <input
+                    id="object-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => handleImageUpload(e, 'object')}
+                  />
+                </div>
+                {objectImages.length > 0 && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+                    {objectImages.map((img, idx) => (
+                      <div key={idx} style={{ position: 'relative', width: 60, height: 60, borderRadius: 4, overflow: 'hidden', border: '1px solid var(--border)' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img} alt="Obyekt" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button
+                          style={{
+                            position: 'absolute', top: 2, right: 2,
+                            width: 16, height: 16, borderRadius: '50%',
+                            background: 'rgba(239, 68, 68, 0.9)', color: '#fff',
+                            border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', fontSize: 10, lineHeight: 1
+                          }}
+                          onClick={() => setObjectImages(prev => prev.filter((_, i) => i !== idx))}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Calculation Photos */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Hisob-kitob / Chizma ({calcImages.length})</label>
+                <div style={{
+                  border: '1px dashed var(--border)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '12px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: 'rgba(255,255,255,0.01)'
+                }} onClick={() => document.getElementById('calc-upload')?.click()}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Yuklash uchun bosing</span>
+                  <input
+                    id="calc-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => handleImageUpload(e, 'calc')}
+                  />
+                </div>
+                {calcImages.length > 0 && (
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+                    {calcImages.map((img, idx) => (
+                      <div key={idx} style={{ position: 'relative', width: 60, height: 60, borderRadius: 4, overflow: 'hidden', border: '1px solid var(--border)' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img} alt="Chizma" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button
+                          style={{
+                            position: 'absolute', top: 2, right: 2,
+                            width: 16, height: 16, borderRadius: '50%',
+                            background: 'rgba(239, 68, 68, 0.9)', color: '#fff',
+                            border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            cursor: 'pointer', fontSize: 10, lineHeight: 1
+                          }}
+                          onClick={() => setCalcImages(prev => prev.filter((_, i) => i !== idx))}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Elements */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {inputs.map((input, idx) => (
-              <div key={idx} className="glass-card" style={{ padding: 18 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                  <span className="badge badge-gold">
-                    <Ruler size={11} /> Element #{idx + 1}
-                  </span>
-                  {inputs.length > 1 && (
-                    <button onClick={() => removeItem(idx)} className="btn btn-ghost btn-sm"
-                      style={{ padding: '4px 8px', color: 'var(--error)' }}>
-                      <Trash2 size={14} />
-                    </button>
+            {inputs.map((input, idx) => {
+              const elMeta = elements.find(e => e.id === input.elementType);
+              const isVolumeBased = elMeta ? elMeta.calculationType === 'volume' : true;
+
+              return (
+                <div key={idx} className="glass-card" style={{ padding: 18 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <span className="badge badge-gold">
+                      <Ruler size={11} /> Element #{idx + 1}
+                    </span>
+                    {inputs.length > 1 && (
+                      <button onClick={() => removeItem(idx)} className="btn btn-ghost btn-sm"
+                        style={{ padding: '4px 8px', color: 'var(--error)' }}>
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <div className="input-group" style={{ marginBottom: 12 }}>
+                    <label>Element turi</label>
+                    <select className="input-field" value={input.elementType}
+                      onChange={e => updateInput(idx, 'elementType', e.target.value)}>
+                      {elements.map((el) => (
+                        <option key={el.id} value={el.id}>{el.nameUz} — {el.nameRu}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {isVolumeBased && (
+                    <div className="calc-row">
+                      <div className="input-group">
+                        <label>Uzunlik (m)</label>
+                        <input type="number" className="input-field" step="0.01"
+                          value={input.length} onChange={e => updateInput(idx, 'length', e.target.value === '' ? '' : +e.target.value)} />
+                      </div>
+                      <div className="input-group">
+                        <label>Kenglik (m)</label>
+                        <input type="number" className="input-field" step="0.01"
+                          value={input.width} onChange={e => updateInput(idx, 'width', e.target.value === '' ? '' : +e.target.value)} />
+                      </div>
+                      <div className="input-group">
+                        <label>Balandlik (m)</label>
+                        <input type="number" className="input-field" step="0.01"
+                          value={input.height} onChange={e => updateInput(idx, 'height', e.target.value === '' ? '' : +e.target.value)} />
+                      </div>
+                    </div>
                   )}
-                </div>
-                <div className="input-group" style={{ marginBottom: 12 }}>
-                  <label>Element turi</label>
-                  <select className="input-field" value={input.elementType}
-                    onChange={e => updateInput(idx, 'elementType', e.target.value as FacadeElementType)}>
-                    {Object.entries(FACADE_ELEMENTS).map(([key, el]) => (
-                      <option key={key} value={key}>{el.nameUz} — {el.nameRu}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="calc-row">
-                  <div className="input-group">
-                    <label>Uzunlik (m)</label>
-                    <input type="number" className="input-field" step="0.01" min="0.01"
-                      value={input.length} onChange={e => updateInput(idx, 'length', +e.target.value)} />
-                  </div>
-                  <div className="input-group">
-                    <label>Kenglik (m)</label>
-                    <input type="number" className="input-field" step="0.01" min="0.01"
-                      value={input.width} onChange={e => updateInput(idx, 'width', +e.target.value)} />
-                  </div>
-                  <div className="input-group">
-                    <label>Balandlik (m)</label>
-                    <input type="number" className="input-field" step="0.01" min="0.01"
-                      value={input.height} onChange={e => updateInput(idx, 'height', +e.target.value)} />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+                    <div className="input-group">
+                      <label>Miqdori / Soni {elMeta ? `(${elMeta.unit})` : ''}</label>
+                      <input type="number" className="input-field"
+                        value={input.quantity} onChange={e => updateInput(idx, 'quantity', e.target.value === '' ? '' : +e.target.value)} />
+                    </div>
+                    <div className="input-group">
+                      <label>Birlik narxi (so&apos;m, ixtiyoriy)</label>
+                      <input type="number" className="input-field" placeholder="Standart narx"
+                        value={input.customPrice ?? ''} onChange={e => updateInput(idx, 'customPrice', e.target.value === '' ? '' : +e.target.value)} />
+                    </div>
                   </div>
                 </div>
-                <div className="input-group" style={{ marginTop: 12 }}>
-                  <label>Soni (dona)</label>
-                  <input type="number" className="input-field" min="1"
-                    value={input.quantity} onChange={e => updateInput(idx, 'quantity', +e.target.value)} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Actions */}
@@ -298,24 +461,16 @@ export default function ZamerPage() {
                         </div>
                       </div>
                       <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold)', fontWeight: 700 }}>
-                        ${item.totalPrice.toLocaleString()}
+                        {item.totalPrice.toLocaleString()}&nbsp;so&apos;m
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                  <div className="calc-total-row">
-                    <span>Jami:</span>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>${result.subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="calc-total-row">
-                    <span>QQS (12%):</span>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>${result.vat.toLocaleString()}</span>
-                  </div>
-                  <div className="calc-total-row grand">
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+                  <div className="calc-total-row grand" style={{ borderTop: 'none', paddingTop: 8, marginTop: 0 }}>
                     <span>UMUMIY:</span>
-                    <span>${result.total.toLocaleString()}</span>
+                    <span>{result.total.toLocaleString()}&nbsp;so&apos;m</span>
                   </div>
                 </div>
 

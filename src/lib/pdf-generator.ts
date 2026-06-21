@@ -2,13 +2,31 @@
 // Artline Decor — PDF Smeta Generator (jsPDF)
 // ============================================================
 import type { CalculatorResult, Order } from './types';
+import { getPricing } from './store';
+
+function cyrillicToLatin(text: string): string {
+  if (!text) return '';
+  const mapping: { [key: string]: string } = {
+    'А': 'A', 'а': 'a', 'Б': 'B', 'б': 'b', 'В': 'V', 'в': 'v', 'Г': 'G', 'г': 'g',
+    'Д': 'D', 'д': 'd', 'Е': 'E', 'е': 'e', 'Ё': 'Yo', 'ё': 'yo', 'Ж': 'J', 'ж': 'j',
+    'З': 'Z', 'з': 'z', 'И': 'I', 'и': 'i', 'Й': 'Y', 'й': 'y', 'К': 'K', 'к': 'k',
+    'Л': 'L', 'л': 'l', 'М': 'M', 'м': 'm', 'Н': 'N', 'н': 'n', 'О': 'O', 'о': 'o',
+    'П': 'P', 'п': 'p', 'Р': 'R', 'р': 'r', 'С': 'S', 'с': 's', 'Т': 'T', 'т': 't',
+    'У': 'U', 'у': 'u', 'Ф': 'F', 'ф': 'f', 'Х': 'X', 'х': 'x', 'Ц': 'Ts', 'ц': 'ts',
+    'Ч': 'Ch', 'ч': 'ch', 'Ш': 'Sh', 'ш': 'sh', 'Щ': 'Sh', 'щ': 'sh', 'Ъ': '', 'ъ': '',
+    'Ы': 'Y', 'ы': 'y', 'Ь': '', 'ь': '', 'Э': 'E', 'э': 'e', 'Ю': 'Yu', 'ю': 'yu',
+    'Я': 'Ya', 'я': 'ya', 'Ў': "O'", 'ў': "o'", 'Қ': 'Q', 'қ': 'q', 'Ғ': "G'", 'ғ': "g'",
+    'Ҳ': 'H', 'ҳ': 'h'
+  };
+  return text.split('').map(char => mapping[char] ?? char).join('');
+}
 
 export async function generateEstimatePDF(
   result: CalculatorResult,
   clientInfo?: { name: string; phone: string; address: string }
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
-  await import('jspdf-autotable');
+  const { default: autoTable } = await import('jspdf-autotable');
 
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -47,11 +65,11 @@ export async function generateEstimatePDF(
     doc.setFont('helvetica', 'bold');
     doc.text('Mijoz:', margin, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(clientInfo.name, margin + 25, y);
+    doc.text(cyrillicToLatin(clientInfo.name), margin + 25, y);
     y += 7;
     doc.text(`Tel: ${clientInfo.phone}`, margin, y);
     y += 7;
-    doc.text(`Manzil: ${clientInfo.address}`, margin, y);
+    doc.text(`Manzil: ${cyrillicToLatin(clientInfo.address)}`, margin, y);
     y += 12;
   }
 
@@ -70,18 +88,17 @@ export async function generateEstimatePDF(
 
   const tableBody = result.items.map((item, idx) => [
     (idx + 1).toString(),
-    item.name,
-    item.dimensions,
-    `${item.volume} m³`,
+    cyrillicToLatin(item.name),
+    cyrillicToLatin(item.dimensions),
+    item.volume > 0 ? `${item.volume} m3` : '-',
     item.quantity.toString(),
-    `$${item.unitPrice}`,
-    `$${item.totalPrice.toLocaleString()}`,
+    `${item.unitPrice.toLocaleString()} so'm`,
+    `${item.totalPrice.toLocaleString()} so'm`,
   ]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (doc as any).autoTable({
+  autoTable(doc, {
     startY: y,
-    head: [['#', 'Element', "O'lcham", 'Hajm', 'Soni', 'Narx/m³', 'Jami']],
+    head: [['#', 'Element', "O'lcham", 'Hajm', 'Soni', 'Birlik narxi', 'Jami']],
     body: tableBody,
     theme: 'grid',
     headStyles: {
@@ -106,25 +123,20 @@ export async function generateEstimatePDF(
     margin: { left: margin, right: margin },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   y = (doc as any).lastAutoTable.finalY + 10;
 
   // ---- Totals ----
-  const totalsX = pageWidth - margin - 70;
+  const totalsX = pageWidth - margin - 80;
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(80, 80, 80);
   doc.text('Jami:', totalsX, y);
-  doc.text(`$${result.subtotal.toLocaleString()}`, totalsX + 55, y, { align: 'right' });
-  y += 7;
-
-  doc.text('QQS (12%):', totalsX, y);
-  doc.text(`$${result.vat.toLocaleString()}`, totalsX + 55, y, { align: 'right' });
+  doc.text(`${result.subtotal.toLocaleString()} so'm`, totalsX + 65, y, { align: 'right' });
   y += 7;
 
   doc.setDrawColor(201, 168, 76);
-  doc.line(totalsX, y, totalsX + 55, y);
+  doc.line(totalsX, y, totalsX + 65, y);
   y += 6;
 
   doc.setFontSize(13);
@@ -132,7 +144,7 @@ export async function generateEstimatePDF(
   doc.setTextColor(10, 10, 15);
   doc.text('UMUMIY:', totalsX, y);
   doc.setTextColor(201, 168, 76);
-  doc.text(`$${result.total.toLocaleString()}`, totalsX + 55, y, { align: 'right' });
+  doc.text(`${result.total.toLocaleString()} so'm`, totalsX + 65, y, { align: 'right' });
 
   // ---- Footer ----
   y += 20;
@@ -144,31 +156,64 @@ export async function generateEstimatePDF(
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
   doc.setFont('helvetica', 'normal');
-  doc.text('Artline Decor — 10 yillik kafolat bilan premial fasad tizimlari', margin, y);
+  doc.text('Artline Decor — Premial fasad tizimlari', margin, y);
   y += 5;
-  doc.text('Material: PSB-S-25F / PSB-S-35F import xomashyo | Ekologik xavfsiz', margin, y);
+  doc.text('Kafolat va Sifat: 10 yil rasmiy sifat kafolati | Ekologik xavfsiz', margin, y);
   y += 5;
-  doc.text('Montaj: 45° burchakli kesim, 2m ga 3-4 dona dyubel bilan mahkamlash', margin, y);
+  doc.text('Material: PSB-S-25F / PSB-S-35F import xomashyo (Rossiya)', margin, y);
   y += 5;
-  doc.text('Buyurtma tayyorligi: 1-3 ish kuni', margin, y);
+  doc.text('Montaj: 45° burchakli kesim, 2m profilga 3-4 dona maxsus dyubel bilan mahkamlash', margin, y);
 
-  // Save
-  doc.save(`Artline_Smeta_${Date.now()}.pdf`);
+  // Save/Download PDF with robust mobile and Telegram in-app browser fallbacks
+  try {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+    const isTelegram = /Telegram/i.test(navigator.userAgent);
+
+    if (isMobile || isTelegram) {
+      const blob = doc.output('blob');
+      const blobUrl = URL.createObjectURL(blob);
+      
+      const newTab = window.open(blobUrl, '_blank');
+      if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
+        window.location.href = blobUrl;
+      }
+    } else {
+      doc.save(`Artline_Smeta_${Date.now()}.pdf`);
+    }
+  } catch (err) {
+    console.error("PDF generation/download error, attempting fallback:", err);
+    try {
+      const blob = doc.output('blob');
+      const blobUrl = URL.createObjectURL(blob);
+      window.location.href = blobUrl;
+    } catch (fallbackErr) {
+      alert("PDF yuklab olishda xatolik yuz berdi. Iltimos, boshqa brauzerda urinib ko'ring.");
+    }
+  }
 }
 
 export async function generateOrderPDF(order: Order): Promise<void> {
+  const pricing = getPricing();
   const result = {
-    items: order.items.map((item) => ({
-      elementType: item.elementType,
-      name: item.name,
-      dimensions: `${item.length} × ${item.width} × ${item.height} m`,
-      volume: item.length * item.width * item.height,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      totalPrice: item.totalPrice,
-    })),
-    subtotal: order.totalPrice / 1.12,
-    vat: order.totalPrice - order.totalPrice / 1.12,
+    items: order.items.map((item) => {
+      const elMeta = pricing.elements.find(el => el.id === item.elementType);
+      const isUnit = elMeta ? elMeta.calculationType === 'unit' : false;
+      const dimensions = (isUnit && elMeta) ? (elMeta.unit || 'dona') : `${item.length} × ${item.width} × ${item.height} m`;
+      const volume = isUnit ? 0 : item.length * item.width * item.height;
+      return {
+        elementType: item.elementType,
+        name: item.name,
+        dimensions,
+        volume,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        totalPrice: item.totalPrice,
+      };
+    }),
+    subtotal: order.totalPrice,
+    vat: 0,
     total: order.totalPrice,
   };
 

@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { LayoutDashboard, DollarSign, History, LogOut, Home, Ruler, PieChart, Package, Film } from 'lucide-react';
-import { isAuthenticated, setAuthenticated } from '@/lib/store';
+import { LayoutDashboard, DollarSign, History, LogOut, Home, Ruler, PieChart, Package, Film, Briefcase, Settings } from 'lucide-react';
 import Image from 'next/image';
+import { Toaster } from 'react-hot-toast';
 
 const NAV_ITEMS = [
   { href: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Kanban Board' },
   { href: '/dashboard/zamer', icon: <Ruler size={18} />, label: 'Zamer & Smeta' },
   { href: '/dashboard/pricing', icon: <DollarSign size={18} />, label: 'Narxlar' },
+  { href: '/dashboard/portfolio', icon: <Briefcase size={18} />, label: 'Portfolio' },
   { href: '/dashboard/videos', icon: <Film size={18} />, label: 'Videolar' },
   { href: '/dashboard/analytics', icon: <PieChart size={18} />, label: 'Analitika' },
   { href: '/dashboard/inventory', icon: <Package size={18} />, label: 'Omborxona' },
   { href: '/dashboard/history', icon: <History size={18} />, label: 'Tarix' },
+  { href: '/dashboard/integrations', icon: <Settings size={18} />, label: 'Integratsiyalar' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -22,23 +24,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (pathname === '/dashboard/login') {
       setReady(true);
       return;
     }
-    if (!isAuthenticated()) {
-      router.push('/dashboard/login');
-    } else {
-      setReady(true);
-    }
+
+    fetch('/api/auth/session')
+      .then((res) => res.json())
+      .then((session) => {
+        if (cancelled) return;
+        if (!session.authenticated) {
+          router.push('/dashboard/login');
+          return;
+        }
+        setReady(true);
+      })
+      .catch(() => {
+        if (!cancelled) router.push('/dashboard/login');
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [pathname, router]);
 
   if (!ready) return null;
   if (pathname === '/dashboard/login') return <>{children}</>;
 
-  const handleLogout = () => {
-    setAuthenticated(false);
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/dashboard/login');
+    router.refresh();
   };
 
   return (
@@ -98,6 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <main className="dash-main">
         {children}
+        <Toaster position="top-right" />
       </main>
     </div>
   );

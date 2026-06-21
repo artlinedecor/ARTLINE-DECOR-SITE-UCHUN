@@ -19,6 +19,8 @@ export default function ClientPortal() {
   const id = params?.id as string;
   const [order, setOrder] = useState<Order | null>(null);
 
+  const [pdfLoading, setPdfLoading] = useState(false);
+
   useEffect(() => {
     if (id) {
       const orders = getOrders();
@@ -39,6 +41,18 @@ export default function ClientPortal() {
   }
 
   const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === order.status);
+
+  const handleDownloadPDF = async () => {
+    setPdfLoading(true);
+    try {
+      const { generateOrderPDF } = await import('@/lib/pdf-generator');
+      await generateOrderPDF(order);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
@@ -75,7 +89,7 @@ export default function ClientPortal() {
               <div style={{ position: 'absolute', top: '50%', left: 0, width: '100%', height: '4px', background: 'var(--border)', transform: 'translateY(-50%)', borderRadius: '2px' }} />
               <div 
                 style={{ 
-                  position: 'absolute', top: '50%', left: 0, height: '4px', background: 'var(--accent-gold)', 
+                   position: 'absolute', top: '50%', left: 0, height: '4px', background: 'var(--accent-gold)', 
                   transform: 'translateY(-50%)', borderRadius: '2px', transition: 'width 0.5s ease',
                   width: `${(currentStepIndex / (STATUS_STEPS.length - 1)) * 100}%` 
                 }}
@@ -131,11 +145,18 @@ export default function ClientPortal() {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '24px' }}>
               <div>
                 <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '4px', fontFamily: 'var(--font-body)' }}>Umumiy Summa</div>
-                <div style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-gold)', fontFamily: 'var(--font-heading)' }}>${order.totalPrice.toFixed(2)}</div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--accent-gold)', fontFamily: 'var(--font-heading)' }}>
+                  {order.totalPrice.toLocaleString()} so&apos;m
+                </div>
               </div>
-              <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button 
+                className="btn btn-outline" 
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+                onClick={handleDownloadPDF}
+                disabled={pdfLoading}
+              >
                 <FileText size={18} />
-                Smetani PDF yuklab olish
+                {pdfLoading ? 'Yuklanmoqda...' : 'Smetani PDF yuklab olish'}
               </button>
             </div>
           </div>

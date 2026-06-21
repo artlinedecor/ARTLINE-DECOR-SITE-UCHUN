@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
+import TiltCard from '@/components/effects/TiltCard';
 
 const faqs = [
   {
@@ -60,6 +61,11 @@ export default function FAQ() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+            <TiltCard
+              className="faq-tilt"
+              max={4}
+              scale={1.01}
               style={{
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '16px',
@@ -102,6 +108,7 @@ export default function FAQ() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </TiltCard>
             </motion.div>
           ))}
         </div>
