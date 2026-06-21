@@ -2,22 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Menu, X, Lock, MapPin, Phone, Send, ChevronDown, FileText, Presentation } from 'lucide-react';
-
-const YoutubeIcon = ({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
-    <polygon points="10 15 15 12 10 9" />
-  </svg>
-);
-
-const InstagramIcon = ({ size = 16, color = 'currentColor' }: { size?: number; color?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
+import { Menu, X, Lock, MapPin, Phone, ChevronDown, FileText, Presentation } from 'lucide-react';
 
 const NAV_LINKS = [
   { href: '#trust', label: 'Texnologiya' },
@@ -75,10 +60,8 @@ export default function Navbar() {
               <a href="tel:+998991020200" style={{ color: '#fff' }}>+998 99 102 02 00</a>
             </span>
           </div>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <a href="https://t.me/Art_linedecor" target="_blank" rel="noopener noreferrer" style={{ color: '#a0aec0' }}><Send size={13} /></a>
-            <a href="https://www.instagram.com/artlinedecor.uz?igsh=MWR4c2JoaGtobTl1Nw==" target="_blank" rel="noopener noreferrer" style={{ color: '#a0aec0' }}><InstagramIcon size={13} /></a>
-            <a href="https://www.youtube.com/@art.linedecor" target="_blank" rel="noopener noreferrer" style={{ color: '#a0aec0' }}><YoutubeIcon size={13} /></a>
+          <div style={{ display: 'flex', gap: '14px', alignItems: 'center', fontSize: '0.78rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>Ish vaqti: <span style={{ color: '#fff' }}>09:00 — 19:00</span></span>
           </div>
         </div>
       </div>

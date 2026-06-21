@@ -420,16 +420,16 @@ export default function Hero() {
               letterSpacing: '-0.02em',
             }}
           >
-            Uyingiz Uchun Premium Fasad <br />
-            <motion.span 
+            Uyingiz va Binongizga <br />
+            <motion.span
               animate={{ color: activeSeason.color }}
               transition={{ duration: 1.5 }}
-              style={{ 
+              style={{
                 display: 'inline-block',
                 textShadow: '0 4px 30px rgba(0,0,0,0.95)'
               }}
             >
-              Termo-Panellari va Arxitektura Dekorlari
+              Arxitektura Salobati
             </motion.span>
           </h1>
 

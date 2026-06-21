@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Send, Check } from 'lucide-react';
+import { X, Send, Check, User, MapPin, Ruler, Building2, ShieldCheck, Phone } from 'lucide-react';
 import { generateId } from '@/lib/store';
 import { Order } from '@/lib/types';
 import toast, { Toaster } from 'react-hot-toast';
@@ -178,37 +178,82 @@ export default function EstimateModal() {
 
   if (!isOpen) return null;
 
+  const labelStyle: React.CSSProperties = {
+    color: '#cbd5e0', fontSize: '0.78rem', fontWeight: 600,
+    textTransform: 'uppercase', letterSpacing: '0.06em',
+    display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px',
+  };
+  const fieldStyle: React.CSSProperties = {
+    background: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(217,154,108,0.18)',
+    borderRadius: '12px',
+    padding: '14px 16px',
+    fontSize: '0.98rem',
+    color: '#fff',
+    width: '100%',
+    transition: 'border-color 0.2s ease, background 0.2s ease',
+  };
+
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 10000,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)',
-      padding: '16px', overflowY: 'auto'
+      background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)',
+      padding: '20px', overflowY: 'auto'
     }} onClick={() => setIsOpen(false)}>
       <Toaster position="top-right" />
-      <div className="glass-card" style={{
-        width: '100%', maxWidth: '520px', padding: 0,
-        background: '#0a0d16', border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '24px', overflow: 'hidden', boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
+      <div style={{
+        width: '100%', maxWidth: '600px', padding: 0,
+        background: 'linear-gradient(180deg, #0d1119 0%, #06080e 100%)',
+        border: '1px solid rgba(217,154,108,0.22)',
+        borderRadius: '28px', overflow: 'hidden',
+        boxShadow: '0 32px 120px rgba(0,0,0,0.7), 0 0 80px rgba(217,154,108,0.08)',
         position: 'relative'
       }} onClick={(e) => e.stopPropagation()}>
-        
+
+        {/* Gold accent gradient at top */}
+        <div aria-hidden style={{
+          position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+          background: 'linear-gradient(90deg, transparent, var(--accent-gold), var(--accent-warm), var(--accent-gold), transparent)',
+        }} />
+        {/* Decorative gold glow */}
+        <div aria-hidden style={{
+          position: 'absolute', top: '-60px', right: '-60px', width: '200px', height: '200px',
+          background: 'radial-gradient(closest-side, rgba(217,154,108,0.18), transparent)',
+          filter: 'blur(30px)', pointerEvents: 'none',
+        }} />
+
         {/* Header */}
         <div style={{
-          padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          padding: '28px 32px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+          gap: '16px', position: 'relative',
         }}>
-          <h3 style={{
-            fontSize: '1.25rem', fontWeight: 700, margin: 0,
-            fontFamily: 'var(--font-heading)', color: '#fff',
-            display: 'flex', alignItems: 'center', gap: '8px'
-          }}>
-            <span style={{ color: 'var(--accent-gold)' }}>📞</span> Qayta Aloqa So&apos;rash
-          </h3>
-          <button onClick={() => setIsOpen(false)} style={{
-            background: 'rgba(255,255,255,0.05)', border: 'none',
-            color: '#a0aec0', cursor: 'pointer', padding: '6px', borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
+          <div>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '5px 12px', borderRadius: '100px',
+              background: 'rgba(217,154,108,0.12)', border: '1px solid rgba(217,154,108,0.3)',
+              color: 'var(--accent-warm)', fontSize: '0.72rem', fontWeight: 700,
+              textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px',
+            }}>
+              <Phone size={11} /> Bepul maslahat
+            </div>
+            <h3 style={{
+              fontSize: '1.55rem', fontWeight: 700, margin: 0,
+              fontFamily: 'var(--font-heading)', color: '#fff',
+              lineHeight: 1.2,
+            }}>
+              Qayta aloqa so&apos;rash
+            </h3>
+            <p style={{ color: '#a0aec0', fontSize: '0.88rem', margin: '8px 0 0', lineHeight: 1.55, maxWidth: '420px' }}>
+              Ma&apos;lumotlarni qoldiring — mutaxassisimiz <strong style={{ color: '#fff' }}>15 daqiqa</strong> ichida bog&apos;lanadi.
+            </p>
+          </div>
+          <button onClick={() => setIsOpen(false)} aria-label="Yopish" style={{
+            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+            color: '#a0aec0', cursor: 'pointer', padding: '8px', borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
             <X size={18} />
           </button>
@@ -235,116 +280,91 @@ export default function EstimateModal() {
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            <p style={{ color: '#a0aec0', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
-              Ma'lumotlarni qoldiring — mutaxassisimiz qisqa vaqt ichida siz bilan bog'lanib, barcha savollaringizga javob beradi va bepul maslahat beradi.
-            </p>
-
+          <form onSubmit={handleSubmit} style={{ padding: '24px 32px 28px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {/* Ism */}
-            <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" style={{ color: '#a0aec0', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Ismingiz *</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Masalan: Dilmurod"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)' }}
-              />
+            <div>
+              <label style={labelStyle}><User size={13} style={{ color: 'var(--accent-gold)' }} /> Ismingiz</label>
+              <input type="text" placeholder="Masalan: Dilmurod" value={name} onChange={e => setName(e.target.value)} style={fieldStyle} />
             </div>
 
             {/* Telefon */}
-            <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" style={{ color: '#a0aec0', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Telefon Raqamingiz *</label>
-              <input
-                type="text"
-                className="form-control"
-                value={phone}
-                onChange={handlePhoneChange}
-                placeholder="+998 (90) 123-45-67"
-                style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', fontFamily: 'var(--font-mono)' }}
-              />
+            <div>
+              <label style={labelStyle}><Phone size={13} style={{ color: 'var(--accent-gold)' }} /> Telefon raqamingiz</label>
+              <input type="text" value={phone} onChange={handlePhoneChange} placeholder="+998 (90) 123-45-67"
+                style={{ ...fieldStyle, fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }} />
             </div>
 
-            {/* Shahar / Viloyat */}
-            <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" style={{ color: '#a0aec0', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Shahar / Viloyat</label>
-              <select
-                className="form-control"
-                value={city}
-                onChange={e => setCity(e.target.value)}
-                style={{ background: '#0a0d16', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
-              >
-                {REGIONS.map(reg => (
-                  <option key={reg} value={reg}>{reg}</option>
-                ))}
+            {/* Shahar */}
+            <div>
+              <label style={labelStyle}><MapPin size={13} style={{ color: 'var(--accent-gold)' }} /> Shahar / Viloyat</label>
+              <select value={city} onChange={e => setCity(e.target.value)}
+                style={{ ...fieldStyle, background: '#0a0d16', cursor: 'pointer' }}>
+                {REGIONS.map(reg => (<option key={reg} value={reg}>{reg}</option>))}
               </select>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              {/* Maydon */}
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ color: '#a0aec0', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Maydon (m²) *</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  placeholder="Masalan: 250"
-                  value={area}
-                  onChange={e => setArea(e.target.value)}
-                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)' }}
-                />
+              <div>
+                <label style={labelStyle}><Ruler size={13} style={{ color: 'var(--accent-gold)' }} /> Maydon (m²)</label>
+                <input type="number" placeholder="250" value={area} onChange={e => setArea(e.target.value)} style={fieldStyle} />
               </div>
-
-              {/* Bino turi */}
-              <div className="form-group" style={{ margin: 0 }}>
-                <label className="form-label" style={{ color: '#a0aec0', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bino turi</label>
-                <select
-                  className="form-control"
-                  value={buildingType}
-                  onChange={e => setBuildingType(e.target.value)}
-                  style={{ background: '#0a0d16', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
-                >
-                  {BUILDING_TYPES.map(type => (
-                    <option key={type.value} value={type.value}>{type.label}</option>
-                  ))}
+              <div>
+                <label style={labelStyle}><Building2 size={13} style={{ color: 'var(--accent-gold)' }} /> Bino turi</label>
+                <select value={buildingType} onChange={e => setBuildingType(e.target.value)}
+                  style={{ ...fieldStyle, background: '#0a0d16', cursor: 'pointer' }}>
+                  {BUILDING_TYPES.map(type => (<option key={type.value} value={type.value}>{type.label}</option>))}
                 </select>
               </div>
             </div>
 
-            {/* User Role */}
-            <div className="form-group" style={{ margin: 0 }}>
-              <label className="form-label" style={{ color: '#a0aec0', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Siz kimsiz?</label>
-              <select
-                className="form-control"
-                value={userRole}
-                onChange={e => setUserRole(e.target.value)}
-                style={{ background: '#0a0d16', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', cursor: 'pointer' }}
-              >
-                {USER_ROLES.map(role => (
-                  <option key={role.value} value={role.value}>{role.label}</option>
-                ))}
-              </select>
+            {/* Role pills */}
+            <div>
+              <label style={labelStyle}>Siz kimsiz?</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                {USER_ROLES.map(role => {
+                  const isActive = userRole === role.value;
+                  return (
+                    <button key={role.value} type="button" onClick={() => setUserRole(role.value)}
+                      style={{
+                        padding: '12px 14px', borderRadius: '12px', cursor: 'pointer',
+                        background: isActive ? 'linear-gradient(135deg, rgba(217,154,108,0.18), rgba(242,181,140,0.08))' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isActive ? 'var(--accent-gold)' : 'rgba(255,255,255,0.08)'}`,
+                        color: isActive ? '#fff' : '#a0aec0',
+                        fontWeight: 600, fontSize: '0.9rem',
+                        transition: 'all 0.2s ease',
+                      }}>
+                      {role.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Trust line */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '10px 14px', borderRadius: '10px',
+              background: 'rgba(62,207,142,0.06)', border: '1px solid rgba(62,207,142,0.15)',
+              color: '#a0aec0', fontSize: '0.8rem',
+            }}>
+              <ShieldCheck size={14} style={{ color: '#3ecf8e', flexShrink: 0 }} />
+              <span>Ma&apos;lumotlaringiz himoyada — uchinchi shaxslarga oshkor qilinmaydi.</span>
             </div>
 
             {/* Submit */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn btn-primary"
-              style={{
-                marginTop: '12px', justifyContent: 'center', gap: '8px',
-                padding: '14px', borderRadius: '12px', width: '100%',
-                fontWeight: 700, fontSize: '1rem',
-                boxShadow: '0 4px 20px rgba(201, 168, 76, 0.25)'
-              }}
+            <button type="submit" disabled={isSubmitting} style={{
+              marginTop: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+              padding: '16px', borderRadius: '14px', width: '100%',
+              fontWeight: 700, fontSize: '1.02rem',
+              background: 'linear-gradient(135deg, var(--accent-gold) 0%, var(--accent-warm) 100%)',
+              color: '#0a0a0a', border: 'none', cursor: isSubmitting ? 'wait' : 'pointer',
+              boxShadow: '0 12px 32px rgba(217,154,108,0.35), 0 0 0 1px rgba(255,255,255,0.05) inset',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            }}
+              onMouseEnter={e => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 18px 40px rgba(217,154,108,0.45), 0 0 0 1px rgba(255,255,255,0.05) inset'; } }}
+              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 12px 32px rgba(217,154,108,0.35), 0 0 0 1px rgba(255,255,255,0.05) inset'; }}
             >
-              {isSubmitting ? (
-                <>Yuborilmoqda...</>
-              ) : (
-                <>
-                  <Send size={18} /> Qayta aloqa so&apos;rash
-                </>
-              )}
+              {isSubmitting ? 'Yuborilmoqda…' : (<><Send size={18} /> Qayta aloqa so&apos;rash</>)}
             </button>
           </form>
         )}
