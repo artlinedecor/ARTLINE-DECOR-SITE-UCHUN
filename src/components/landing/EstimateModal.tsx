@@ -155,7 +155,7 @@ export default function EstimateModal() {
         status: 'new',
         items: [],
         totalPrice: 0,
-        notes: `So'rov turi: Bepul hisob-kitob modal. Rol: ${rolLabel}. Maydon: ${area.trim()} m².`
+        notes: `So'rov turi: Qayta aloqa (callback). Rol: ${rolLabel}. Maydon: ${area.trim()} m².`
       };
       await fetch('/api/orders', {
         method: 'POST',
@@ -203,7 +203,7 @@ export default function EstimateModal() {
             fontFamily: 'var(--font-heading)', color: '#fff',
             display: 'flex', alignItems: 'center', gap: '8px'
           }}>
-            <span style={{ color: 'var(--accent-gold)' }}>🏛</span> Bepul Hisob-Kitob Olish
+            <span style={{ color: 'var(--accent-gold)' }}>📞</span> Qayta Aloqa So&apos;rash
           </h3>
           <button onClick={() => setIsOpen(false)} style={{
             background: 'rgba(255,255,255,0.05)', border: 'none',
@@ -228,16 +228,16 @@ export default function EstimateModal() {
               <Check size={32} color="#4CAF50" />
             </div>
             <h4 style={{ fontSize: '1.4rem', color: '#fff', margin: 0, fontFamily: 'var(--font-heading)' }}>
-              Rahmat! Ariza Qabul Qilindi
+              Rahmat! So&apos;rovingiz qabul qilindi
             </h4>
             <p style={{ color: '#a0aec0', fontSize: '0.95rem', maxWidth: '360px', margin: 0, lineHeight: 1.6 }}>
-              Mutaxassisimiz tez orada siz bilan bog'lanib, bepul smeta hisob-kitobini taqdim etadi va savollaringizga javob beradi.
+              Mutaxassisimiz tez orada siz bilan telefon orqali bog'lanib, barcha savollaringizga javob beradi va bepul maslahat beradi.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             <p style={{ color: '#a0aec0', fontSize: '0.85rem', margin: 0, lineHeight: 1.5 }}>
-              Quyidagi ma'lumotlarni to'ldiring. Mutaxassislarimiz siz uchun maxsus 3 xil variantdagi smetani bepul tayyorlab berishadi.
+              Ma'lumotlarni qoldiring — mutaxassisimiz qisqa vaqt ichida siz bilan bog'lanib, barcha savollaringizga javob beradi va bepul maslahat beradi.
             </p>
 
             {/* Ism */}
@@ -342,7 +342,7 @@ export default function EstimateModal() {
                 <>Yuborilmoqda...</>
               ) : (
                 <>
-                  <Send size={18} /> Smeta So'rash
+                  <Send size={18} /> Qayta aloqa so&apos;rash
                 </>
               )}
             </button>

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, X, Star } from 'lucide-react';
+import { Play, X, Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import TiltCard from '@/components/effects/TiltCard';
 
 function getYouTubeEmbedUrl(url: string): string | null {
@@ -42,101 +42,183 @@ const testimonials = [
   }
 ];
 
+const AUTOPLAY_MS = 6000;
+
 export default function VideoTestimonials() {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [paused, setPaused] = useState(false);
+
+  const count = testimonials.length;
+  const go = useCallback((dir: number) => {
+    setDirection(dir);
+    setIndex((prev) => (prev + dir + count) % count);
+  }, [count]);
+
+  // Auto-advance (pauses on hover / when a video modal is open)
+  useEffect(() => {
+    if (paused || activeVideo) return;
+    const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) return;
+    const t = setInterval(() => go(1), AUTOPLAY_MS);
+    return () => clearInterval(t);
+  }, [paused, activeVideo, go, index]);
+
+  const active = testimonials[index];
+
+  const variants = {
+    enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 60 : -60 }),
+    center: { opacity: 1, x: 0 },
+    exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -60 : 60 }),
+  };
 
   return (
     <section className="section" style={{ background: '#0A0A0A', color: '#fff' }}>
-      <div className="container">
+      <div className="container" style={{ maxWidth: '1000px' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          style={{ textAlign: 'center', marginBottom: '64px' }}
+          style={{ textAlign: 'center', marginBottom: '48px' }}
         >
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 700, fontFamily: 'var(--font-heading)', marginBottom: '16px' }}>
-            Mijozlarimiz <span style={{ color: 'rgba(255,255,255,0.4)' }}>Fikri</span>
+          <span className="badge badge-gold" style={{ marginBottom: '16px', display: 'inline-block' }}>Haqiqiy mijozlar</span>
+          <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 700, fontFamily: 'var(--font-heading)', marginBottom: '16px' }}>
+            Mijozlarimiz <span style={{ color: 'var(--accent-gold)' }}>Fikri</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
             Haqiqiy mijozlar, haqiqiy uylar. Bizning ishimiz haqida ular nima deyishini o'zlaridan eshiting.
           </p>
         </motion.div>
 
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px'
-        }}>
-          {testimonials.map((testial, index) => (
-            <motion.div
-              key={testial.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-            >
-            <TiltCard
-              max={6}
-              scale={1.02}
-              style={{
-                position: 'relative',
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '24px', overflow: 'hidden',
-              }}
-            >
-              {/* Video Thumbnail Area */}
-              <div 
-                style={{ position: 'relative', aspectRatio: '16/9', cursor: 'pointer', overflow: 'hidden' }}
-                onClick={() => setActiveVideo(testial.videoUrl)}
+        {/* Carousel */}
+        <div
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          style={{ position: 'relative' }}
+        >
+          <div style={{ overflow: 'hidden', borderRadius: '28px' }}>
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={active.id}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                <img 
-                  src={testial.videoThumbnail} 
-                  alt={testial.name} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8, transition: 'transform 0.7s ease' }}
-                  onMouseOver={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.opacity = '1'; }}
-                  onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.opacity = '0.8'; }}
-                />
-                <div style={{
-                  position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                  <div style={{
-                    width: '64px', height: '64px', background: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(4px)', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.5)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    transition: 'transform 0.3s ease'
-                  }}>
-                    <Play color="#fff" size={24} style={{ marginLeft: '4px' }} />
+                <TiltCard
+                  className="testimonial-card"
+                  max={5}
+                  scale={1.01}
+                  glare
+                  style={{
+                    position: 'relative',
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1.1fr)',
+                    gap: '0',
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '28px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Video side */}
+                  <div
+                    className="testimonial-media"
+                    style={{ position: 'relative', minHeight: '320px', cursor: 'pointer', overflow: 'hidden' }}
+                    onClick={() => setActiveVideo(active.videoUrl)}
+                  >
+                    <img
+                      src={active.videoThumbnail}
+                      alt={active.name}
+                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
+                    />
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(120deg, rgba(10,10,10,0.1), rgba(10,10,10,0.55))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.92 }}
+                        style={{
+                          width: '72px', height: '72px', background: 'rgba(255,255,255,0.18)',
+                          backdropFilter: 'blur(6px)', borderRadius: '50%', border: '1.5px solid rgba(255,255,255,0.6)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}
+                      >
+                        <Play color="#fff" size={28} style={{ marginLeft: '5px' }} fill="#fff" />
+                      </motion.div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Text Area */}
-              <div style={{ padding: '24px' }}>
-                <div style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} color="#f5a623" fill="#f5a623" />
-                  ))}
-                </div>
-                <p style={{ fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.8)', marginBottom: '24px', fontStyle: 'italic', lineHeight: 1.6 }}>
-                  "{testial.text}"
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px' }}>
-                  <div style={{
-                    width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-heading)', fontWeight: 700
-                  }}>
-                    {testial.name.charAt(0)}
+                  {/* Text side */}
+                  <div className="testimonial-body" style={{ padding: 'clamp(24px, 4vw, 44px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <Quote size={36} style={{ color: 'var(--accent-gold)', opacity: 0.5, marginBottom: '16px' }} />
+                    <div style={{ display: 'flex', gap: '4px', marginBottom: '18px' }}>
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} size={18} color="#f5a623" fill="#f5a623" />
+                      ))}
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-body)', color: 'rgba(255,255,255,0.92)', fontSize: 'clamp(1.05rem, 2vw, 1.3rem)', lineHeight: 1.6, fontStyle: 'italic', marginBottom: '28px' }}>
+                      “{active.text}”
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '20px' }}>
+                      <div style={{
+                        width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0,
+                        background: 'linear-gradient(135deg, var(--accent-gold), var(--accent-warm))',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontFamily: 'var(--font-heading)', fontWeight: 700, color: '#0A0A0A', fontSize: '1.2rem',
+                      }}>
+                        {active.name.charAt(0)}
+                      </div>
+                      <div>
+                        <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, color: '#fff', fontSize: '1.05rem', margin: 0 }}>{active.name}</h4>
+                        <span style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>{active.location}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h4 style={{ fontFamily: 'var(--font-heading)', fontWeight: 700, color: '#fff', fontSize: '1rem', margin: 0 }}>{testial.name}</h4>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}>{testial.location}</span>
-                  </div>
-                </div>
-              </div>
-            </TiltCard>
-            </motion.div>
-          ))}
+                </TiltCard>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', marginTop: '28px' }}>
+            <button
+              onClick={() => go(-1)}
+              aria-label="Oldingi"
+              style={ctrlBtn}
+            >
+              <ChevronLeft size={22} />
+            </button>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {testimonials.map((t, i) => (
+                <button
+                  key={t.id}
+                  onClick={() => { setDirection(i > index ? 1 : -1); setIndex(i); }}
+                  aria-label={`${i + 1}-sharh`}
+                  style={{
+                    width: i === index ? '28px' : '10px',
+                    height: '10px',
+                    borderRadius: '100px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    background: i === index ? 'var(--accent-gold)' : 'rgba(255,255,255,0.25)',
+                  }}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={() => go(1)}
+              aria-label="Keyingi"
+              style={ctrlBtn}
+            >
+              <ChevronRight size={22} />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -147,7 +229,7 @@ export default function VideoTestimonials() {
             position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
             background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(4px)', padding: '16px'
           }}>
-            <button 
+            <button
               onClick={() => setActiveVideo(null)}
               style={{
                 position: 'absolute', top: '24px', right: '24px', color: '#fff',
@@ -157,7 +239,7 @@ export default function VideoTestimonials() {
             >
               <X size={24} />
             </button>
-            <motion.div 
+            <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -175,11 +257,11 @@ export default function VideoTestimonials() {
                   style={{ width: '100%', height: '100%', border: 'none' }}
                 />
               ) : (
-                <video 
-                  src={activeVideo} 
+                <video
+                  src={activeVideo}
                   style={{ width: '100%', height: '100%' }}
-                  controls 
-                  autoPlay 
+                  controls
+                  autoPlay
                 />
               )}
             </motion.div>
@@ -189,3 +271,17 @@ export default function VideoTestimonials() {
     </section>
   );
 }
+
+const ctrlBtn: React.CSSProperties = {
+  width: '46px',
+  height: '46px',
+  borderRadius: '50%',
+  border: '1px solid rgba(255,255,255,0.15)',
+  background: 'rgba(255,255,255,0.04)',
+  color: '#fff',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+};

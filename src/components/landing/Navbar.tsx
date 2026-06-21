@@ -42,7 +42,7 @@ const InstagramIcon = ({ size = 16, color = 'currentColor' }: { size?: number; c
 const NAV_LINKS = [
   { href: '#trust', label: 'Texnologiya' },
   { href: '#facade', label: 'Fasad' },
-  { href: '#calculator', label: 'Bepul hisob-kitob' },
+  { href: '#calculator', label: 'Qayta aloqa' },
   { href: '#portfolio', label: 'Portfolio' },
   { href: '#contact', label: 'Aloqa' },
 ];

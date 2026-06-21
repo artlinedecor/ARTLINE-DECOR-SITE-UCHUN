@@ -7,7 +7,6 @@ import VideoShowcase from '@/components/landing/VideoShowcase';
 import Portfolio from '@/components/landing/Portfolio';
 import InteractiveMap from '@/components/landing/InteractiveMap';
 import VideoTestimonials from '@/components/landing/VideoTestimonials';
-import SocialFeed from '@/components/landing/SocialFeed';
 import FAQ from '@/components/landing/FAQ';
 import Footer from '@/components/landing/Footer';
 import EstimateModal from '@/components/landing/EstimateModal';
@@ -27,7 +26,6 @@ export default function Home() {
         <ScrollReveal><Portfolio /></ScrollReveal>
         <ScrollReveal><InteractiveMap /></ScrollReveal>
         <ScrollReveal><VideoTestimonials /></ScrollReveal>
-        <ScrollReveal><SocialFeed /></ScrollReveal>
         <ScrollReveal><FAQ /></ScrollReveal>
       </main>
       <Footer />

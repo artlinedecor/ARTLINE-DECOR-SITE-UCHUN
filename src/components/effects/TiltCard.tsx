@@ -8,12 +8,13 @@ import {
   type MotionValue,
 } from 'framer-motion';
 import type { CSSProperties, ReactNode } from 'react';
-import { useFancyEffects } from '@/lib/use-fancy-effects';
+import { usePrefersReducedMotion } from '@/lib/use-fancy-effects';
 
 /**
- * Reusable 3D tilt + cursor glare wrapper. GPU-only (rotate/scale on transform).
- * Falls back to a plain div on touch / reduced-motion so it never interferes
- * with tap targets or accessibility.
+ * Reusable 3D tilt + glare wrapper. GPU-only (rotate/scale on transform).
+ * Works with both a mouse (hover) and touch (finger drag), so the 3D "wow"
+ * is felt on mobile too. Falls back to a plain div only when the user has
+ * requested reduced motion, so it never fights accessibility.
  */
 export default function TiltCard({
   children,
@@ -32,7 +33,8 @@ export default function TiltCard({
   scale?: number;
   glare?: boolean;
 }) {
-  const enabled = useFancyEffects();
+  const reduced = usePrefersReducedMotion();
+  const enabled = !reduced;
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const cfg = { stiffness: 150, damping: 18 };
@@ -54,12 +56,19 @@ export default function TiltCard({
     );
   }
 
-  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const r = e.currentTarget.getBoundingClientRect();
-    mx.set((e.clientX - r.left) / r.width - 0.5);
-    my.set((e.clientY - r.top) / r.height - 0.5);
+  const setFromPoint = (clientX: number, clientY: number, rect: DOMRect) => {
+    mx.set((clientX - rect.left) / rect.width - 0.5);
+    my.set((clientY - rect.top) / rect.height - 0.5);
   };
-  const onLeave = () => {
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    setFromPoint(e.clientX, e.clientY, e.currentTarget.getBoundingClientRect());
+  };
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const t = e.touches[0];
+    if (!t) return;
+    setFromPoint(t.clientX, t.clientY, e.currentTarget.getBoundingClientRect());
+  };
+  const reset = () => {
     mx.set(0);
     my.set(0);
   };
@@ -69,7 +78,10 @@ export default function TiltCard({
       className={className}
       onClick={onClick}
       onMouseMove={onMove}
-      onMouseLeave={onLeave}
+      onMouseLeave={reset}
+      onTouchStart={onTouchMove}
+      onTouchMove={onTouchMove}
+      onTouchEnd={reset}
       whileHover={{ scale }}
       style={{
         ...style,

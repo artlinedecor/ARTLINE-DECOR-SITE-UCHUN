@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Shield, Zap, ChevronDown, CloudRain, Sun, Snowflake, Leaf } from 'lucide-react';
+import { Shield, ChevronDown, CloudRain, Sun, Snowflake, Leaf, PhoneCall } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useFancyEffects } from '@/lib/use-fancy-effects';
 
@@ -253,6 +253,21 @@ export default function Hero() {
     };
   }, []);
 
+  // Mobil uchun: telefonni qiyalatganda parallaxni harakatga keltirish (gyroscope)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.DeviceOrientationEvent) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // faqat sensorli / coarse qurilmalar (desktopda sichqoncha bor)
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const handle = (e: DeviceOrientationEvent) => {
+      const clamp = (v: number) => Math.max(-1, Math.min(1, v / 25));
+      mx.set(clamp(e.gamma ?? 0) * 0.5);
+      my.set(clamp((e.beta ?? 0) - 45) * 0.5);
+    };
+    window.addEventListener('deviceorientation', handle);
+    return () => window.removeEventListener('deviceorientation', handle);
+  }, [mx, my]);
+
   const activeSeason = SEASONS[currentSeason];
 
   return (
@@ -322,27 +337,31 @@ export default function Hero() {
       </motion.div>
 
       {/* Main Content Overlay */}
-      <motion.div className="container" style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '100px', rotateX, rotateY, x: contentX, y: contentY, transformStyle: 'preserve-3d' }}>
+      <motion.div className="container" style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 'clamp(150px, 18vh, 200px)', paddingBottom: 'clamp(90px, 12vh, 130px)', rotateX, rotateY, x: contentX, y: contentY, transformStyle: 'preserve-3d' }}>
         
         {/* Season Indicator Pill */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
+          className="hero-season-pill"
           style={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
             gap: '8px',
+            maxWidth: '94vw',
             background: 'rgba(10, 15, 25, 0.6)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '100px',
-            padding: '6px 6px 6px 16px',
+            padding: '8px 12px',
             marginBottom: '40px',
             backdropFilter: 'blur(12px)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
           }}
         >
-          <span style={{ fontSize: '0.9rem', color: '#a0aec0', fontWeight: 500, letterSpacing: '0.02em' }}>
+          <span className="hero-season-label" style={{ fontSize: '0.9rem', color: '#a0aec0', fontWeight: 500, letterSpacing: '0.02em', paddingLeft: '6px' }}>
             Yilning har qanday faslida ishonchli
           </span>
           <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
@@ -462,8 +481,8 @@ export default function Hero() {
             whileHover={{ scale: 1.05, background: activeSeason.color }}
             whileTap={{ scale: 0.95 }}
           >
-            <Zap size={20} style={{ marginRight: '8px' }} />
-            Bepul hisob-kitob
+            <PhoneCall size={20} style={{ marginRight: '8px' }} />
+            Qayta aloqa so&apos;rash
           </motion.a>
           
           <a 

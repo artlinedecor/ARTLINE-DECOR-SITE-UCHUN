@@ -29,7 +29,8 @@ const ACTIONS = [
 ];
 
 export default function FloatingContact() {
-  const [open, setOpen] = useState(false);
+  // Kontaktlar ko'rinib tursin — standart holatda ochiq (bizni topish oson bo'lsin)
+  const [open, setOpen] = useState(true);
 
   return (
     <div

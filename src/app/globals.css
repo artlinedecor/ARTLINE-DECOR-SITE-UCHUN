@@ -1255,6 +1255,26 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   .btn-primary::after { display: none !important; }
 }
 
+/* ---- Testimonial carousel: stack on mobile ---- */
+@media (max-width: 720px) {
+  .testimonial-card {
+    grid-template-columns: 1fr !important;
+  }
+  .testimonial-card .testimonial-media {
+    min-height: 220px !important;
+  }
+}
+
+/* ---- Hero season pill: keep compact on small screens ---- */
+@media (max-width: 560px) {
+  .hero-season-label {
+    display: none;
+  }
+  .hero-season-pill {
+    padding: 6px 8px !important;
+  }
+}
+
 /* ---- Mobile: lighten heavy effects ---- */
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
   .cursor-glow-layer { display: none !important; }
