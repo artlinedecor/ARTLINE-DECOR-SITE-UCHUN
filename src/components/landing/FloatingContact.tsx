@@ -3,34 +3,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Phone, Send, X, MessageCircle } from 'lucide-react';
+import { useT } from '@/lib/i18n';
 
 const PHONE = '998991020200';
-const WA_TEXT = encodeURIComponent("Assalomu alaykum! Fasad / termo-panel bo'yicha ma'lumot va narx olmoqchiman.");
-
-const ACTIONS = [
-  {
-    label: 'WhatsApp',
-    href: `https://wa.me/${PHONE}?text=${WA_TEXT}`,
-    bg: '#25D366',
-    icon: <MessageCircle size={22} />,
-  },
-  {
-    label: 'Telegram',
-    href: 'https://t.me/Art_linedecor',
-    bg: '#229ED9',
-    icon: <Send size={20} />,
-  },
-  {
-    label: "Qo'ng'iroq",
-    href: `tel:+${PHONE}`,
-    bg: '#d99a6c',
-    icon: <Phone size={20} />,
-  },
-];
 
 export default function FloatingContact() {
-  // Kontaktlar ko'rinib tursin — standart holatda ochiq (bizni topish oson bo'lsin)
+  const { t } = useT();
   const [open, setOpen] = useState(true);
+
+  const WA_TEXT = encodeURIComponent("Assalomu alaykum! Fasad / termo-panel bo'yicha ma'lumot va narx olmoqchiman.");
+  const ACTIONS = [
+    { label: t('fc.whatsapp'), href: `https://wa.me/${PHONE}?text=${WA_TEXT}`, bg: '#25D366', icon: <MessageCircle size={22} /> },
+    { label: t('fc.telegram'), href: 'https://t.me/Art_linedecor', bg: '#229ED9', icon: <Send size={20} /> },
+    { label: t('fc.call'), href: `tel:+${PHONE}`, bg: '#d99a6c', icon: <Phone size={20} /> },
+  ];
 
   return (
     <div

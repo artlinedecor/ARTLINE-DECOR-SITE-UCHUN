@@ -4,36 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { Shield, ChevronDown, CloudRain, Sun, Snowflake, Leaf, PhoneCall } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useFancyEffects } from '@/lib/use-fancy-effects';
+import { useT } from '@/lib/i18n';
 
 const SEASONS = [
-  { 
-    id: 'winter', 
-    name: 'Qish', 
-    color: '#00d2ff', 
-    glow: 'rgba(0, 210, 255, 0.15)',
-    icon: <Snowflake size={18} />
-  },
-  { 
-    id: 'spring', 
-    name: 'Bahor', 
-    color: '#00e676', 
-    glow: 'rgba(0, 230, 118, 0.15)',
-    icon: <CloudRain size={18} />
-  },
-  { 
-    id: 'summer', 
-    name: 'Yoz', 
-    color: '#ffaa00', 
-    glow: 'rgba(255, 170, 0, 0.15)',
-    icon: <Sun size={18} />
-  },
-  { 
-    id: 'autumn', 
-    name: 'Kuz', 
-    color: '#ff6600', 
-    glow: 'rgba(255, 102, 0, 0.15)',
-    icon: <Leaf size={18} />
-  }
+  { id: 'winter', nameKey: 'hero.season.winter', color: '#00d2ff', glow: 'rgba(0, 210, 255, 0.15)', icon: <Snowflake size={18} /> },
+  { id: 'spring', nameKey: 'hero.season.spring', color: '#00e676', glow: 'rgba(0, 230, 118, 0.15)', icon: <CloudRain size={18} /> },
+  { id: 'summer', nameKey: 'hero.season.summer', color: '#ffaa00', glow: 'rgba(255, 170, 0, 0.15)', icon: <Sun size={18} /> },
+  { id: 'autumn', nameKey: 'hero.season.rain', color: '#ff6600', glow: 'rgba(255, 102, 0, 0.15)', icon: <Leaf size={18} /> },
 ];
 
 const SEASON_IMAGES = [
@@ -44,6 +21,7 @@ const SEASON_IMAGES = [
 ];
 
 export default function Hero() {
+  const { t } = useT();
   const [currentSeason, setCurrentSeason] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
@@ -362,7 +340,7 @@ export default function Hero() {
           }}
         >
           <span className="hero-season-label" style={{ fontSize: '0.9rem', color: '#a0aec0', fontWeight: 500, letterSpacing: '0.02em', paddingLeft: '6px' }}>
-            Yilning har qanday faslida ishonchli
+            {t('hero.season.label')}
           </span>
           <div style={{ display: 'flex', gap: '4px', marginLeft: '8px' }}>
             {SEASONS.map((s, idx) => {
@@ -387,7 +365,7 @@ export default function Hero() {
                   >
                     {s.icon}
                   </motion.div>
-                  {isActive && <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.name}</span>}
+                  {isActive && <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t(s.nameKey)}</span>}
                 </div>
               );
             })}
@@ -420,7 +398,7 @@ export default function Hero() {
               letterSpacing: '-0.02em',
             }}
           >
-            Uyingiz va Binongizga <br />
+            {t('hero.title.1')} <br />
             <motion.span
               animate={{ color: activeSeason.color }}
               transition={{ duration: 1.5 }}
@@ -429,7 +407,7 @@ export default function Hero() {
                 textShadow: '0 4px 30px rgba(0,0,0,0.95)'
               }}
             >
-              Arxitektura Salobati
+              {t('hero.title.2')}
             </motion.span>
           </h1>
 
@@ -445,7 +423,7 @@ export default function Hero() {
               textShadow: '0 2px 12px rgba(0,0,0,0.85)'
             }}
           >
-            Panellarimiz qishda sovuqdan, yozda issiqdan, kuz va bahorda esa namlikdan <strong style={{ color: '#ffffff', fontWeight: 700 }}>100% himoya qiladi</strong>. G'isht ustiga to'g'ridan-to'g'ri montaj qilinadi — suvoq talab etilmaydi.
+            {t('hero.subtitle')}
           </p>
         </motion.div>
 
@@ -482,7 +460,7 @@ export default function Hero() {
             whileTap={{ scale: 0.95 }}
           >
             <PhoneCall size={20} style={{ marginRight: '8px' }} />
-            Qayta aloqa so&apos;rash
+            {t('hero.cta.callback')}
           </motion.a>
           
           <a 
@@ -501,7 +479,7 @@ export default function Hero() {
               borderRadius: '100px'
             }}
           >
-            Katalog (PDF)
+            {t('hero.cta.catalog')}
           </a>
         </motion.div>
 
@@ -520,10 +498,10 @@ export default function Hero() {
           }}
         >
           {[
-            { value: "10 yil", label: "Rasmiy kafolat" },
-            { value: "500+", label: "Bajarilgan uylar" },
-            { value: "100%", label: "Ekologik toza" },
-            { value: "Premium", label: "AMK Ximoya qatlami", icon: <Shield size={24} style={{ marginRight: '10px' }} /> }
+            { value: t('hero.stat.warranty.v'), label: t('hero.stat.warranty.l') },
+            { value: t('hero.stat.houses.v'), label: t('hero.stat.houses.l') },
+            { value: t('hero.stat.eco.v'), label: t('hero.stat.eco.l') },
+            { value: t('hero.stat.amk.v'), label: t('hero.stat.amk.l'), icon: <Shield size={24} style={{ marginRight: '10px' }} /> }
           ].map((stat, i) => (
             <motion.div 
               key={i} 

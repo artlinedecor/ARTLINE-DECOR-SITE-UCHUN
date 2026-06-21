@@ -5,6 +5,7 @@ import { X, Send, Check, User, MapPin, Ruler, Building2, ShieldCheck, Phone } fr
 import { generateId } from '@/lib/store';
 import { Order } from '@/lib/types';
 import toast, { Toaster } from 'react-hot-toast';
+import { useT } from '@/lib/i18n';
 
 const REGIONS = [
   'Toshkent sh.',
@@ -23,18 +24,17 @@ const REGIONS = [
   'Qoraqalpog\'iston res.'
 ];
 
-const BUILDING_TYPES = [
-  { value: 'residential', label: 'Xususiy uy / Hovli' },
-  { value: 'commercial', label: 'Tijorat binosi (Do\'kon, Ofis, H.k.)' },
-  { value: 'multistory', label: 'Ko\'p qavatli bino' }
-];
-
-const USER_ROLES = [
-  { value: 'owner', label: 'Uy egasi' },
-  { value: 'master', label: 'Usta / Quruvchi' }
-];
-
 export default function EstimateModal() {
+  const { t } = useT();
+  const BUILDING_TYPES = [
+    { value: 'residential', label: t('modal.bt.residential') },
+    { value: 'commercial', label: t('modal.bt.commercial') },
+    { value: 'multistory', label: t('modal.bt.multistory') },
+  ];
+  const USER_ROLES = [
+    { value: 'owner', label: t('modal.role.owner') },
+    { value: 'master', label: t('modal.role.master') },
+  ];
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+998 ');
@@ -109,15 +109,15 @@ export default function EstimateModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      toast.error('Iltimos, ismingizni kiriting!');
+      toast.error(t('modal.err.name'));
       return;
     }
     if (phone.length < 17) {
-      toast.error('Iltimos, telefon raqamingizni to\'liq kiriting!');
+      toast.error(t('modal.err.phone'));
       return;
     }
     if (!area.trim() || isNaN(Number(area)) || Number(area) <= 0) {
-      toast.error('Iltimos, taxminiy fasad maydonini kiriting (m²)!');
+      toast.error(t('modal.err.area'));
       return;
     }
 
@@ -164,13 +164,13 @@ export default function EstimateModal() {
       });
 
       setIsSuccess(true);
-      toast.success('So\'rovingiz muvaffaqiyatli yuborildi!');
+      toast.success(t('modal.toast.ok'));
       setTimeout(() => {
         setIsOpen(false);
       }, 3000);
     } catch (err) {
       console.error(err);
-      toast.error('Xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.');
+      toast.error(t('modal.toast.err'));
     } finally {
       setIsSubmitting(false);
     }
@@ -237,17 +237,17 @@ export default function EstimateModal() {
               color: 'var(--accent-warm)', fontSize: '0.72rem', fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px',
             }}>
-              <Phone size={11} /> Bepul maslahat
+              <Phone size={11} /> {t('modal.badge')}
             </div>
             <h3 style={{
               fontSize: '1.55rem', fontWeight: 700, margin: 0,
               fontFamily: 'var(--font-heading)', color: '#fff',
               lineHeight: 1.2,
             }}>
-              Qayta aloqa so&apos;rash
+              {t('modal.title')}
             </h3>
             <p style={{ color: '#a0aec0', fontSize: '0.88rem', margin: '8px 0 0', lineHeight: 1.55, maxWidth: '420px' }}>
-              Ma&apos;lumotlarni qoldiring — mutaxassisimiz <strong style={{ color: '#fff' }}>15 daqiqa</strong> ichida bog&apos;lanadi.
+              {t('modal.subtitle.1')} <strong style={{ color: '#fff' }}>{t('modal.subtitle.bold')}</strong> {t('modal.subtitle.2')}
             </p>
           </div>
           <button onClick={() => setIsOpen(false)} aria-label="Yopish" style={{
@@ -273,30 +273,30 @@ export default function EstimateModal() {
               <Check size={32} color="#4CAF50" />
             </div>
             <h4 style={{ fontSize: '1.4rem', color: '#fff', margin: 0, fontFamily: 'var(--font-heading)' }}>
-              Rahmat! So&apos;rovingiz qabul qilindi
+              {t('modal.success.title')}
             </h4>
             <p style={{ color: '#a0aec0', fontSize: '0.95rem', maxWidth: '360px', margin: 0, lineHeight: 1.6 }}>
-              Mutaxassisimiz tez orada siz bilan telefon orqali bog'lanib, barcha savollaringizga javob beradi va bepul maslahat beradi.
+              {t('modal.success.text')}
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ padding: '24px 32px 28px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
             {/* Ism */}
             <div>
-              <label style={labelStyle}><User size={13} style={{ color: 'var(--accent-gold)' }} /> Ismingiz</label>
-              <input type="text" placeholder="Masalan: Dilmurod" value={name} onChange={e => setName(e.target.value)} style={fieldStyle} />
+              <label style={labelStyle}><User size={13} style={{ color: 'var(--accent-gold)' }} /> {t('modal.label.name')}</label>
+              <input type="text" placeholder={t('modal.ph.name')} value={name} onChange={e => setName(e.target.value)} style={fieldStyle} />
             </div>
 
             {/* Telefon */}
             <div>
-              <label style={labelStyle}><Phone size={13} style={{ color: 'var(--accent-gold)' }} /> Telefon raqamingiz</label>
+              <label style={labelStyle}><Phone size={13} style={{ color: 'var(--accent-gold)' }} /> {t('modal.label.phone')}</label>
               <input type="text" value={phone} onChange={handlePhoneChange} placeholder="+998 (90) 123-45-67"
                 style={{ ...fieldStyle, fontFamily: 'var(--font-mono)', letterSpacing: '0.04em' }} />
             </div>
 
             {/* Shahar */}
             <div>
-              <label style={labelStyle}><MapPin size={13} style={{ color: 'var(--accent-gold)' }} /> Shahar / Viloyat</label>
+              <label style={labelStyle}><MapPin size={13} style={{ color: 'var(--accent-gold)' }} /> {t('modal.label.city')}</label>
               <select value={city} onChange={e => setCity(e.target.value)}
                 style={{ ...fieldStyle, background: '#0a0d16', cursor: 'pointer' }}>
                 {REGIONS.map(reg => (<option key={reg} value={reg}>{reg}</option>))}
@@ -305,11 +305,11 @@ export default function EstimateModal() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
-                <label style={labelStyle}><Ruler size={13} style={{ color: 'var(--accent-gold)' }} /> Maydon (m²)</label>
-                <input type="number" placeholder="250" value={area} onChange={e => setArea(e.target.value)} style={fieldStyle} />
+                <label style={labelStyle}><Ruler size={13} style={{ color: 'var(--accent-gold)' }} /> {t('modal.label.area')}</label>
+                <input type="number" placeholder={t('modal.ph.area')} value={area} onChange={e => setArea(e.target.value)} style={fieldStyle} />
               </div>
               <div>
-                <label style={labelStyle}><Building2 size={13} style={{ color: 'var(--accent-gold)' }} /> Bino turi</label>
+                <label style={labelStyle}><Building2 size={13} style={{ color: 'var(--accent-gold)' }} /> {t('modal.label.type')}</label>
                 <select value={buildingType} onChange={e => setBuildingType(e.target.value)}
                   style={{ ...fieldStyle, background: '#0a0d16', cursor: 'pointer' }}>
                   {BUILDING_TYPES.map(type => (<option key={type.value} value={type.value}>{type.label}</option>))}
@@ -319,7 +319,7 @@ export default function EstimateModal() {
 
             {/* Role pills */}
             <div>
-              <label style={labelStyle}>Siz kimsiz?</label>
+              <label style={labelStyle}>{t('modal.label.role')}</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {USER_ROLES.map(role => {
                   const isActive = userRole === role.value;
@@ -348,7 +348,7 @@ export default function EstimateModal() {
               color: '#a0aec0', fontSize: '0.8rem',
             }}>
               <ShieldCheck size={14} style={{ color: '#3ecf8e', flexShrink: 0 }} />
-              <span>Ma&apos;lumotlaringiz himoyada — uchinchi shaxslarga oshkor qilinmaydi.</span>
+              <span>{t('modal.privacy')}</span>
             </div>
 
             {/* Submit */}
@@ -364,7 +364,7 @@ export default function EstimateModal() {
               onMouseEnter={e => { if (!isSubmitting) { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 18px 40px rgba(217,154,108,0.45), 0 0 0 1px rgba(255,255,255,0.05) inset'; } }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 12px 32px rgba(217,154,108,0.35), 0 0 0 1px rgba(255,255,255,0.05) inset'; }}
             >
-              {isSubmitting ? 'Yuborilmoqda…' : (<><Send size={18} /> Qayta aloqa so&apos;rash</>)}
+              {isSubmitting ? t('modal.submitting') : (<><Send size={18} /> {t('modal.submit')}</>)}
             </button>
           </form>
         )}

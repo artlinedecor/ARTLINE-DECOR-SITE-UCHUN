@@ -1,8 +1,10 @@
 'use client';
 
 import { Phone, MapPin, Clock, Send, FileText } from 'lucide-react';
+import { useT } from '@/lib/i18n';
 
 export default function Footer() {
+  const { t } = useT();
   return (
     <footer className="footer" id="contact">
       <div className="container">
@@ -12,10 +14,7 @@ export default function Footer() {
               <img src="/logo.png" alt="Artline Decor Logo" width={48} height={48} style={{ objectFit: 'contain' }} />
               ARTLINE DECOR
             </div>
-            <p className="footer-desc">
-              Premial fasad tizimlari — 3-in-1 texnologiyasi: dekor + izolyatsiya + himoya.
-              10 yillik kafolat bilan import xomashyodan tayyorlangan mahsulotlar.
-            </p>
+            <p className="footer-desc">{t('foot.desc')}</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 20 }}>
               <a href="https://t.me/Art_linedecor" target="_blank" rel="noopener noreferrer"
                 className="btn btn-outline btn-sm" style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -46,27 +45,27 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4>Hujjatlar</h4>
+            <h4>{t('foot.docs')}</h4>
             <ul className="footer-links">
               <li>
                 <a href="/ARTLINE_DECOR_Architectural_Catalog.pdf" download style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <FileText size={14} /> Fasad Katalogi (PDF)
+                  <FileText size={14} /> {t('foot.docs.catalog')}
                 </a>
               </li>
-              <li><a href="#facade">Fasad dekor turlari</a></li>
-              <li><a href="#calculator">Bepul smeta hisoblash</a></li>
-              <li><a href="#portfolio">Bajarilgan loyihalar</a></li>
+              <li><a href="#facade">{t('foot.docs.types')}</a></li>
+              <li><a href="#calculator">{t('foot.docs.smeta')}</a></li>
+              <li><a href="#portfolio">{t('foot.docs.projects')}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4>Aloqa & Manzil</h4>
+            <h4>{t('foot.contact')}</h4>
             <ul className="footer-links">
               <li style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                 <MapPin size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--accent-gold)' }} />
-                <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" 
+                <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/"
                    target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}>
-                  Toshkent sh., Yashnabod tumani, Iqbol ko'chasi (Yandex Xarita)
+                  {t('foot.address')}
                 </a>
               </li>
               <li style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -75,14 +74,14 @@ export default function Footer() {
               </li>
               <li style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <Clock size={16} style={{ flexShrink: 0, color: 'var(--accent-gold)' }} />
-                <span>Dush-Shan: 09:00 — 18:00</span>
+                <span>{t('foot.hours')}</span>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="footer-bottom">
-          © {new Date().getFullYear()} Artline Decor. Barcha huquqlar himoyalangan.
+          © {new Date().getFullYear()} Artline Decor. {t('foot.copy')}
         </div>
       </div>
     </footer>

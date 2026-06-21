@@ -4,46 +4,28 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 import TiltCard from '@/components/effects/TiltCard';
+import { useT } from '@/lib/i18n';
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Alisher U.",
-    location: "Toshkent viloyati",
-    role: "Uy egasi",
-    text: "Termo panellar 3sm va 5sm qalinlikda ajoyib sifatda o'rnatildi. Uydagi issiqlik izolyatsiyasi sezilarli darajada yaxshilandi, sifatiga gap bo'lishi mumkin emas!"
-  },
-  {
-    id: 2,
-    name: "Murod N.",
-    location: "Samarqand",
-    role: "Quruvchi",
-    text: "Tabiiy toshga juda o'xshashligi va g'isht ustiga to'g'ridan-to'g'ri o'rnatilishi bizga juda ma'qul keldi. Fasad dizayni ajoyib ko'rinish oldi!"
-  },
-  {
-    id: 3,
-    name: "Jamshid B.",
-    location: "Buxoro",
-    role: "Uy egasi",
-    text: "Karniz va kalonalar bilan fasadga termo panellar o'rnatilgandan so'ng uy butunlay premium ko'rinishga kirdi. 10 yillik kafolat berilgani ishonchli."
-  },
-  {
-    id: 4,
-    name: "Sherzod R.",
-    location: "Andijon",
-    role: "Tijorat binosi egasi",
-    text: "Do'konim peshtoqiga arxitektura dekoridan kalonalar qo'ydim — mijozlarim ko'paydi. Premium ko'rinish savdoga ham ijobiy ta'sir qildi."
-  }
+const testimonialKeys = [
+  { id: 1, name: "Alisher U.", locKey: 'tst.loc.tashkent', roleKey: 'tst.role.owner', textKey: 'tst.text.1' },
+  { id: 2, name: "Murod N.", locKey: 'tst.loc.samarkand', roleKey: 'tst.role.builder', textKey: 'tst.text.2' },
+  { id: 3, name: "Jamshid B.", locKey: 'tst.loc.bukhara', roleKey: 'tst.role.owner', textKey: 'tst.text.3' },
+  { id: 4, name: "Sherzod R.", locKey: 'tst.loc.andijan', roleKey: 'tst.role.commercial', textKey: 'tst.text.4' },
 ];
 
 const AUTOPLAY_MS = 6500;
 
 export default function VideoTestimonials() {
+  const { t } = useT();
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
 
-  const count = testimonials.length;
+  const items = testimonialKeys.map(tk => ({
+    id: tk.id, name: tk.name,
+    location: t(tk.locKey), role: t(tk.roleKey), text: t(tk.textKey),
+  }));
+  const count = items.length;
   const go = useCallback((dir: number) => {
     setDirection(dir);
     setIndex((prev) => (prev + dir + count) % count);
@@ -53,11 +35,11 @@ export default function VideoTestimonials() {
     if (paused) return;
     const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;
-    const t = setInterval(() => go(1), AUTOPLAY_MS);
-    return () => clearInterval(t);
+    const id = setInterval(() => go(1), AUTOPLAY_MS);
+    return () => clearInterval(id);
   }, [paused, go, index]);
 
-  const active = testimonials[index];
+  const active = items[index];
 
   const variants = {
     enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 60 : -60 }),
@@ -86,12 +68,12 @@ export default function VideoTestimonials() {
           transition={{ duration: 0.6 }}
           style={{ textAlign: 'center', marginBottom: '48px' }}
         >
-          <span className="badge badge-gold" style={{ marginBottom: '16px', display: 'inline-block' }}>Haqiqiy mijozlar</span>
+          <span className="badge badge-gold" style={{ marginBottom: '16px', display: 'inline-block' }}>{t('tst.badge')}</span>
           <h2 style={{ fontSize: 'clamp(2rem, 4vw, 2.5rem)', fontWeight: 700, fontFamily: 'var(--font-heading)', marginBottom: '16px' }}>
-            Mijozlarimiz <span style={{ color: 'var(--accent-gold)' }}>Fikri</span>
+            {t('tst.title.1')} <span style={{ color: 'var(--accent-gold)' }}>{t('tst.title.2')}</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto' }}>
-            Bizning ishimiz haqida ular nima deyishini o'zlaridan eshiting.
+            {t('tst.subtitle')}
           </p>
         </motion.div>
 
@@ -173,9 +155,9 @@ export default function VideoTestimonials() {
             </button>
 
             <div style={{ display: 'flex', gap: '10px' }}>
-              {testimonials.map((t, i) => (
+              {items.map((it, i) => (
                 <button
-                  key={t.id}
+                  key={it.id}
                   onClick={() => { setDirection(i > index ? 1 : -1); setIndex(i); }}
                   aria-label={`${i + 1}-sharh`}
                   style={{

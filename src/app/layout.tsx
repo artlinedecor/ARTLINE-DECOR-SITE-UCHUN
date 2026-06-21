@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import CursorGlow from "@/components/effects/CursorGlow";
+import { LangProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Artline Decor — Premial Fasad Tizimlari | 10 Yillik Kafolat",
@@ -13,8 +14,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="uz">
       <body>
-        <CursorGlow />
-        {children}
+        <LangProvider>
+          <CursorGlow />
+          {children}
+        </LangProvider>
       </body>
     </html>
   );

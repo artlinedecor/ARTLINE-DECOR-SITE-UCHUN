@@ -3,18 +3,19 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Menu, X, Lock, MapPin, Phone, ChevronDown, FileText, Presentation } from 'lucide-react';
+import { useT, type Lang } from '@/lib/i18n';
 
 const NAV_LINKS = [
-  { href: '#trust', label: 'Texnologiya' },
-  { href: '#facade', label: 'Fasad' },
-  { href: '#calculator', label: 'Qayta aloqa' },
-  { href: '#portfolio', label: 'Portfolio' },
-  { href: '#contact', label: 'Aloqa' },
+  { href: '#trust', key: 'nav.tech' },
+  { href: '#facade', key: 'nav.facade' },
+  { href: '#calculator', key: 'nav.callback' },
+  { href: '#portfolio', key: 'nav.portfolio' },
+  { href: '#contact', key: 'nav.contact' },
 ];
 
 const CATALOGS = [
-  { href: '/ARTLINE_DECOR_Architectural_Catalog.pdf', label: 'Arxitektura katalogi', meta: 'PDF · 14 MB', icon: <FileText size={18} /> },
-  { href: '/ARTLINE_DECOR_Catalog.pptx', label: 'Asosiy katalog (slaydlar)', meta: 'PPTX · 24 MB', icon: <Presentation size={18} /> },
+  { href: '/ARTLINE_DECOR_Architectural_Catalog.pdf', key: 'nav.cat.arch', meta: 'PDF · 14 MB', icon: <FileText size={18} /> },
+  { href: '/ARTLINE_DECOR_Catalog.pptx', key: 'nav.cat.main', meta: 'PPTX · 24 MB', icon: <Presentation size={18} /> },
 ];
 
 const SOCIALS: { href: string; label: string; svg: React.ReactNode }[] = [
@@ -37,10 +38,36 @@ const SOCIALS: { href: string; label: string; svg: React.ReactNode }[] = [
 ];
 
 export default function Navbar() {
+  const { t, lang, setLang } = useT();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const catRef = useRef<HTMLLIElement>(null);
+
+  const LangSwitch = () => (
+    <div role="group" aria-label="Language" style={{
+      display: 'inline-flex', alignItems: 'center',
+      padding: '3px', borderRadius: '100px',
+      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(217,154,108,0.18)',
+      gap: '2px',
+    }}>
+      {(['uz', 'ru'] as Lang[]).map(l => {
+        const active = lang === l;
+        return (
+          <button key={l} type="button" onClick={() => setLang(l)}
+            style={{
+              padding: '4px 10px', borderRadius: '100px', cursor: 'pointer',
+              background: active ? 'linear-gradient(135deg, var(--accent-gold), var(--accent-warm))' : 'transparent',
+              color: active ? '#0a0a0a' : '#a0aec0',
+              border: 'none', fontSize: '0.72rem', fontWeight: 700,
+              letterSpacing: '0.04em', transition: 'all 0.2s ease',
+            }}>
+            {l.toUpperCase()}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -70,8 +97,8 @@ export default function Navbar() {
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <MapPin size={13} style={{ color: 'var(--accent-gold)' }} />
-              <span>Showroom: Toshkent sh., Yashnabod tumani, Iqbol ko'chasi — </span>
-              <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>Xaritada ko'rish</a>
+              <span>{t('top.showroom')} </span>
+              <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>{t('top.map')}</a>
             </span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Phone size={13} style={{ color: 'var(--accent-gold)' }} />
@@ -79,7 +106,7 @@ export default function Navbar() {
             </span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '0.78rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>Ish vaqti: <span style={{ color: '#fff' }}>09:00 — 19:00</span></span>
+            <span style={{ color: 'var(--text-muted)' }}>{t('top.hours')} <span style={{ color: '#fff' }}>09:00 — 19:00</span></span>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.08)' }}>
               {SOCIALS.map(s => (
                 <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
@@ -96,6 +123,7 @@ export default function Navbar() {
                 </a>
               ))}
             </div>
+            <LangSwitch />
           </div>
         </div>
       </div>
@@ -139,7 +167,7 @@ export default function Navbar() {
                     }
                   }}
                 >
-                  {link.label}
+                  {t(link.key)}
                 </a>
               </li>
             ))}
@@ -151,7 +179,7 @@ export default function Navbar() {
                 aria-expanded={catOpen}
                 aria-haspopup="true"
               >
-                Kataloglar
+                {t('nav.catalogs')}
                 <ChevronDown size={14} style={{ transform: catOpen ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.25s ease' }} />
               </button>
               {catOpen && (
@@ -168,7 +196,7 @@ export default function Navbar() {
                     >
                       <span style={{ color: 'var(--accent-gold)', display: 'flex' }}>{c.icon}</span>
                       <span>
-                        <div style={{ fontWeight: 600 }}>{c.label}</div>
+                        <div style={{ fontWeight: 600 }}>{t(c.key)}</div>
                         <div className="cat-item-meta">{c.meta}</div>
                       </span>
                     </a>
@@ -213,24 +241,27 @@ export default function Navbar() {
                   }
                 }}
                 style={{ display: 'block', padding: '12px 16px', color: 'var(--text-secondary)' }}>
-                {link.label}
+                {t(link.key)}
               </a>
             ))}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', marginTop: 8, display: 'flex', justifyContent: 'center' }}>
+              <LangSwitch />
+            </div>
             <div style={{ padding: '8px 16px', borderTop: '1px solid var(--border)', marginTop: 8 }}>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Kataloglar</div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{t('nav.catalogs')}</div>
               {CATALOGS.map(c => (
                 <a key={c.href} href={c.href} download target="_blank" rel="noopener noreferrer"
                   onClick={() => setMobileOpen(false)}
                   style={{ display: 'flex', gap: 10, alignItems: 'center', padding: '10px 0', color: 'var(--text-primary)' }}>
                   <span style={{ color: 'var(--accent-gold)' }}>{c.icon}</span>
                   <span>
-                    <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{c.label}</div>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{t(c.key)}</div>
                     <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>{c.meta}</div>
                   </span>
                 </a>
               ))}
               <a href="/dashboard" style={{ display: 'inline-flex', gap: 8, alignItems: 'center', marginTop: 12, padding: '8px 14px', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 100, fontSize: '0.82rem' }}>
-                <Lock size={13} /> Dashboard
+                <Lock size={13} /> {t('nav.dashboard')}
               </a>
             </div>
           </div>
