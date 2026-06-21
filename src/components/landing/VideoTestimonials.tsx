@@ -3,31 +3,42 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X, Star } from 'lucide-react';
+import TiltCard from '@/components/effects/TiltCard';
+
+function getYouTubeEmbedUrl(url: string): string | null {
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+  if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+  const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  return null;
+}
 
 const testimonials = [
   {
     id: 1,
     name: "Alisher U.",
-    location: "Tashkent City",
+    location: "Toshkent viloyati",
     videoThumbnail: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    text: "Uyimni suvoq qilmasdan to'g'ridan-to'g'ri panellar o'rnatishdi. Vaqt va pulimni tejadim. Sifati a'lo darajada!"
+    videoUrl: "https://www.youtube.com/shorts/wp686HcUraw",
+    text: "Termo panellar 3sm va 5sm qalinlikda ajoyib sifatda o'rnatildi. Uydagi issiqlik izolyatsiyasi sezilarli darajada yaxshilandi, sifatiga gap bo'lishi mumkin emas!"
   },
   {
     id: 2,
     name: "Murod N.",
-    location: "Samarkand",
+    location: "Samarqand",
     videoThumbnail: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    text: "Dizayn juda zamonaviy chiqdi. Qishda uyimiz ancha issiq bo'lib qoldi. Artline jamoasiga rahmat."
+    videoUrl: "https://youtu.be/ta8G7WeojKQ",
+    text: "Tabiiy toshga juda o'xshashligi va g'isht ustiga to'g'ridan-to'g'ri o'rnatilishi bizga juda ma'qul keldi. Fasad dizayni ajoyib ko'rinish oldi!"
   },
   {
     id: 3,
     name: "Jamshid B.",
-    location: "Bukhara",
+    location: "Buxoro",
     videoThumbnail: "https://images.unsplash.com/photo-1600566753086-00f18efc2291?q=80&w=600&auto=format&fit=crop",
-    videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    text: "10 yillik kafolat berishgani ishonchimni oqladi. O'rnatish jarayoni atigi 6 kun davom etdi."
+    videoUrl: "https://youtu.be/hDJ1Kw_a8tE",
+    text: "Karniz va kalonalar bilan fasadga termo panellar o'rnatilgandan so'ng uy butunlay premium ko'rinishga kirdi. 10 yillik kafolat berilgani ishonchli."
   }
 ];
 
@@ -62,10 +73,14 @@ export default function VideoTestimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
+            >
+            <TiltCard
+              max={6}
+              scale={1.02}
               style={{
+                position: 'relative',
                 background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '24px', overflow: 'hidden',
-                transition: 'background 0.3s ease'
               }}
             >
               {/* Video Thumbnail Area */}
@@ -119,6 +134,7 @@ export default function VideoTestimonials() {
                   </div>
                 </div>
               </div>
+            </TiltCard>
             </motion.div>
           ))}
         </div>
@@ -151,12 +167,21 @@ export default function VideoTestimonials() {
                 boxShadow: '0 24px 80px rgba(0,0,0,0.5)'
               }}
             >
-              <video 
-                src={activeVideo} 
-                style={{ width: '100%', height: '100%' }}
-                controls 
-                autoPlay 
-              />
+              {getYouTubeEmbedUrl(activeVideo) ? (
+                <iframe
+                  src={getYouTubeEmbedUrl(activeVideo)! + "?autoplay=1"}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                />
+              ) : (
+                <video 
+                  src={activeVideo} 
+                  style={{ width: '100%', height: '100%' }}
+                  controls 
+                  autoPlay 
+                />
+              )}
             </motion.div>
           </div>
         )}

@@ -64,14 +64,14 @@ export default function Footer() {
             <ul className="footer-links">
               <li style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                 <MapPin size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--accent-gold)' }} />
-                <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/?ll=69.414157,41.308519&mode=search&sctx=ZAAAAAgBEAAaKAoSCTWaXIyBWlFAEemY84x9p0RAEhIJ2exI9Z1fhD8R%2Bs%2BaH39pcT8iBgABAgMEBSgKOABA31BIAWoCdXqdAc3MzD2gAQCoAQC9AWs7gGLCAQaMov2qhASCAgxBcnRsaW5lRGVjb3KKAgCSAgCaAgxkZXNrdG9wLW1hcHM%3D&sll=69.414157,41.308519&sspn=0.039793,0.017003&text=ArtlineDecor&utm_source=share&z=15" 
+                <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" 
                    target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}>
-                  Toshkent sh., Yakkasaroy tumani (Yandex Xarita)
+                  Toshkent sh., Yashnabod tumani, Iqbol ko'chasi (Yandex Xarita)
                 </a>
               </li>
               <li style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <Phone size={16} style={{ flexShrink: 0, color: 'var(--accent-gold)' }} />
-                <a href="tel:+998901234567" style={{ color: 'var(--text-primary)' }}>+998 90 123 45 67</a>
+                <a href="tel:+998991020200" style={{ color: 'var(--text-primary)' }}>+998 99 102 02 00</a>
               </li>
               <li style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <Clock size={16} style={{ flexShrink: 0, color: 'var(--accent-gold)' }} />

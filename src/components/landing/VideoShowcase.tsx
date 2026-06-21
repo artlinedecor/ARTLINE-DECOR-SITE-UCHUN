@@ -1,145 +1,208 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Play, Film, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Play, X, ChevronLeft, ChevronRight, Film, CheckCircle2, Maximize2 } from 'lucide-react';
 import { getVideos } from '@/lib/store';
 import type { ShowcaseVideo } from '@/lib/types';
+import TiltCard from '@/components/effects/TiltCard';
+
+// Extract YouTube ID from various YouTube URL formats
+function getYouTubeId(url: string): string | null {
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+  if (shortsMatch) return shortsMatch[1];
+  const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (watchMatch) return watchMatch[1];
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return shortMatch[1];
+  return null;
+}
+
+// Convert YouTube links (regular and Shorts) to embed format
+function getYouTubeEmbedUrl(url: string): string | null {
+  const id = getYouTubeId(url);
+  return id ? `https://www.youtube.com/embed/${id}?autoplay=1&rel=0` : null;
+}
+
+// Retrieve high quality YouTube video thumbnail
+function getYouTubeThumbnail(url: string): string {
+  const id = getYouTubeId(url);
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '/logo.png';
+}
 
 export default function VideoShowcase() {
   const [videos, setVideos] = useState<ShowcaseVideo[]>([]);
-  const [activeVideo, setActiveVideo] = useState<ShowcaseVideo | null>(null);
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
     const loadedVideos = getVideos();
     setVideos(loadedVideos);
-    if (loadedVideos.length > 0) {
-      setActiveVideo(loadedVideos[0]);
-    }
   }, []);
 
-  // Avoid hydration mismatch by not rendering video player until client-side loads
+  const handlePrev = useCallback(() => {
+    if (activeIdx === null || videos.length === 0) return;
+    setActiveIdx((prevIdx) => (prevIdx === null ? 0 : (prevIdx - 1 + videos.length) % videos.length));
+  }, [activeIdx, videos.length]);
+
+  const handleNext = useCallback(() => {
+    if (activeIdx === null || videos.length === 0) return;
+    setActiveIdx((prevIdx) => (prevIdx === null ? 0 : (prevIdx + 1) % videos.length));
+  }, [activeIdx, videos.length]);
+
+  const handleClose = useCallback(() => {
+    setActiveIdx(null);
+  }, []);
+
+  // Listen for keyboard controls inside lightbox
+  useEffect(() => {
+    if (activeIdx === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeIdx, handleClose, handlePrev, handleNext]);
+
   if (!isClient) {
-    return null; // Yoki qandaydir skeleton
+    return (
+      <section className="section" id="videos" style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--border)' }}>
+        <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
+          <div className="badge badge-gold" style={{ marginBottom: 12 }}>Video Obzorlar</div>
+          <h2 className="section-title">Yuklanmoqda...</h2>
+        </div>
+      </section>
+    );
   }
 
-  if (videos.length === 0 || !activeVideo) {
+  if (videos.length === 0) {
     return null;
   }
 
+  const activeVideo = activeIdx !== null ? videos[activeIdx] : null;
+
   return (
-    <section className="section" id="videos" style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--border)' }}>
+    <section className="section" id="videos" style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--border)', position: 'relative' }}>
       <div className="container">
+        
+        {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <div className="badge badge-gold" style={{ marginBottom: 12 }}>Video Obzorlar</div>
           <h2 className="section-title">Mahsulotlarimiz bilan albatta tanishib chiqing!</h2>
           <p className="section-subtitle" style={{ margin: '16px auto 0', maxWidth: '750px' }}>
-            Artline Decor termo-panellari qanday tayyorlanadi, g&apos;isht ustiga qanday montaj qilinadi va yakunda qanday hashamatli ko&apos;rinish oladi? Barchasini grafikalar emas, haqiqiy videolarda tomosha qiling.
+            Artline Decor termo-panellari qanday tayyorlanadi, g&apos;isht ustiga qanday montaj qilinadi va yakunda qanday hashamatli ko&apos;rinish oladi? Barchasini vertikal videolarda tomosha qiling.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 32, alignItems: 'start' }} className="facade-container">
-          {/* Active Video Player */}
-          <div className="glass-card" style={{ padding: 12, borderRadius: 'var(--radius-lg)', background: 'var(--bg-secondary)', overflow: 'hidden' }}>
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '16/10', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#000' }}>
-              <video
-                key={activeVideo.id}
-                src={activeVideo.src}
-                controls
-                autoPlay
-                loop
-                muted
-                playsInline
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        {/* 9:16 Vertical Video Grid */}
+        <div className="video-grid">
+          {videos.map((video, idx) => (
+            <TiltCard
+              key={video.id}
+              className="video-card"
+              max={6}
+              scale={1.03}
+              onClick={() => setActiveIdx(idx)}
+            >
+              <img
+                src={getYouTubeThumbnail(video.src)} 
+                alt={video.title} 
+                className="video-card-img" 
+                loading="lazy"
               />
-            </div>
-            <div style={{ padding: '20px 12px 12px' }}>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'var(--accent-warm)', fontFamily: 'var(--font-heading)' }}>
-                {activeVideo.title}
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                {activeVideo.desc}
-              </p>
+              <div className="video-card-overlay">
+                <span className="video-card-badge">{video.duration}</span>
+                <div className="video-card-play-btn">
+                  <Play size={24} fill="currentColor" style={{ marginLeft: 4 }} />
+                </div>
+                <div className="video-card-info">
+                  <h4 className="video-card-title">{video.title}</h4>
+                  <p className="video-card-desc">{video.desc}</p>
+                </div>
+              </div>
+            </TiltCard>
+          ))}
+        </div>
+
+        {/* Immersive Lightbox Modal */}
+        {activeVideo && (
+          <div className="video-lightbox" onClick={handleClose}>
+            <div className="lightbox-container" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Close Button */}
+              <button className="lightbox-close" onClick={handleClose} aria-label="Yopish">
+                <X size={20} />
+              </button>
+
+              {/* Prev Button */}
+              <button className="lightbox-btn lightbox-btn-prev" onClick={handlePrev} aria-label="Oldingi video">
+                <ChevronLeft size={28} />
+              </button>
+
+              {/* Main 9:16 Video Wrapper */}
+              <div className="lightbox-video-wrapper">
+                {getYouTubeEmbedUrl(activeVideo.src) ? (
+                  <iframe
+                    key={activeVideo.id}
+                    src={getYouTubeEmbedUrl(activeVideo.src)!}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{ width: '100%', height: '100%', border: 'none' }}
+                  />
+                ) : (
+                  <video
+                    key={activeVideo.id}
+                    src={activeVideo.src}
+                    controls
+                    autoPlay
+                    loop
+                    playsInline
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                )}
+              </div>
+
+              {/* Next Button */}
+              <button className="lightbox-btn lightbox-btn-next" onClick={handleNext} aria-label="Keyingi video">
+                <ChevronRight size={28} />
+              </button>
+
+              {/* Title & Desc under video */}
+              <div className="lightbox-info">
+                <h3 className="lightbox-title">{activeVideo.title}</h3>
+                <p className="lightbox-desc">{activeVideo.desc}</p>
+              </div>
+
             </div>
           </div>
+        )}
 
-          {/* Video List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            {videos.map((video) => {
-              const isActive = video.id === activeVideo.id;
-              return (
-                <div
-                  key={video.id}
-                  onClick={() => setActiveVideo(video)}
-                  style={{
-                    display: 'flex',
-                    gap: 16,
-                    padding: 16,
-                    borderRadius: 'var(--radius-md)',
-                    background: isActive ? 'var(--bg-tertiary)' : 'var(--bg-secondary)',
-                    border: isActive ? '1px solid var(--accent-gold)' : '1px solid var(--border)',
-                    cursor: 'pointer',
-                    transition: 'var(--transition)',
-                    boxShadow: isActive ? 'var(--shadow-gold)' : 'none',
-                  }}
-                >
-                  <div style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 'var(--radius-sm)',
-                    background: isActive ? 'var(--accent-glow)' : 'rgba(255,255,255,0.02)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: isActive ? 'var(--accent-gold)' : 'var(--text-muted)',
-                    flexShrink: 0,
-                  }}>
-                    {isActive ? <Play size={20} fill="currentColor" /> : <Film size={20} />}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{
-                      fontSize: '0.95rem',
-                      fontWeight: 600,
-                      color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                      marginBottom: 4,
-                      fontFamily: 'var(--font-heading)',
-                    }}>
-                      {video.title}
-                    </h4>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      color: 'var(--accent-gold)',
-                      fontWeight: 500,
-                    }}>
-                      {video.duration}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Quick Guarantee Box */}
-            <div className="glass-card" style={{
-              background: 'var(--bg-tertiary)',
-              border: '1px dashed var(--border-gold)',
-              padding: 20,
-              marginTop: 12,
-            }}>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <CheckCircle2 size={24} style={{ color: 'var(--success)', flexShrink: 0 }} />
-                <div>
-                  <h4 style={{ fontSize: '0.95rem', color: 'var(--text-primary)', marginBottom: 4, fontWeight: 600 }}>
-                    10 Yillik Rasmiy Kafolat
-                  </h4>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                    Akril tosh qoplamamiz quyoshda yemirilmaydi, yomg&apos;ir suvini o&apos;tkazmaydi va sovuqda yorilib ketmaydi.
-                  </p>
-                </div>
+        {/* Quick Guarantee Box */}
+        <div style={{ maxWidth: '600px', margin: '48px auto 0' }}>
+          <div className="glass-card" style={{
+            background: 'var(--bg-tertiary)',
+            border: '1px dashed var(--border-gold)',
+            padding: 20,
+            borderRadius: 'var(--radius-lg)'
+          }}>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <CheckCircle2 size={28} style={{ color: 'var(--success)', flexShrink: 0 }} />
+              <div>
+                <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: 6, fontWeight: 600 }}>
+                  10 Yillik Rasmiy Kafolat
+                </h4>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                  Akril tosh qoplamamiz quyoshda yemirilmaydi, yomg&apos;ir suvini o&apos;tkazmaydi va sovuqda yorilib ketmaydi.
+                </p>
               </div>
             </div>
           </div>
         </div>
+
       </div>
     </section>
   );

@@ -15,11 +15,13 @@ export interface Order {
   items: OrderItem[];
   totalPrice: number;
   notes: string;
+  objectImages?: string[];
+  calcImages?: string[];
 }
 
 export interface OrderItem {
   id: string;
-  elementType: FacadeElementType;
+  elementType: string;
   name: string;
   length: number;  // meters
   width: number;   // meters
@@ -29,40 +31,33 @@ export interface OrderItem {
   totalPrice: number;
 }
 
-export type FacadeElementType =
-  | 'cornice'    // Karniz
-  | 'column'     // Ustun
-  | 'pilaster'   // Pilyastr
-  | 'archivolt'  // Archivolт
-  | 'bracket'    // Kronshteyn
-  | 'molding'    // Molding
-  | 'rustik'     // Rustik
-  | 'medallion'  // Medalyon
-  | 'balustrade' // Balyustrada
-  | 'keystone';  // Zamkoviy kamen
+export type FacadeElementType = string;
 
 export interface FacadeElement {
-  type: FacadeElementType;
+  id: string;
   nameUz: string;
   nameRu: string;
   description: string;
   rules: string;  // Artline standart qoidalari
-  pricePerUnit: number;
+  pricePerUnit: number; // in USD
   unit: string;   // m, m², dona
+  calculationType: 'volume' | 'unit';
 }
 
 export interface PricingConfig {
   pricePerCubicMeter: number;  // Default: 250$
-  elements: Record<FacadeElementType, number>;
+  usdToUzsRate: number;        // USD to UZS exchange rate
+  elements: FacadeElement[];
   updatedAt: string;
 }
 
 export interface CalculatorInput {
-  elementType: FacadeElementType;
-  length: number;
-  width: number;
-  height: number;
-  quantity: number;
+  elementType: string;
+  length: number | "";
+  width: number | "";
+  height: number | "";
+  quantity: number | "";
+  customPrice?: number | "";
 }
 
 export interface CalculatorResult {
@@ -73,7 +68,7 @@ export interface CalculatorResult {
 }
 
 export interface CalculatorResultItem {
-  elementType: FacadeElementType;
+  elementType: string;
   name: string;
   dimensions: string;
   volume: number;

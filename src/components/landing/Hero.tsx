@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Shield, Zap, ChevronDown, CloudRain, Sun, Snowflake, Leaf } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useFancyEffects } from '@/lib/use-fancy-effects';
 
 const SEASONS = [
   { 
@@ -48,6 +49,25 @@ export default function Hero() {
   
   const currentSeasonRef = useRef(0);
   currentSeasonRef.current = currentSeason;
+
+  // 3D mouse parallax
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const springCfg = { stiffness: 60, damping: 18 };
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [5, -5]), springCfg);
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-7, 7]), springCfg);
+  const contentX = useSpring(useTransform(mx, [-0.5, 0.5], [-18, 18]), springCfg);
+  const contentY = useSpring(useTransform(my, [-0.5, 0.5], [-12, 12]), springCfg);
+  const bgX = useSpring(useTransform(mx, [-0.5, 0.5], [25, -25]), springCfg);
+  const bgY = useSpring(useTransform(my, [-0.5, 0.5], [18, -18]), springCfg);
+  const fancy = useFancyEffects();
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (!fancy) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width - 0.5);
+    my.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const handleMouseLeave = () => { mx.set(0); my.set(0); };
 
   useEffect(() => {
     SEASON_IMAGES.forEach((src) => {
@@ -95,7 +115,8 @@ export default function Hero() {
     }
 
     let particles: Particle[] = [];
-    const maxParticles = 250;
+    // Lighten the particle field on small / low-power screens.
+    const maxParticles = width < 768 ? 90 : 250;
 
     const initParticles = () => {
       particles = [];
@@ -218,7 +239,13 @@ export default function Hero() {
       animationFrameId = requestAnimationFrame(animate);
     };
 
-    animationFrameId = requestAnimationFrame(animate);
+    const prefersReduced =
+      typeof window !== 'undefined' && window.matchMedia
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false;
+    if (!prefersReduced) {
+      animationFrameId = requestAnimationFrame(animate);
+    }
 
     return () => {
       cancelAnimationFrame(animationFrameId);
@@ -229,10 +256,10 @@ export default function Hero() {
   const activeSeason = SEASONS[currentSeason];
 
   return (
-    <section className="hero" id="hero" style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-      
+    <section className="hero" id="hero" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', perspective: '1200px' }}>
+
       {/* Background System */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+      <motion.div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', x: bgX, y: bgY, scale: 1.06 }}>
         
         {/* Blurred Full-Bleed Background for Edges */}
         {SEASON_IMAGES.map((img, idx) => (
@@ -292,10 +319,10 @@ export default function Hero() {
           ref={canvasRef}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}
         />
-      </div>
+      </motion.div>
 
       {/* Main Content Overlay */}
-      <div className="container" style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '100px' }}>
+      <motion.div className="container" style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '100px', rotateX, rotateY, x: contentX, y: contentY, transformStyle: 'preserve-3d' }}>
         
         {/* Season Indicator Pill */}
         <motion.div
@@ -413,6 +440,10 @@ export default function Hero() {
           <motion.a 
             href="#calculator" 
             className="btn btn-lg"
+            onClick={(e) => {
+              e.preventDefault();
+              (window as any).openEstimateModal?.();
+            }}
             animate={{ 
               boxShadow: `0 0 30px ${activeSeason.color}40`,
               borderColor: activeSeason.color,
@@ -425,18 +456,20 @@ export default function Hero() {
               padding: '16px 40px',
               borderRadius: '100px',
               border: '2px solid transparent',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              cursor: 'pointer'
             }}
             whileHover={{ scale: 1.05, background: activeSeason.color }}
             whileTap={{ scale: 0.95 }}
           >
             <Zap size={20} style={{ marginRight: '8px' }} />
-            Smetani hisoblash
+            Bepul hisob-kitob
           </motion.a>
           
           <a 
             href="/ARTLINE_DECOR_Architectural_Catalog.pdf" 
-            download
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn btn-lg"
             style={{ 
               background: 'rgba(255,255,255,0.05)', 
@@ -499,9 +532,9 @@ export default function Hero() {
             </motion.div>
           ))}
         </motion.div>
-      </div>
+      </motion.div>
 
-      <motion.a 
+      <motion.a
         href="#trust" 
         animate={{ y: [0, 15, 0] }}
         transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}

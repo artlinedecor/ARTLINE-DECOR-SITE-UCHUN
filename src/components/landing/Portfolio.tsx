@@ -1,23 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import {
   X, MapPin, Clock, Ruler, Star, ChevronLeft, ChevronRight,
   Zap, CheckCircle2, Quote, ArrowRight, FileText,
 } from 'lucide-react';
 import { PORTFOLIO_PROJECTS, STYLE_LABELS } from '@/lib/portfolio-data';
-import type { PortfolioProject, PortfolioStyle } from '@/lib/types';
+import { getPortfolioProjects } from '@/lib/store';
+import type { PortfolioProject } from '@/lib/types';
 import BeforeAfterSlider from './BeforeAfterSlider';
+import { useFancyEffects } from '@/lib/use-fancy-effects';
 
-type FilterKey = 'all' | PortfolioStyle;
+// YouTube linkini embed formatga o'giradi
+function getYouTubeEmbedUrl(url: string): string | null {
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+  if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
+  const watchMatch = url.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  return null;
+}
 
-const FILTERS: { key: FilterKey; label: string }[] = [
-  { key: 'all', label: 'Barchasi' },
-  { key: 'classic', label: '🏛️ Klassik' },
-  { key: 'modern', label: '🔷 Zamonaviy' },
-  { key: 'hitech', label: '⚡ Hi-Tech' },
-];
 
 // ---- Star rating ----
 function StarRating({ rating }: { rating: number }) {
@@ -84,7 +89,6 @@ function ProjectModal({
   project: PortfolioProject;
   onClose: () => void;
 }) {
-  const styleInfo = STYLE_LABELS[project.style];
   const [showBeforeAfter, setShowBeforeAfter] = useState(false);
 
   return (
@@ -134,7 +138,17 @@ function ProjectModal({
                       <span className="video-compare-badge badge-oldin">OLDIN (G'isht)</span>
                     </div>
                     <div className="video-compare-box">
-                      <video src={project.afterVideo} controls autoPlay loop muted playsInline className="video-compare-media" />
+                      {getYouTubeEmbedUrl(project.afterVideo) ? (
+                        <iframe
+                          src={getYouTubeEmbedUrl(project.afterVideo)!}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="video-compare-media"
+                          style={{ border: 'none', width: '100%', height: '100%' }}
+                        />
+                      ) : (
+                        <video src={project.afterVideo} controls autoPlay loop muted playsInline className="video-compare-media" />
+                      )}
                       <span className="video-compare-badge badge-keyin">KEYIN (Video)</span>
                     </div>
                   </div>
@@ -156,16 +170,6 @@ function ProjectModal({
           <div className="portfolio-modal-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
               <h2 className="portfolio-modal-title">{project.title}</h2>
-              <span
-                className="badge"
-                style={{
-                  background: `${styleInfo.color}20`,
-                  color: styleInfo.color,
-                  fontSize: '0.7rem',
-                }}
-              >
-                {styleInfo.uz}
-              </span>
             </div>
             <div className="portfolio-modal-location">
               <MapPin size={14} /> {project.location}
@@ -234,7 +238,11 @@ function ProjectModal({
           )}
 
           {/* Lead-Funnel CTA */}
-          <a href="#calculator" className="portfolio-cta" onClick={onClose}>
+          <a href="#calculator" className="portfolio-cta" onClick={(e) => {
+            e.preventDefault();
+            onClose();
+            (window as any).openEstimateModal?.();
+          }}>
             <span>Mening uyim uchun ham shunday smeta hisoblab ber</span>
             <ArrowRight size={18} />
           </a>
@@ -244,15 +252,98 @@ function ProjectModal({
   );
 }
 
+// ---- 3D Tilt Portfolio Card ----
+function PortfolioCard({ project, onClick }: { project: PortfolioProject; onClick: () => void }) {
+  const fancy = useFancyEffects();
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const cfg = { stiffness: 150, damping: 18 };
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [9, -9]), cfg);
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-9, 9]), cfg);
+  const glareX = useTransform(mx, [-0.5, 0.5], ['0%', '100%']);
+  const glareY = useTransform(my, [-0.5, 0.5], ['0%', '100%']);
+  const glareBg = useTransform(
+    [glareX, glareY] as unknown as import('framer-motion').MotionValue<string>[],
+    ([x, y]: string[]) => `radial-gradient(circle at ${x} ${y}, rgba(255,255,255,0.22), transparent 45%)`
+  );
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!fancy) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width - 0.5);
+    my.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const onLeave = () => { mx.set(0); my.set(0); };
+
+  return (
+    <motion.div
+      className="portfolio-card"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      onClick={onClick}
+      onMouseMove={fancy ? onMove : undefined}
+      onMouseLeave={fancy ? onLeave : undefined}
+      whileHover={fancy ? { scale: 1.03 } : undefined}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', perspective: 1000 }}
+    >
+      <div className="portfolio-card-img-wrapper" style={{ transform: 'translateZ(35px)', transformStyle: 'preserve-3d' }}>
+        <img
+          src={project.images[0].src}
+          alt={project.images[0].alt}
+          className="portfolio-card-img"
+        />
+        {/* Cursor glare */}
+        {fancy && (
+          <motion.div
+            aria-hidden
+            style={{
+              position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
+              background: glareBg,
+            }}
+          />
+        )}
+        {/* Overlay */}
+        <div className="portfolio-card-overlay">
+          <span className="portfolio-card-view">Batafsil ko&apos;rish →</span>
+        </div>
+        {/* Featured badge */}
+        {project.featured && (
+          <span className="portfolio-card-featured">⭐ TOP</span>
+        )}
+      </div>
+
+      <div className="portfolio-card-body" style={{ transform: 'translateZ(22px)' }}>
+        <h3 className="portfolio-card-title">{project.title}</h3>
+        <div className="portfolio-card-location">
+          <MapPin size={13} /> {project.location}
+        </div>
+        <div className="portfolio-card-meta">
+          <span><Clock size={13} /> {project.completionDays} kun</span>
+          <span><Ruler size={13} /> {project.area} m²</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ---- Main Portfolio Component ----
 export default function Portfolio() {
-  const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
+  const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const [isClient, setIsClient] = useState(false);
 
-  const filtered =
-    activeFilter === 'all'
-      ? PORTFOLIO_PROJECTS
-      : PORTFOLIO_PROJECTS.filter(p => p.style === activeFilter);
+  useEffect(() => {
+    setIsClient(true);
+    setProjects(getPortfolioProjects());
+  }, []);
+
+  if (!isClient) {
+    return null;
+  }
+
+  const filtered = projects;
 
   return (
     <section className="section" id="portfolio" style={{ background: 'var(--bg-secondary)' }}>
@@ -270,86 +361,34 @@ export default function Portfolio() {
           </p>
         </div>
 
-        {/* Filter Bar */}
-        <div className="portfolio-filters">
-          {FILTERS.map(f => (
-            <button
-              key={f.key}
-              className={`portfolio-filter-btn ${activeFilter === f.key ? 'active' : ''}`}
-              onClick={() => setActiveFilter(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+        {/* Filters removed to avoid segmentation */}
 
         {/* Portfolio Grid */}
-        <motion.div className="portfolio-grid" layout>
-          <AnimatePresence mode="popLayout">
-            {filtered.map(project => {
-              const styleInfo = STYLE_LABELS[project.style];
-              return (
-                <motion.div
-                  key={project.id}
-                  className="portfolio-card"
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  onClick={() => setSelectedProject(project)}
-                >
-                  <div className="portfolio-card-img-wrapper">
-                    <img
-                      src={project.images[0].src}
-                      alt={project.images[0].alt}
-                      className="portfolio-card-img"
-                    />
-                    {/* Overlay */}
-                    <div className="portfolio-card-overlay">
-                      <span className="portfolio-card-view">Batafsil ko&apos;rish →</span>
-                    </div>
-                    {/* Style badge */}
-                    <span
-                      className="portfolio-card-badge"
-                      style={{ background: `${styleInfo.color}cc`, color: '#fff' }}
-                    >
-                      {styleInfo.uz}
-                    </span>
-                    {/* Featured badge */}
-                    {project.featured && (
-                      <span className="portfolio-card-featured">⭐ TOP</span>
-                    )}
-                  </div>
-
-                  <div className="portfolio-card-body">
-                    <h3 className="portfolio-card-title">{project.title}</h3>
-                    <div className="portfolio-card-location">
-                      <MapPin size={13} /> {project.location}
-                    </div>
-                    <div className="portfolio-card-meta">
-                      <span><Clock size={13} /> {project.completionDays} kun</span>
-                      <span><Ruler size={13} /> {project.area} m²</span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </motion.div>
+        <div className="portfolio-grid">
+          {filtered.map(project => (
+            <PortfolioCard
+              key={project.id}
+              project={project}
+              onClick={() => setSelectedProject(project)}
+            />
+          ))}
+        </div>
 
         {/* CTA Section */}
         <div className="portfolio-bottom-cta" style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' }}>
           <div>
             <p style={{ marginBottom: 16 }}>Sizning uyingiz ham shunday chiroyli bo&apos;lishi mumkin</p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href="#calculator" className="btn btn-primary btn-lg">
+              <a href="#calculator" className="btn btn-primary btn-lg" onClick={(e) => {
+                e.preventDefault();
+                (window as any).openEstimateModal?.();
+              }}>
                 <Zap size={18} />
                 Bepul smeta hisoblash
               </a>
-              <a href="/ARTLINE_DECOR_Architectural_Catalog.pdf" download className="btn btn-outline btn-lg" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <a href="/ARTLINE_DECOR_Architectural_Catalog.pdf" target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-lg" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <FileText size={18} />
-                Fasad katalogini yuklab olish (PDF)
+                Fasad katalogini ko'rish (PDF)
               </a>
             </div>
           </div>

@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
-import { sendTelegramNotification, formatNewLeadMessage, formatStatusChangeMessage } from '@/lib/telegram';
+import { 
+  sendTelegramNotification, 
+  formatNewLeadMessage, 
+  formatStatusChangeMessage, 
+  formatEstimateModalMessage 
+} from '@/lib/telegram';
+import { isAdminRequest } from '@/lib/server-auth';
 
 export async function POST(request: Request) {
   try {
@@ -8,7 +14,12 @@ export async function POST(request: Request) {
     let message = '';
     
     if (payload.type === 'status_change') {
+      if (!(await isAdminRequest())) {
+        return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+      }
       message = formatStatusChangeMessage(payload.order);
+    } else if (payload.type === 'estimate_modal') {
+      message = formatEstimateModalMessage(payload);
     } else {
       message = formatNewLeadMessage(payload);
     }

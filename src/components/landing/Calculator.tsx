@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Trash2, Download, Calculator as CalcIcon } from 'lucide-react';
-import { FACADE_ELEMENTS, calculateEstimate } from '@/lib/calculator';
+import { calculateEstimate } from '@/lib/calculator';
 import { generateEstimatePDF } from '@/lib/pdf-generator';
+import { getPricing } from '@/lib/store';
 import type { FacadeElementType, CalculatorInput, CalculatorResult } from '@/lib/types';
 
 const EMPTY_INPUT: CalculatorInput = {
@@ -15,11 +16,34 @@ const EMPTY_INPUT: CalculatorInput = {
 };
 
 export default function Calculator() {
-  const [inputs, setInputs] = useState<CalculatorInput[]>([{ ...EMPTY_INPUT }]);
+  const [elements, setElements] = useState<any[]>([]);
+  const [inputs, setInputs] = useState<CalculatorInput[]>([{
+    elementType: 'cornice',
+    length: 1,
+    width: 0.15,
+    height: 0.15,
+    quantity: 1,
+  }]);
   const [result, setResult] = useState<CalculatorResult | null>(null);
   const [clientName, setClientName] = useState('');
   const [clientPhone, setClientPhone] = useState('');
   const [clientAddress, setClientAddress] = useState('');
+
+  useEffect(() => {
+    const pricing = getPricing();
+    if (pricing && pricing.elements) {
+      setElements(pricing.elements);
+      if (pricing.elements.length > 0) {
+        setInputs([{
+          elementType: pricing.elements[0].id,
+          length: 1,
+          width: 0.15,
+          height: 0.15,
+          quantity: 1,
+        }]);
+      }
+    }
+  }, []);
 
   const updateInput = (idx: number, field: keyof CalculatorInput, value: string | number) => {
     setInputs(prev => {
@@ -29,7 +53,16 @@ export default function Calculator() {
     });
   };
 
-  const addItem = () => setInputs(prev => [...prev, { ...EMPTY_INPUT }]);
+  const addItem = () => {
+    const defaultType = elements[0]?.id || 'cornice';
+    setInputs(prev => [...prev, {
+      elementType: defaultType,
+      length: 1,
+      width: 0.15,
+      height: 0.15,
+      quantity: 1,
+    }]);
+  };
 
   const removeItem = (idx: number) => {
     if (inputs.length <= 1) return;
@@ -89,50 +122,64 @@ export default function Calculator() {
 
             {/* Items */}
             <div className="calc-items">
-              {inputs.map((input, idx) => (
-                <div key={idx} className="glass-card" style={{ padding: 16 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <span className="badge badge-gold">Element #{idx + 1}</span>
-                    {inputs.length > 1 && (
-                      <button onClick={() => removeItem(idx)} className="btn btn-ghost btn-sm"
-                        style={{ padding: '4px 8px', color: 'var(--error)' }}>
-                        <Trash2 size={14} />
-                      </button>
+              {inputs.map((input, idx) => {
+                const elMeta = elements.find(e => e.id === input.elementType);
+                const isVolumeBased = elMeta ? elMeta.calculationType === 'volume' : true;
+
+                return (
+                  <div key={idx} className="glass-card" style={{ padding: 16 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <span className="badge badge-gold">Element #{idx + 1}</span>
+                      {inputs.length > 1 && (
+                        <button onClick={() => removeItem(idx)} className="btn btn-ghost btn-sm"
+                          style={{ padding: '4px 8px', color: 'var(--error)' }}>
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="input-group" style={{ marginBottom: 12 }}>
+                      <label>Element turi</label>
+                      <select className="input-field" value={input.elementType}
+                        onChange={e => updateInput(idx, 'elementType', e.target.value)}>
+                        {elements.map((el) => (
+                          <option key={el.id} value={el.id}>{el.nameUz} ({el.nameRu})</option>
+                        ))}
+                      </select>
+                    </div>
+                    {isVolumeBased && (
+                      <div className="calc-row">
+                        <div className="input-group">
+                          <label>Uzunlik (m)</label>
+                          <input type="number" className="input-field" step="0.01"
+                            value={input.length} onChange={e => updateInput(idx, 'length', e.target.value === '' ? '' : +e.target.value)} />
+                        </div>
+                        <div className="input-group">
+                          <label>Kenglik (m)</label>
+                          <input type="number" className="input-field" step="0.01"
+                            value={input.width} onChange={e => updateInput(idx, 'width', e.target.value === '' ? '' : +e.target.value)} />
+                        </div>
+                        <div className="input-group">
+                          <label>Balandlik (m)</label>
+                          <input type="number" className="input-field" step="0.01"
+                            value={input.height} onChange={e => updateInput(idx, 'height', e.target.value === '' ? '' : +e.target.value)} />
+                        </div>
+                      </div>
                     )}
-                  </div>
-                  <div className="input-group" style={{ marginBottom: 12 }}>
-                    <label>Element turi</label>
-                    <select className="input-field" value={input.elementType}
-                      onChange={e => updateInput(idx, 'elementType', e.target.value as FacadeElementType)}>
-                      {Object.entries(FACADE_ELEMENTS).map(([key, el]) => (
-                        <option key={key} value={key}>{el.nameUz} ({el.nameRu})</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="calc-row">
-                    <div className="input-group">
-                      <label>Uzunlik (m)</label>
-                      <input type="number" className="input-field" step="0.01" min="0.01"
-                        value={input.length} onChange={e => updateInput(idx, 'length', +e.target.value)} />
-                    </div>
-                    <div className="input-group">
-                      <label>Kenglik (m)</label>
-                      <input type="number" className="input-field" step="0.01" min="0.01"
-                        value={input.width} onChange={e => updateInput(idx, 'width', +e.target.value)} />
-                    </div>
-                    <div className="input-group">
-                      <label>Balandlik (m)</label>
-                      <input type="number" className="input-field" step="0.01" min="0.01"
-                        value={input.height} onChange={e => updateInput(idx, 'height', +e.target.value)} />
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+                      <div className="input-group">
+                        <label>Miqdori / Soni {elMeta ? `(${elMeta.unit})` : ''}</label>
+                        <input type="number" className="input-field"
+                          value={input.quantity} onChange={e => updateInput(idx, 'quantity', e.target.value === '' ? '' : +e.target.value)} />
+                      </div>
+                      <div className="input-group">
+                        <label>Birlik narxi (so&apos;m, ixtiyoriy)</label>
+                        <input type="number" className="input-field" placeholder="Standart narx"
+                          value={input.customPrice ?? ''} onChange={e => updateInput(idx, 'customPrice', e.target.value === '' ? '' : +e.target.value)} />
+                      </div>
                     </div>
                   </div>
-                  <div className="input-group" style={{ marginTop: 12 }}>
-                    <label>Soni</label>
-                    <input type="number" className="input-field" min="1"
-                      value={input.quantity} onChange={e => updateInput(idx, 'quantity', +e.target.value)} />
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             <div style={{ display: 'flex', gap: 12 }}>
@@ -168,28 +215,20 @@ export default function Calculator() {
                       <div>
                         <strong>{item.name}</strong>
                         <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: '0.8rem' }}>
-                          {item.dimensions} × {item.quantity} шт
+                          {item.dimensions} × {item.quantity} dona
                         </span>
                       </div>
                       <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold)' }}>
-                        ${item.totalPrice.toLocaleString()}
+                        {item.totalPrice.toLocaleString()}&nbsp;so&apos;m
                       </span>
                     </div>
                   ))}
                 </div>
 
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                  <div className="calc-total-row">
-                    <span>Jami:</span>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>${result.subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="calc-total-row">
-                    <span>QQS (12%):</span>
-                    <span style={{ fontFamily: 'var(--font-mono)' }}>${result.vat.toLocaleString()}</span>
-                  </div>
-                  <div className="calc-total-row grand">
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+                  <div className="calc-total-row grand" style={{ borderTop: 'none', paddingTop: 8, marginTop: 0 }}>
                     <span>UMUMIY:</span>
-                    <span>${result.total.toLocaleString()}</span>
+                    <span>{result.total.toLocaleString()}&nbsp;so&apos;m</span>
                   </div>
                 </div>
 

@@ -10,6 +10,9 @@ import VideoTestimonials from '@/components/landing/VideoTestimonials';
 import SocialFeed from '@/components/landing/SocialFeed';
 import FAQ from '@/components/landing/FAQ';
 import Footer from '@/components/landing/Footer';
+import EstimateModal from '@/components/landing/EstimateModal';
+import FloatingContact from '@/components/landing/FloatingContact';
+import ScrollReveal from '@/components/effects/ScrollReveal';
 
 export default function Home() {
   return (
@@ -17,17 +20,19 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
-        <FacadeAnatomy />
-        <TrustElements />
-        <VideoShowcase />
+        <ScrollReveal><FacadeAnatomy /></ScrollReveal>
+        <ScrollReveal><TrustElements /></ScrollReveal>
+        <ScrollReveal><VideoShowcase /></ScrollReveal>
 
-        <Portfolio />
-        <InteractiveMap />
-        <VideoTestimonials />
-        <SocialFeed />
-        <FAQ />
+        <ScrollReveal><Portfolio /></ScrollReveal>
+        <ScrollReveal><InteractiveMap /></ScrollReveal>
+        <ScrollReveal><VideoTestimonials /></ScrollReveal>
+        <ScrollReveal><SocialFeed /></ScrollReveal>
+        <ScrollReveal><FAQ /></ScrollReveal>
       </main>
       <Footer />
+      <EstimateModal />
+      <FloatingContact />
     </>
   );
 }

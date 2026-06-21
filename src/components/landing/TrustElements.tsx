@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Cpu, Ruler, FileCheck, Download, CheckCircle } from 'lucide-react';
+import TiltCard from '@/components/effects/TiltCard';
 
 const TRUST_ITEMS = [
   {
@@ -34,29 +35,53 @@ const TRUST_ITEMS = [
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const started = useRef(false);
 
   useEffect(() => {
+    const el = ref.current;
+
+    const run = () => {
+      if (started.current) return;
+      started.current = true;
+      const duration = 1200;
+      const startTime = performance.now();
+      const tick = (now: number) => {
+        const p = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3); // easeOut
+        setCount(Math.round(target * eased));
+        if (p < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          setCount(target); // guarantee final value
+        }
+      };
+      requestAnimationFrame(tick);
+    };
+
+    // No IntersectionObserver support -> run immediately
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      run();
+      return;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          let start = 0;
-          const step = target / 40;
-          const interval = setInterval(() => {
-            start += step;
-            if (start >= target) {
-              setCount(target);
-              clearInterval(interval);
-            } else {
-              setCount(Math.floor(start));
-            }
-          }, 30);
+          run();
           observer.disconnect();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    observer.observe(el);
+
+    // Fallback: if the observer never fires within 1.5s, animate anyway
+    const fallback = setTimeout(run, 1500);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(fallback);
+    };
   }, [target]);
 
   return <div ref={ref} className="stat-value">{count}{suffix}</div>;
@@ -76,8 +101,9 @@ export default function TrustElements() {
 
         <div className="trust-grid">
           {TRUST_ITEMS.map((item, idx) => (
-            <div
+            <TiltCard
               key={idx}
+              max={7}
               className="glass-card trust-card animate-fade-in"
               style={{ animationDelay: `${idx * 0.1}s` }}
             >
@@ -137,28 +163,28 @@ export default function TrustElements() {
               </div>
               <h3 style={{ marginBottom: 12, fontSize: '1.25rem', fontWeight: 600, color: '#fff' }}>{item.title}</h3>
               <p style={{ fontSize: '0.9rem', lineHeight: 1.6, color: 'var(--text-secondary)' }}>{item.desc}</p>
-            </div>
+            </TiltCard>
           ))}
         </div>
 
         {/* Stats counters */}
         <div className="stats-grid" style={{ marginTop: 64 }}>
-          <div className="stat-card" style={{ textAlign: 'center' }}>
+          <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
             <div className="stat-label">Rasmiy kafolat</div>
             <AnimatedCounter target={10} suffix=" yil" />
-          </div>
-          <div className="stat-card" style={{ textAlign: 'center' }}>
+          </TiltCard>
+          <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
             <div className="stat-label">Xomashyo zichligi</div>
             <AnimatedCounter target={35} suffix=" kg/m³" />
-          </div>
-          <div className="stat-card" style={{ textAlign: 'center' }}>
+          </TiltCard>
+          <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
             <div className="stat-label">Buyurtma tayyor bo&apos;lishi</div>
             <AnimatedCounter target={3} suffix=" kun" />
-          </div>
-          <div className="stat-card" style={{ textAlign: 'center' }}>
+          </TiltCard>
+          <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
             <div className="stat-label">Akril qoplama qalinligi</div>
             <AnimatedCounter target={4} suffix=" mm+" />
-          </div>
+          </TiltCard>
         </div>
 
         {/* Download certifications */}

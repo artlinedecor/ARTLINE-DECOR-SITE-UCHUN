@@ -7,12 +7,12 @@ import {
 } from 'recharts';
 
 const monthlyRevenue = [
-  { name: 'Yanvar', revenue: 15000 },
-  { name: 'Fevral', revenue: 18000 },
-  { name: 'Mart', revenue: 25000 },
-  { name: 'Aprel', revenue: 22000 },
-  { name: 'May', revenue: 30000 },
-  { name: 'Iyun', revenue: 35000 },
+  { name: 'Yanvar', revenue: 15000 * 12650 },
+  { name: 'Fevral', revenue: 18000 * 12650 },
+  { name: 'Mart', revenue: 25000 * 12650 },
+  { name: 'Aprel', revenue: 22000 * 12650 },
+  { name: 'May', revenue: 30000 * 12650 },
+  { name: 'Iyun', revenue: 35000 * 12650 },
 ];
 
 const elementsSold = [
@@ -37,7 +37,7 @@ export default function AnalyticsPage() {
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))' }}>
         <div className="stat-card">
           <div className="stat-label">Umumiy Daromad (Yil bo'yicha)</div>
-          <div className="stat-value">$145,000</div>
+          <div className="stat-value">1 834 250 000 so&apos;m</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Bajarilgan Loyihalar</div>
@@ -45,14 +45,14 @@ export default function AnalyticsPage() {
         </div>
         <div className="stat-card">
           <div className="stat-label">O'rtacha Chek</div>
-          <div className="stat-value">$1,169</div>
+          <div className="stat-value">14 787 850 so&apos;m</div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginTop: '16px' }}>
         {/* Revenue Chart */}
         <div className="glass-card">
-          <h3 style={{ fontSize: '1.2rem', marginBottom: '24px', color: '#fff', fontFamily: 'var(--font-heading)' }}>Oylik Daromad ($)</h3>
+          <h3 style={{ fontSize: '1.2rem', marginBottom: '24px', color: '#fff', fontFamily: 'var(--font-heading)' }}>Oylik Daromad (so&apos;m)</h3>
           <div style={{ height: '300px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyRevenue}>
