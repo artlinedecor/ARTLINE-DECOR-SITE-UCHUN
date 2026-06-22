@@ -230,6 +230,7 @@ export default function Navbar() {
             position: 'absolute', top: '100%', left: 0, right: 0,
             background: 'rgba(5,8,17,0.97)', backdropFilter: 'blur(20px)',
             borderBottom: '1px solid var(--border-gold)', padding: 16,
+            maxHeight: 'calc(100vh - 120px)', overflowY: 'auto',
           }}>
             {NAV_LINKS.map(link => (
               <a key={link.href} href={link.href}
