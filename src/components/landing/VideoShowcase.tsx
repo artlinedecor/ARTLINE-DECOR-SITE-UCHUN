@@ -60,22 +60,37 @@ export default function VideoShowcase() {
     setActiveIdx(null);
   }, []);
 
-  // Lock body scroll only when lightbox toggles open/closed (not on every video change)
+  // Bulletproof body scroll lock: position:fixed freezes the viewport
   const isOpen = activeIdx !== null;
   useEffect(() => {
     if (!isOpen) return;
     const scrollY = window.scrollY;
-    const original = {
-      overflow: document.body.style.overflow,
-      paddingRight: document.body.style.paddingRight,
-    };
     const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+    const original = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      right: document.body.style.right,
+      width: document.body.style.width,
+      paddingRight: document.body.style.paddingRight,
+      overflow: document.body.style.overflow,
+    };
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
     if (scrollbarW > 0) document.body.style.paddingRight = `${scrollbarW}px`;
     return () => {
+      document.body.style.position = original.position;
+      document.body.style.top = original.top;
+      document.body.style.left = original.left;
+      document.body.style.right = original.right;
+      document.body.style.width = original.width;
       document.body.style.overflow = original.overflow;
       document.body.style.paddingRight = original.paddingRight;
-      window.scrollTo({ top: scrollY, behavior: 'instant' as ScrollBehavior });
+      window.scrollTo(0, scrollY);
     };
   }, [isOpen]);
 
