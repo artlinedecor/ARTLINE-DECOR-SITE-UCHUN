@@ -60,37 +60,46 @@ export default function VideoShowcase() {
     setActiveIdx(null);
   }, []);
 
-  // Bulletproof body scroll lock: position:fixed freezes the viewport
+  // Bulletproof scroll lock: position:fixed body + html overflow hidden
   const isOpen = activeIdx !== null;
   useEffect(() => {
     if (!isOpen) return;
     const scrollY = window.scrollY;
     const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
-    const original = {
-      position: document.body.style.position,
-      top: document.body.style.top,
-      left: document.body.style.left,
-      right: document.body.style.right,
-      width: document.body.style.width,
-      paddingRight: document.body.style.paddingRight,
-      overflow: document.body.style.overflow,
+    const html = document.documentElement;
+    const body = document.body;
+    const orig = {
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+      bodyOverflow: body.style.overflow,
+      bodyPaddingRight: body.style.paddingRight,
+      htmlOverflow: html.style.overflow,
+      htmlScrollBehavior: html.style.scrollBehavior,
     };
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
-    if (scrollbarW > 0) document.body.style.paddingRight = `${scrollbarW}px`;
+    // Disable smooth scrolling so restore is instant
+    html.style.scrollBehavior = 'auto';
+    html.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.left = '0';
+    body.style.right = '0';
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    if (scrollbarW > 0) body.style.paddingRight = `${scrollbarW}px`;
     return () => {
-      document.body.style.position = original.position;
-      document.body.style.top = original.top;
-      document.body.style.left = original.left;
-      document.body.style.right = original.right;
-      document.body.style.width = original.width;
-      document.body.style.overflow = original.overflow;
-      document.body.style.paddingRight = original.paddingRight;
+      body.style.position = orig.bodyPosition;
+      body.style.top = orig.bodyTop;
+      body.style.left = orig.bodyLeft;
+      body.style.right = orig.bodyRight;
+      body.style.width = orig.bodyWidth;
+      body.style.overflow = orig.bodyOverflow;
+      body.style.paddingRight = orig.bodyPaddingRight;
+      html.style.overflow = orig.htmlOverflow;
       window.scrollTo(0, scrollY);
+      html.style.scrollBehavior = orig.htmlScrollBehavior;
     };
   }, [isOpen]);
 
@@ -186,9 +195,12 @@ export default function VideoShowcase() {
 
               {/* Fullscreen Button */}
               <button
+                type="button"
                 className="lightbox-fullscreen-btn"
                 aria-label="Fullscreen"
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   const el = lightboxRef.current as any;
                   if (!el) return;
                   try {
@@ -206,12 +218,12 @@ export default function VideoShowcase() {
               </button>
 
               {/* Close Button */}
-              <button className="lightbox-close" onClick={handleClose} aria-label="Yopish">
+              <button type="button" className="lightbox-close" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleClose(); }} aria-label="Yopish">
                 <X size={20} />
               </button>
 
               {/* Prev Button */}
-              <button className="lightbox-btn lightbox-btn-prev" onClick={handlePrev} aria-label="Oldingi video">
+              <button type="button" className="lightbox-btn lightbox-btn-prev" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handlePrev(); }} aria-label="Oldingi video">
                 <ChevronLeft size={28} />
               </button>
 
@@ -239,7 +251,7 @@ export default function VideoShowcase() {
               </div>
 
               {/* Next Button */}
-              <button className="lightbox-btn lightbox-btn-next" onClick={handleNext} aria-label="Keyingi video">
+              <button type="button" className="lightbox-btn lightbox-btn-next" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleNext(); }} aria-label="Keyingi video">
                 <ChevronRight size={28} />
               </button>
 
