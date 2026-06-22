@@ -67,12 +67,22 @@ export default function FacadeAnatomy() {
   useEffect(() => {
     recalcArrows();
     window.addEventListener('resize', recalcArrows);
+    window.addEventListener('scroll', recalcArrows, { passive: true });
     const timer = setTimeout(recalcArrows, 500);
     return () => {
       window.removeEventListener('resize', recalcArrows);
+      window.removeEventListener('scroll', recalcArrows);
       clearTimeout(timer);
     };
   }, [recalcArrows]);
+
+  // Recalculate immediately when selection changes so arrow lands on freshly-laid-out hotspot
+  useEffect(() => {
+    if (activeId) {
+      const raf = requestAnimationFrame(() => recalcArrows());
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [activeId, recalcArrows]);
 
   const handleClick = (id: string) => {
     setActiveId(prev => prev === id ? null : id);

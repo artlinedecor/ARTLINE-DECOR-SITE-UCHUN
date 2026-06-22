@@ -945,9 +945,7 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
     width: 100% !important;
     text-align: left !important;
   }
-  .desktop-anatomy-grid svg {
-    display: none !important;
-  }
+  /* Keep arrows visible on mobile too — they point down to the hotspot */
   .desktop-anatomy-grid > div:first-child > div {
     text-align: left !important;
     flex-direction: row-reverse !important;
