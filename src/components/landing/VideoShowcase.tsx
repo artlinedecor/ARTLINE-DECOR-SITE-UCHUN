@@ -60,9 +60,10 @@ export default function VideoShowcase() {
     setActiveIdx(null);
   }, []);
 
-  // Lock body scroll and remember position when lightbox is open
+  // Lock body scroll only when lightbox toggles open/closed (not on every video change)
+  const isOpen = activeIdx !== null;
   useEffect(() => {
-    if (activeIdx === null) return;
+    if (!isOpen) return;
     const scrollY = window.scrollY;
     const original = {
       overflow: document.body.style.overflow,
@@ -76,7 +77,7 @@ export default function VideoShowcase() {
       document.body.style.paddingRight = original.paddingRight;
       window.scrollTo({ top: scrollY, behavior: 'instant' as ScrollBehavior });
     };
-  }, [activeIdx]);
+  }, [isOpen]);
 
   // Listen for keyboard controls inside lightbox
   useEffect(() => {
