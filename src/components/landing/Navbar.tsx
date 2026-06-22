@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Menu, X, Lock, MapPin, Phone, ChevronDown, FileText, Presentation } from 'lucide-react';
 import { useT, type Lang } from '@/lib/i18n';
+import { usePathname } from 'next/navigation';
 
 const NAV_LINKS = [
   { href: '#trust', key: 'nav.tech' },
@@ -39,6 +40,7 @@ const SOCIALS: { href: string; label: string; svg: React.ReactNode }[] = [
 
 export default function Navbar() {
   const { t, lang, setLang } = useT();
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
@@ -86,28 +88,28 @@ export default function Navbar() {
   return (
     <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, transition: 'all 0.3s ease' }}>
       {/* Top Bar */}
-      <div style={{
+      <div className="navbar-topbar" style={{
         background: '#05070f', borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
         fontSize: '0.8rem', color: '#a0aec0',
         padding: scrolled ? '0px' : '8px 0', maxHeight: scrolled ? '0px' : '40px',
         opacity: scrolled ? 0 : 1, overflow: 'hidden', transition: 'all 0.3s ease',
         display: 'flex', alignItems: 'center'
       }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+        <div className="container navbar-topbar-inner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+          <div className="navbar-topbar-left" style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
             <span className="navbar-topbar-address" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <MapPin size={13} style={{ color: 'var(--accent-gold)' }} />
               <span>{t('top.showroom')} </span>
               <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>{t('top.map')}</a>
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <a href="tel:+998991020200" className="navbar-topbar-phone" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap' }}>
               <Phone size={13} style={{ color: 'var(--accent-gold)' }} />
-              <a href="tel:+998991020200" style={{ color: '#fff' }}>+998 99 102 02 00</a>
-            </span>
+              +998 99 102 02 00
+            </a>
           </div>
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '0.78rem' }}>
+          <div className="navbar-topbar-right" style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '0.78rem' }}>
             <span className="navbar-topbar-hours" style={{ color: 'var(--text-muted)' }}>{t('top.hours')} <span style={{ color: '#fff' }}>09:00 — 19:00</span></span>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="navbar-topbar-socials" style={{ display: 'flex', gap: '8px', alignItems: 'center', paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.08)' }}>
               {SOCIALS.map(s => (
                 <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
                   style={{
@@ -144,7 +146,7 @@ export default function Navbar() {
         }} />
 
         <div className="container navbar-inner">
-          <a href="#hero" className="navbar-logo" aria-label="Artline Decor">
+          <a href={pathname === '/' ? '#hero' : '/'} className="navbar-logo" aria-label="Artline Decor">
             <Image
               src="/logo.png"
               alt="Artline Decor"
@@ -159,7 +161,7 @@ export default function Navbar() {
             {NAV_LINKS.map(link => (
               <li key={link.href}>
                 <a
-                  href={link.href}
+                  href={pathname === '/' ? link.href : `/${link.href}`}
                   onClick={(e) => {
                     if (link.href === '#calculator') {
                       e.preventDefault();
@@ -233,7 +235,7 @@ export default function Navbar() {
             maxHeight: 'calc(100vh - 120px)', overflowY: 'auto',
           }}>
             {NAV_LINKS.map(link => (
-              <a key={link.href} href={link.href}
+              <a key={link.href} href={pathname === '/' ? link.href : `/${link.href}`}
                 onClick={(e) => {
                   setMobileOpen(false);
                   if (link.href === '#calculator') {

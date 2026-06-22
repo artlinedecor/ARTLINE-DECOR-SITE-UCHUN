@@ -1415,6 +1415,33 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
 }
 @media (max-width: 560px) {
   .navbar-topbar-phone-label { display: none !important; }
+  .navbar-topbar-socials { gap: 6px !important; }
+  .navbar-topbar-socials a { width: 22px !important; height: 22px !important; }
 }
 
+/* ---- Mobile: interactive map ---- */
+@media (max-width: 768px) {
+  .interactive-map-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+  .interactive-map-grid > div:first-child {
+    min-height: 250px;
+    padding: 12px !important;
+  }
+  .interactive-map-grid svg { min-height: 220px; }
+}
 
+/* ---- Mobile: topbar compact ---- */
+@media (max-width: 768px) {
+  .navbar-topbar { font-size: 0.68rem !important; padding: 4px 0 !important; }
+  .navbar-topbar-inner { flex-wrap: wrap; gap: 4px; justify-content: center !important; }
+  .navbar-topbar-left { gap: 8px !important; justify-content: center; width: 100%; }
+  .navbar-topbar-right { gap: 6px !important; justify-content: center; width: 100%; }
+  .navbar-topbar-address { display: none !important; }
+  .navbar-topbar-hours { display: none !important; }
+  .navbar-topbar-phone { font-size: 0.72rem; }
+  .navbar-topbar-socials { border-left: none !important; padding-left: 0 !important; }
+  .navbar-topbar-socials a { width: 22px !important; height: 22px !important; }
+  .navbar-topbar-socials svg { width: 11px; height: 11px; }
+}
