@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Play, X, ChevronLeft, ChevronRight, Film, CheckCircle2, Maximize2, Minimize2 } from 'lucide-react';
 import { getVideos } from '@/lib/store';
 import type { ShowcaseVideo } from '@/lib/types';
@@ -58,6 +59,24 @@ export default function VideoShowcase() {
   const handleClose = useCallback(() => {
     setActiveIdx(null);
   }, []);
+
+  // Lock body scroll and remember position when lightbox is open
+  useEffect(() => {
+    if (activeIdx === null) return;
+    const scrollY = window.scrollY;
+    const original = {
+      overflow: document.body.style.overflow,
+      paddingRight: document.body.style.paddingRight,
+    };
+    const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    if (scrollbarW > 0) document.body.style.paddingRight = `${scrollbarW}px`;
+    return () => {
+      document.body.style.overflow = original.overflow;
+      document.body.style.paddingRight = original.paddingRight;
+      window.scrollTo({ top: scrollY, behavior: 'instant' as ScrollBehavior });
+    };
+  }, [activeIdx]);
 
   // Listen for keyboard controls inside lightbox
   useEffect(() => {
@@ -133,8 +152,8 @@ export default function VideoShowcase() {
           ))}
         </div>
 
-        {/* Immersive Lightbox Modal */}
-        {activeVideo && (
+        {/* Immersive Lightbox Modal — portal to body */}
+        {activeVideo && typeof window !== 'undefined' && createPortal(
           <div
             className="video-lightbox"
             onClick={handleClose}
@@ -215,7 +234,8 @@ export default function VideoShowcase() {
               </div>
 
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Quick Guarantee Box */}
