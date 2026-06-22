@@ -79,8 +79,13 @@ export default function Hero() {
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
+    let lastW = window.innerWidth;
     const handleResize = () => {
       if (!canvas) return;
+      // On mobile the address bar show/hide fires resize with only a height
+      // change — ignore those to avoid constant canvas churn while scrolling.
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     };
@@ -103,7 +108,8 @@ export default function Hero() {
 
     let particles: Particle[] = [];
     // Lighten the particle field on small / low-power screens.
-    const maxParticles = width < 768 ? 90 : 250;
+    const isMobile = width < 768;
+    const maxParticles = isMobile ? 55 : 250;
 
     const initParticles = () => {
       particles = [];
@@ -137,11 +143,10 @@ export default function Hero() {
         if (seasonIdx === 0) {
           // Winter: Snowflakes
           ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          ctx.shadowBlur = p.size * 2;
-          ctx.shadowColor = 'white';
+          if (!isMobile) { ctx.shadowBlur = p.size * 2; ctx.shadowColor = 'white'; }
           ctx.arc(p.x, p.y, p.size * 1.2, 0, Math.PI * 2);
           ctx.fill();
-          ctx.shadowBlur = 0;
+          if (!isMobile) ctx.shadowBlur = 0;
 
           p.vy = 1.0 + p.size * 0.4;
           p.vx = 0.3 + Math.sin(time * p.swaySpeed + p.swayOffset) * 0.4;
@@ -161,11 +166,10 @@ export default function Hero() {
         } else if (seasonIdx === 2) {
           // Summer: Sun Dust / Lens Flares
           ctx.fillStyle = 'rgba(255, 220, 150, 0.6)';
-          ctx.shadowBlur = p.size * 3;
-          ctx.shadowColor = '#ffcc00';
+          if (!isMobile) { ctx.shadowBlur = p.size * 3; ctx.shadowColor = '#ffcc00'; }
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fill();
-          ctx.shadowBlur = 0;
+          if (!isMobile) ctx.shadowBlur = 0;
 
           p.vy = -(0.3 + p.size * 0.1);
           p.vx = Math.sin(time * p.swaySpeed + p.swayOffset) * 0.2;
@@ -223,19 +227,48 @@ export default function Hero() {
       });
 
       ctx.globalAlpha = 1;
-      animationFrameId = requestAnimationFrame(animate);
+      if (running) animationFrameId = requestAnimationFrame(animate);
     };
 
     const prefersReduced =
       typeof window !== 'undefined' && window.matchMedia
         ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
         : false;
-    if (!prefersReduced) {
+
+    let running = false;
+    const startLoop = () => {
+      if (running || prefersReduced) return;
+      running = true;
       animationFrameId = requestAnimationFrame(animate);
-    }
+    };
+    const stopLoop = () => {
+      running = false;
+      cancelAnimationFrame(animationFrameId);
+    };
+
+    // Only animate while the hero is actually on-screen. Running a heavy
+    // particle canvas the whole time (even at the bottom of the page) starves
+    // mobile memory and makes the browser reload the tab — which is exactly
+    // the "page jumps back to top" the user was seeing.
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) startLoop();
+        else stopLoop();
+      },
+      { threshold: 0 }
+    );
+    io.observe(canvas);
+
+    const onVisibility = () => {
+      if (document.hidden) stopLoop();
+      else startLoop();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      stopLoop();
+      io.disconnect();
+      document.removeEventListener('visibilitychange', onVisibility);
       window.removeEventListener('resize', handleResize);
     };
   }, []);
