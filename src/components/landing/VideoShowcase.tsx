@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Play, X, ChevronLeft, ChevronRight, Film, CheckCircle2, Maximize2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Play, X, ChevronLeft, ChevronRight, Film, CheckCircle2, Maximize2, Minimize2 } from 'lucide-react';
 import { getVideos } from '@/lib/store';
 import type { ShowcaseVideo } from '@/lib/types';
 import TiltCard from '@/components/effects/TiltCard';
@@ -35,6 +35,9 @@ export default function VideoShowcase() {
   const [videos, setVideos] = useState<ShowcaseVideo[]>([]);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const touchStartX = React.useRef<number | null>(null);
+  const lightboxRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -132,9 +135,41 @@ export default function VideoShowcase() {
 
         {/* Immersive Lightbox Modal */}
         {activeVideo && (
-          <div className="video-lightbox" onClick={handleClose}>
+          <div
+            className="video-lightbox"
+            onClick={handleClose}
+            ref={lightboxRef}
+            onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+            onTouchEnd={(e) => {
+              if (touchStartX.current === null) return;
+              const dx = e.changedTouches[0].clientX - touchStartX.current;
+              touchStartX.current = null;
+              if (Math.abs(dx) > 60) { if (dx < 0) handleNext(); else handlePrev(); }
+            }}
+          >
             <div className="lightbox-container" onClick={(e) => e.stopPropagation()}>
-              
+
+              {/* Fullscreen Button */}
+              <button
+                className="lightbox-fullscreen-btn"
+                aria-label="Fullscreen"
+                onClick={async () => {
+                  const el = lightboxRef.current as any;
+                  if (!el) return;
+                  try {
+                    if (!document.fullscreenElement) {
+                      await (el.requestFullscreen?.() ?? el.webkitRequestFullscreen?.());
+                      setIsFullscreen(true);
+                    } else {
+                      await (document.exitFullscreen?.() ?? (document as any).webkitExitFullscreen?.());
+                      setIsFullscreen(false);
+                    }
+                  } catch {}
+                }}
+              >
+                {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+              </button>
+
               {/* Close Button */}
               <button className="lightbox-close" onClick={handleClose} aria-label="Yopish">
                 <X size={20} />

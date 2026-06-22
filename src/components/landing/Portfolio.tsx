@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import {
   X, MapPin, Clock, Ruler, Star, ChevronLeft, ChevronRight,
-  Zap, CheckCircle2, Quote, ArrowRight, FileText,
+  Zap, CheckCircle2, Quote, ArrowRight, FileText, Maximize2,
 } from 'lucide-react';
 import { PORTFOLIO_PROJECTS, STYLE_LABELS } from '@/lib/portfolio-data';
 import { getPortfolioProjects } from '@/lib/store';
@@ -45,40 +45,112 @@ function StarRating({ rating }: { rating: number }) {
 // ---- Image carousel for modal ----
 function ImageCarousel({ images }: { images: { src: string; alt: string }[] }) {
   const [current, setCurrent] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const touchStartX = React.useRef<number | null>(null);
 
-  if (images.length <= 1) {
-    return (
-      <div className="portfolio-modal-img-wrapper">
-        <img src={images[0]?.src} alt={images[0]?.alt} className="portfolio-modal-img" />
-      </div>
-    );
-  }
+  const next = useCallback(() => setCurrent(p => (p === images.length - 1 ? 0 : p + 1)), [images.length]);
+  const prev = useCallback(() => setCurrent(p => (p === 0 ? images.length - 1 : p - 1)), [images.length]);
+
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFullscreen(false);
+      else if (e.key === 'ArrowLeft') prev();
+      else if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [fullscreen, next, prev]);
+
+  const swipe = {
+    onTouchStart: (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; },
+    onTouchEnd: (e: React.TouchEvent) => {
+      if (touchStartX.current === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX.current;
+      touchStartX.current = null;
+      if (Math.abs(dx) > 50) { if (dx < 0) next(); else prev(); }
+    },
+  };
+
+  if (!images.length) return null;
 
   return (
-    <div className="portfolio-modal-img-wrapper">
-      <img src={images[current].src} alt={images[current].alt} className="portfolio-modal-img" />
-      <button
-        className="portfolio-carousel-btn portfolio-carousel-prev"
-        onClick={() => setCurrent(p => (p === 0 ? images.length - 1 : p - 1))}
-      >
-        <ChevronLeft size={20} />
-      </button>
-      <button
-        className="portfolio-carousel-btn portfolio-carousel-next"
-        onClick={() => setCurrent(p => (p === images.length - 1 ? 0 : p + 1))}
-      >
-        <ChevronRight size={20} />
-      </button>
-      <div className="portfolio-carousel-dots">
-        {images.map((_, idx) => (
-          <button
-            key={idx}
-            className={`portfolio-carousel-dot ${idx === current ? 'active' : ''}`}
-            onClick={() => setCurrent(idx)}
-          />
-        ))}
+    <>
+      <div className="portfolio-modal-img-wrapper" {...swipe}>
+        <img
+          src={images[current].src}
+          alt={images[current].alt}
+          className="portfolio-modal-img"
+          onClick={() => setFullscreen(true)}
+        />
+        {images.length > 1 && (
+          <>
+            <button
+              className="portfolio-carousel-btn portfolio-carousel-prev"
+              onClick={prev}
+              aria-label="Oldingi"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <button
+              className="portfolio-carousel-btn portfolio-carousel-next"
+              onClick={next}
+              aria-label="Keyingi"
+            >
+              <ChevronRight size={22} />
+            </button>
+            <div className="portfolio-carousel-dots">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  className={`portfolio-carousel-dot ${idx === current ? 'active' : ''}`}
+                  onClick={() => setCurrent(idx)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+        <button
+          className="img-fullscreen-close"
+          style={{ top: 12, left: 12, right: 'auto', position: 'absolute' }}
+          onClick={() => setFullscreen(true)}
+          aria-label="Kattalashtirish"
+        >
+          <Maximize2 size={16} />
+        </button>
       </div>
-    </div>
+
+      {fullscreen && (
+        <div className="img-fullscreen-overlay" onClick={() => setFullscreen(false)} {...swipe}>
+          <button className="img-fullscreen-close" onClick={() => setFullscreen(false)} aria-label="Yopish">
+            <X size={20} />
+          </button>
+          {images.length > 1 && (
+            <>
+              <button
+                className="img-fullscreen-nav img-fullscreen-prev"
+                onClick={(e) => { e.stopPropagation(); prev(); }}
+                aria-label="Oldingi"
+              >
+                <ChevronLeft size={26} />
+              </button>
+              <button
+                className="img-fullscreen-nav img-fullscreen-next"
+                onClick={(e) => { e.stopPropagation(); next(); }}
+                aria-label="Keyingi"
+              >
+                <ChevronRight size={26} />
+              </button>
+            </>
+          )}
+          <img
+            src={images[current].src}
+            alt={images[current].alt}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </>
   );
 }
 

@@ -677,9 +677,55 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
 /* Modal Image */
 .portfolio-modal-img-wrapper {
   position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden;
+  background: #070b13;
 }
 .portfolio-modal-img {
   width: 100%; height: 100%; object-fit: contain; background: #070b13;
+  cursor: zoom-in;
+}
+@media (max-width: 768px) {
+  .portfolio-modal-img-wrapper { aspect-ratio: 4/3; }
+}
+
+/* Fullscreen image overlay */
+.img-fullscreen-overlay {
+  position: fixed; inset: 0; z-index: 11000;
+  background: rgba(0,0,0,0.96);
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px;
+  animation: fadeIn 0.2s ease forwards;
+}
+.img-fullscreen-overlay img {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.img-fullscreen-close {
+  position: absolute; top: 18px; right: 18px;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.2);
+  color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+  z-index: 11002;
+}
+.img-fullscreen-close:hover { background: rgba(239,68,68,0.85); border-color: rgba(239,68,68,1); }
+.img-fullscreen-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); border: 1.5px solid rgba(255,255,255,0.2);
+  color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(10px);
+  z-index: 11002;
+}
+.img-fullscreen-nav:hover { background: rgba(217,154,108,0.85); border-color: var(--accent-gold); }
+.img-fullscreen-prev { left: 24px; }
+.img-fullscreen-next { right: 24px; }
+
+/* Make carousel buttons more tappable */
+.portfolio-carousel-btn {
+  width: 48px !important; height: 48px !important;
 }
 
 /* Modal Tabs */
@@ -1070,18 +1116,21 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
 }
 .lightbox-container {
   position: relative;
-  width: 100%;
-  max-width: 450px;
-  height: 85vh;
-  max-height: 800px;
+  width: 92vw;
+  max-width: 1200px;
+  height: 92vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  padding: 0 24px;
+  gap: 16px;
 }
 .lightbox-video-wrapper {
   position: relative;
-  width: 100%;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
   aspect-ratio: 9/16;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -1093,11 +1142,11 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
   color: #fff;
   display: flex;
   align-items: center;
@@ -1105,39 +1154,62 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 10;
+  backdrop-filter: blur(10px);
 }
 .lightbox-btn:hover {
-  background: rgba(192, 131, 90, 0.2);
+  background: rgba(217, 154, 108, 0.85);
   border-color: var(--accent-gold);
-  color: var(--accent-gold);
-  transform: translateY(-50%) scale(1.1);
+  color: #fff;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 10px 30px rgba(217, 154, 108, 0.4);
 }
-.lightbox-btn-prev {
-  left: -70px;
-}
-.lightbox-btn-next {
-  right: -70px;
-}
-.lightbox-close {
+.lightbox-btn-prev { left: 24px; }
+.lightbox-btn-next { right: 24px; }
+.lightbox-fullscreen-btn {
   position: absolute;
-  top: -40px;
-  right: 16px;
-  width: 36px;
-  height: 36px;
+  top: 16px;
+  left: 16px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  z-index: 11;
+}
+.lightbox-fullscreen-btn:hover {
+  background: rgba(217, 154, 108, 0.85);
+  border-color: var(--accent-gold);
+}
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 11;
 }
 .lightbox-close:hover {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.5);
-  color: #ef4444;
+  background: rgba(239, 68, 68, 0.85);
+  border-color: rgba(239, 68, 68, 1);
+  color: #fff;
+  transform: scale(1.06);
 }
 .lightbox-info {
   margin-top: 16px;
@@ -1175,37 +1247,26 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
-  .lightbox-btn-prev {
-    left: 12px;
-    top: auto;
-    bottom: -60px;
-    transform: none;
-  }
-  .lightbox-btn-prev:hover {
-    transform: scale(1.1);
-  }
-  .lightbox-btn-next {
-    right: 12px;
-    top: auto;
-    bottom: -60px;
-    transform: none;
-  }
-  .lightbox-btn-next:hover {
-    transform: scale(1.1);
-  }
   .lightbox-container {
-    height: 75vh;
-    justify-content: flex-start;
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    padding: 0 8px;
+    gap: 8px;
   }
-  .lightbox-close {
-    top: 12px;
-    right: 12px;
-    z-index: 11;
-    background: rgba(0,0,0,0.5);
+  .lightbox-video-wrapper {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 9/16;
+    max-height: calc(100vh - 80px);
   }
+  .lightbox-btn {
+    width: 52px; height: 52px;
+  }
+  .lightbox-btn-prev { left: 10px; }
+  .lightbox-btn-next { right: 10px; }
   .lightbox-info {
-    margin-top: 12px;
-    margin-bottom: 70px;
+    display: none;
   }
 }
 @media (max-width: 480px) {
