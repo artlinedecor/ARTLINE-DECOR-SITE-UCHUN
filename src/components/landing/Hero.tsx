@@ -14,10 +14,10 @@ const SEASONS = [
 ];
 
 const SEASON_IMAGES = [
-  '/hero_winter.png?v=4',
-  '/hero_spring.png?v=4',
-  '/hero_summer.png?v=4',
-  '/hero_autumn.png?v=4'
+  '/hero_winter.webp',
+  '/hero_spring.webp',
+  '/hero_summer.webp',
+  '/hero_autumn.webp'
 ];
 
 export default function Hero() {

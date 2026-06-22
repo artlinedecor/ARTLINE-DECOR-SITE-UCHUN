@@ -2,16 +2,18 @@
 
 import { Phone, MapPin, Clock, Send, FileText } from 'lucide-react';
 import { useT } from '@/lib/i18n';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
   const { t } = useT();
+  const pathname = usePathname();
   return (
     <footer className="footer" id="contact">
       <div className="container">
         <div className="footer-grid">
           <div>
             <div className="footer-logo" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <img src="/logo.png" alt="Artline Decor Logo" width={48} height={48} style={{ objectFit: 'contain' }} />
+              <img src="/logo.webp" alt="Artline Decor Logo" width={48} height={48} style={{ objectFit: 'contain' }} />
               ARTLINE DECOR
             </div>
             <p className="footer-desc">{t('foot.desc')}</p>
@@ -52,9 +54,23 @@ export default function Footer() {
                   <FileText size={14} /> {t('foot.docs.catalog')}
                 </a>
               </li>
-              <li><a href="#facade">{t('foot.docs.types')}</a></li>
-              <li><a href="#calculator">{t('foot.docs.smeta')}</a></li>
-              <li><a href="#portfolio">{t('foot.docs.projects')}</a></li>
+              <li><a href={pathname === '/' ? '#facade' : '/#facade'}>{t('foot.docs.types')}</a></li>
+              <li>
+                <a
+                  href={pathname === '/' ? '#calculator' : '/#calculator'}
+                  onClick={(e) => {
+                    if (pathname !== '/') {
+                      // Let link navigate to /#calculator
+                    } else {
+                      e.preventDefault();
+                      (window as any).openEstimateModal?.();
+                    }
+                  }}
+                >
+                  {t('foot.docs.smeta')}
+                </a>
+              </li>
+              <li><a href={pathname === '/' ? '#portfolio' : '/#portfolio'}>{t('foot.docs.projects')}</a></li>
             </ul>
           </div>
 

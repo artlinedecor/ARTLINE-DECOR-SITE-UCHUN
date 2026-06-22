@@ -6,11 +6,11 @@ import { Shield, Thermometer, CloudRain, Hammer } from 'lucide-react';
 import { useT } from '@/lib/i18n';
 
 const PRODUCT_KEYS = [
-  { id: 'ostirma', titleKey: 'fa.p1.title', subKey: 'fa.p1.sub', img: '/product-travertin.png', hotspot: { x: 23, y: 23 }, side: 'left' as const },
-  { id: 'karniz', titleKey: 'fa.p2.title', subKey: 'fa.p2.sub', img: '/product-cornice.png', hotspot: { x: 37, y: 51 }, side: 'left' as const },
-  { id: 'pianino', titleKey: 'fa.p3.title', subKey: 'fa.p3.sub', img: '/product-fluted-cornice.png', hotspot: { x: 18, y: 53 }, side: 'left' as const },
-  { id: 'oyna', titleKey: 'fa.p4.title', subKey: 'fa.p4.sub', img: '/product-window.png', hotspot: { x: 86, y: 31 }, side: 'right' as const },
-  { id: 'kolonna', titleKey: 'fa.p5.title', subKey: 'fa.p5.sub', img: '/product-column.png', hotspot: { x: 66, y: 36 }, side: 'right' as const },
+  { id: 'ostirma', titleKey: 'fa.p1.title', subKey: 'fa.p1.sub', img: '/product-travertin.webp', hotspot: { x: 23, y: 23 }, side: 'left' as const },
+  { id: 'karniz', titleKey: 'fa.p2.title', subKey: 'fa.p2.sub', img: '/product-cornice.webp', hotspot: { x: 37, y: 51 }, side: 'left' as const },
+  { id: 'pianino', titleKey: 'fa.p3.title', subKey: 'fa.p3.sub', img: '/product-fluted-cornice.webp', hotspot: { x: 18, y: 53 }, side: 'left' as const },
+  { id: 'oyna', titleKey: 'fa.p4.title', subKey: 'fa.p4.sub', img: '/product-window.webp', hotspot: { x: 86, y: 31 }, side: 'right' as const },
+  { id: 'kolonna', titleKey: 'fa.p5.title', subKey: 'fa.p5.sub', img: '/product-column.webp', hotspot: { x: 66, y: 36 }, side: 'right' as const },
   { id: 'termopanel', titleKey: 'fa.p6.title', subKey: 'fa.p6.sub', img: '/portfolio/termo-panel-razrezi.jpg', hotspot: { x: 62, y: 44 }, side: 'right' as const },
 ];
 
@@ -279,7 +279,7 @@ export default function FacadeAnatomy() {
               }}
             >
               <img
-                src="/facade-main.png"
+                src="/facade-main.webp"
                 alt="Hashamatli fasad"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
