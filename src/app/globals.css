@@ -1334,9 +1334,23 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   }
 }
 
+@keyframes fa-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.7; }
+}
+
 /* ---- Mobile: lighten heavy effects ---- */
 @media (max-width: 768px), (hover: none), (pointer: coarse) {
   .cursor-glow-layer { display: none !important; }
+}
+
+/* ---- Mobile: clean topbar layout ---- */
+@media (max-width: 900px) {
+  .navbar-topbar-address { display: none !important; }
+  .navbar-topbar-hours { display: none !important; }
+}
+@media (max-width: 560px) {
+  .navbar-topbar-phone-label { display: none !important; }
 }
 
 

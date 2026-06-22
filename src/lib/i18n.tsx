@@ -29,10 +29,10 @@ const UZ: Dict = {
   'hero.season.autumn': 'KUZ',
   'hero.season.summer': 'YOZ',
   'hero.season.spring': 'BAHOR',
-  'hero.title.1': 'Uyingiz va Binongizga',
+  'hero.title.1': 'Uyingiz va Binoingizga',
   'hero.title.2': 'Arxitektura Salobati',
   'hero.subtitle': "Panellarimiz qishda sovuqdan, yozda jaziramadan, kuz va bahorda esa namlikdan 100% himoya qiladi. G'isht ustiga to'g'ridan-to'g'ri montaj qilinadi — suvoq talab etilmaydi.",
-  'hero.cta.callback': "Qayta aloqa so'rash",
+  'hero.cta.callback': "Qayta aloqa buyurish",
   'hero.cta.catalog': 'Katalog (PDF)',
   'hero.stats.years': "yil tajriba",
   'hero.stats.projects': "loyihalar",
@@ -53,7 +53,7 @@ const UZ: Dict = {
 
   // EstimateModal
   'modal.badge': 'Bepul maslahat',
-  'modal.title': "Qayta aloqa so'rash",
+  'modal.title': "Qayta aloqa buyurish",
   'modal.subtitle.1': "Ma'lumotlarni qoldiring — mutaxassisimiz",
   'modal.subtitle.bold': '15 daqiqa',
   'modal.subtitle.2': "ichida bog'lanadi.",
@@ -71,7 +71,7 @@ const UZ: Dict = {
   'modal.bt.commercial': "Tijorat binosi (Do'kon, Ofis, H.k.)",
   'modal.bt.multistory': "Ko'p qavatli bino",
   'modal.privacy': "Ma'lumotlaringiz himoyada — uchinchi shaxslarga oshkor qilinmaydi.",
-  'modal.submit': "Qayta aloqa so'rash",
+  'modal.submit': "Qayta aloqa buyurish",
   'modal.submitting': 'Yuborilmoqda…',
   'modal.success.title': "Rahmat! So'rovingiz qabul qilindi",
   'modal.success.text': "Mutaxassisimiz tez orada siz bilan telefon orqali bog'lanib, barcha savollaringizga javob beradi va bepul maslahat beradi.",
@@ -265,6 +265,7 @@ const RU: Dict = {
   // EstimateModal
   'modal.badge': 'Бесплатная консультация',
   'modal.title': 'Заказать обратный звонок',
+  'modal.cta': 'Заказать обратный звонок',
   'modal.subtitle.1': 'Оставьте данные — наш специалист свяжется с вами в течение',
   'modal.subtitle.bold': '15 минут',
   'modal.subtitle.2': '.',

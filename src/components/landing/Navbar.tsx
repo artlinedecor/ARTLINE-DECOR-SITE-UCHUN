@@ -95,7 +95,7 @@ export default function Navbar() {
       }}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className="navbar-topbar-address" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <MapPin size={13} style={{ color: 'var(--accent-gold)' }} />
               <span>{t('top.showroom')} </span>
               <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>{t('top.map')}</a>
@@ -106,7 +106,7 @@ export default function Navbar() {
             </span>
           </div>
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center', fontSize: '0.78rem' }}>
-            <span style={{ color: 'var(--text-muted)' }}>{t('top.hours')} <span style={{ color: '#fff' }}>09:00 — 19:00</span></span>
+            <span className="navbar-topbar-hours" style={{ color: 'var(--text-muted)' }}>{t('top.hours')} <span style={{ color: '#fff' }}>09:00 — 19:00</span></span>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingLeft: '8px', borderLeft: '1px solid rgba(255,255,255,0.08)' }}>
               {SOCIALS.map(s => (
                 <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
@@ -260,8 +260,15 @@ export default function Navbar() {
                   </span>
                 </a>
               ))}
-              <a href="/dashboard" style={{ display: 'inline-flex', gap: 8, alignItems: 'center', marginTop: 12, padding: '8px 14px', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 100, fontSize: '0.82rem' }}>
-                <Lock size={13} /> {t('nav.dashboard')}
+              <a href="/dashboard" onClick={() => setMobileOpen(false)} style={{
+                display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'center',
+                marginTop: 16, padding: '12px 18px',
+                color: '#0a0a0a', background: 'linear-gradient(135deg, var(--accent-gold), var(--accent-warm))',
+                border: 'none', borderRadius: 100, fontSize: '0.92rem', fontWeight: 700,
+                boxShadow: '0 8px 20px rgba(217,154,108,0.25)',
+                textDecoration: 'none',
+              }}>
+                <Lock size={14} /> {t('nav.dashboard')}
               </a>
             </div>
           </div>

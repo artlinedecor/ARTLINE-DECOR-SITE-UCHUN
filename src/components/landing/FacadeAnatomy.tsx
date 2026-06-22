@@ -280,32 +280,36 @@ export default function FacadeAnatomy() {
 
               {/* ── NUQTALAR ── */}
               {products.map((prod) => (
-                <div
+                <button
                   key={`dot-${prod.id}`}
+                  type="button"
+                  onClick={() => handleClick(prod.id)}
+                  aria-label={prod.title}
                   style={{
                     position: 'absolute',
                     left: `${prod.hotspot.x}%`, top: `${prod.hotspot.y}%`,
                     transform: 'translate(-50%,-50%)',
                     zIndex: 10,
-                    opacity: activeId === prod.id ? 1 : 0, // Faqat mahsulot bosilganda ko'rinadi
-                    pointerEvents: 'none', // Nuqtani bosib bo'lmaydi, faqat mahsulotni
-                    transition: 'opacity 0.3s ease',
+                    width: '32px', height: '32px',
+                    padding: 0,
+                    border: 'none', background: 'transparent',
+                    cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}
                 >
-                  <div style={{
-                    width: '36px', height: '36px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <div style={{
-                      width: '18px',
-                      height: '18px',
-                      borderRadius: '50%',
-                      background: '#d99a6c',
-                      border: `2px solid #fff`,
-                      boxShadow: '0 0 20px rgba(217,154,108,0.8)',
-                    }} />
-                  </div>
-                </div>
+                  <span aria-hidden style={{
+                    width: activeId === prod.id ? '20px' : '14px',
+                    height: activeId === prod.id ? '20px' : '14px',
+                    borderRadius: '50%',
+                    background: '#d99a6c',
+                    border: '2px solid #fff',
+                    boxShadow: activeId === prod.id
+                      ? '0 0 24px rgba(217,154,108,1)'
+                      : '0 0 14px rgba(217,154,108,0.7)',
+                    transition: 'all 0.25s ease',
+                    animation: activeId === prod.id ? 'none' : 'fa-pulse 2s ease-in-out infinite',
+                  }} />
+                </button>
               ))}
             </div>
           </div>
