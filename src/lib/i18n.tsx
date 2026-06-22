@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 
 export type Lang = 'uz' | 'ru';
 
@@ -26,7 +26,7 @@ const UZ: Dict = {
   // Hero
   'hero.season.label': 'Yilning har qanday faslida ishonchli',
   'hero.season.winter': 'QISH',
-  'hero.season.rain': 'YOMG\'IR',
+  'hero.season.autumn': 'KUZ',
   'hero.season.summer': 'YOZ',
   'hero.season.spring': 'BAHOR',
   'hero.title.1': 'Uyingiz va Binongizga',
@@ -237,7 +237,7 @@ const RU: Dict = {
   // Hero
   'hero.season.label': 'Надёжно в любое время года',
   'hero.season.winter': 'ЗИМА',
-  'hero.season.rain': 'ДОЖДЬ',
+  'hero.season.autumn': 'ОСЕНЬ',
   'hero.season.summer': 'ЛЕТО',
   'hero.season.spring': 'ВЕСНА',
   'hero.title.1': 'Архитектурное величие',
@@ -375,7 +375,7 @@ const RU: Dict = {
   'trust.item2.desc': 'В составе нет токсичных химических веществ. Материал обладает свойством самозатухания.',
   'trust.item2.badge': '100% безопасно',
   'trust.item3.title': 'Точность автоматических станков',
-  'trust.item3.desc': 'Все элементы изготавливаются на автоматизированных «протяжных» станках. Погрешность геометрии — 0 мм.',
+  'trust.item3.desc': 'Все элементы изготавливаются на автоматизированных «протяжных» станках. Погрешность геометрии — менее 1 мм.',
   'trust.item3.badge': 'Идеальная геометрия',
   'trust.item4.title': 'Профессиональный стандарт монтажа',
   'trust.item4.desc': 'Углы режутся точно под 45°, швы не видны. Фасад полностью устойчив к перепадам температуры.',
@@ -459,8 +459,10 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     return DICTS[lang][key] ?? DICTS.uz[key] ?? key;
   }, [lang]);
 
+  const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
+
   return (
-    <LangContext.Provider value={{ lang, setLang, t }}>
+    <LangContext.Provider value={value}>
       {children}
     </LangContext.Provider>
   );

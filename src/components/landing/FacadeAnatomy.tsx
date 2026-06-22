@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Thermometer, CloudRain, Hammer } from 'lucide-react';
 import { useT } from '@/lib/i18n';
@@ -15,11 +15,11 @@ const PRODUCT_KEYS = [
 ];
 
 export default function FacadeAnatomy() {
-  const { t } = useT();
-  const products = PRODUCT_KEYS.map(p => ({
+  const { t, lang } = useT();
+  const products = useMemo(() => PRODUCT_KEYS.map(p => ({
     id: p.id, title: t(p.titleKey), subtitle: t(p.subKey),
     img: p.img, hotspot: p.hotspot, side: p.side,
-  }));
+  })), [lang, t]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
@@ -41,7 +41,7 @@ export default function FacadeAnatomy() {
 
     const newCoords: typeof arrowCoords = {};
 
-    products.forEach((prod) => {
+    PRODUCT_KEYS.forEach((prod) => {
       const circleEl = circleRefs.current[prod.id];
       if (!circleEl) return;
 
@@ -54,8 +54,15 @@ export default function FacadeAnatomy() {
       newCoords[prod.id] = { x1, y1, x2, y2 };
     });
 
-    setArrowCoords(newCoords);
-  }, [products]);
+    setArrowCoords(prev => {
+      const keys = Object.keys(newCoords);
+      const same = keys.length === Object.keys(prev).length && keys.every(k => {
+        const a = newCoords[k]; const b = prev[k];
+        return b && a.x1 === b.x1 && a.y1 === b.y1 && a.x2 === b.x2 && a.y2 === b.y2;
+      });
+      return same ? prev : newCoords;
+    });
+  }, []);
 
   useEffect(() => {
     recalcArrows();

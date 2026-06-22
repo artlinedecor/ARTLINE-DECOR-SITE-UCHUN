@@ -10,7 +10,7 @@ const SEASONS = [
   { id: 'winter', nameKey: 'hero.season.winter', color: '#00d2ff', glow: 'rgba(0, 210, 255, 0.15)', icon: <Snowflake size={18} /> },
   { id: 'spring', nameKey: 'hero.season.spring', color: '#00e676', glow: 'rgba(0, 230, 118, 0.15)', icon: <CloudRain size={18} /> },
   { id: 'summer', nameKey: 'hero.season.summer', color: '#ffaa00', glow: 'rgba(255, 170, 0, 0.15)', icon: <Sun size={18} /> },
-  { id: 'autumn', nameKey: 'hero.season.rain', color: '#ff6600', glow: 'rgba(255, 102, 0, 0.15)', icon: <Leaf size={18} /> },
+  { id: 'autumn', nameKey: 'hero.season.autumn', color: '#ff6600', glow: 'rgba(255, 102, 0, 0.15)', icon: <Leaf size={18} /> },
 ];
 
 const SEASON_IMAGES = [
@@ -386,16 +386,18 @@ export default function Hero() {
           }}
         >
           {/* Hero Title */}
-          <h1 
-            style={{ 
+          <h1
+            style={{
               fontFamily: 'var(--font-heading)',
-              fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
+              fontSize: 'clamp(2.2rem, 4.6vw, 4.2rem)',
               fontWeight: 800,
-              lineHeight: 1.1,
+              lineHeight: 1.12,
               color: '#ffffff',
               marginBottom: '24px',
-              textShadow: '0 4px 20px rgba(0,0,0,0.85)',
+              textShadow: '0 2px 6px rgba(0,0,0,0.55), 0 8px 30px rgba(0,0,0,0.9)',
               letterSpacing: '-0.02em',
+              position: 'relative',
+              zIndex: 2,
             }}
           >
             {t('hero.title.1')} <br />
@@ -404,7 +406,8 @@ export default function Hero() {
               transition={{ duration: 1.5 }}
               style={{
                 display: 'inline-block',
-                textShadow: '0 4px 30px rgba(0,0,0,0.95)'
+                textShadow: '0 2px 8px rgba(0,0,0,0.6), 0 8px 36px rgba(0,0,0,0.95)',
+                WebkitTextStroke: '0.5px rgba(255,255,255,0.04)',
               }}
             >
               {t('hero.title.2')}

@@ -197,13 +197,16 @@ export default function EstimateModal() {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 10000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
       background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(10px)',
       padding: '20px', overflowY: 'auto'
     }} onClick={() => setIsOpen(false)}>
       <Toaster position="top-right" />
       <div style={{
         width: '100%', maxWidth: '600px', padding: 0,
+        margin: 'auto',
+        maxHeight: 'calc(100vh - 40px)',
+        display: 'flex', flexDirection: 'column',
         background: 'linear-gradient(180deg, #0d1119 0%, #06080e 100%)',
         border: '1px solid rgba(217,154,108,0.22)',
         borderRadius: '28px', overflow: 'hidden',
@@ -259,7 +262,8 @@ export default function EstimateModal() {
           </button>
         </div>
 
-        {/* Content */}
+        {/* Scrollable content area */}
+        <div style={{ overflowY: 'auto', flex: '1 1 auto', minHeight: 0 }}>
         {isSuccess ? (
           <div style={{
             padding: '48px 24px', textAlign: 'center',
@@ -368,6 +372,7 @@ export default function EstimateModal() {
             </button>
           </form>
         )}
+        </div>
       </div>
     </div>
   );
