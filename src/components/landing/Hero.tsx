@@ -25,6 +25,8 @@ export default function Hero() {
   const [currentSeason, setCurrentSeason] = useState(0);
   const [canvasFade, setCanvasFade] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heroRef = useRef<HTMLElement>(null);
+  const heroVisibleRef = useRef(true);
 
   const currentSeasonRef = useRef(0);
   currentSeasonRef.current = currentSeason;
@@ -48,19 +50,31 @@ export default function Hero() {
   };
   const handleMouseLeave = () => { mx.set(0); my.set(0); };
 
+  // Pause the season cycle when Hero is off-screen to avoid heavy
+  // framer-motion re-renders (8 full-bleed background divs) on mobile.
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => { heroVisibleRef.current = entry.isIntersecting; },
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     SEASON_IMAGES.forEach((src) => {
       const img = new window.Image();
       img.src = src;
     });
 
-    // Smooth season cycle: fade canvas out, swap season, fade canvas back in
     const interval = setInterval(() => {
+      if (!heroVisibleRef.current) return;
       setCanvasFade(0);
       const swap = setTimeout(() => {
         setCurrentSeason((prev) => (prev + 1) % 4);
         const fadeBack = setTimeout(() => setCanvasFade(1), 60);
-        // store cleanup refs on window? not needed — short timers always run within interval
         void fadeBack;
       }, 1400);
       void swap;
@@ -280,6 +294,7 @@ export default function Hero() {
     // faqat sensorli / coarse qurilmalar (desktopda sichqoncha bor)
     if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const handle = (e: DeviceOrientationEvent) => {
+      if (!heroVisibleRef.current) return;
       const clamp = (v: number) => Math.max(-1, Math.min(1, v / 25));
       mx.set(clamp(e.gamma ?? 0) * 0.5);
       my.set(clamp((e.beta ?? 0) - 45) * 0.5);
@@ -291,45 +306,53 @@ export default function Hero() {
   const activeSeason = SEASONS[currentSeason];
 
   return (
-    <section className="hero" id="hero" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', perspective: '1200px' }}>
+    <section ref={heroRef} className="hero" id="hero" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', perspective: '1200px' }}>
 
       {/* Background System */}
       <motion.div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden', x: bgX, y: bgY, scale: 1.06 }}>
         
-        {/* Blurred Full-Bleed Background for Edges */}
-        {SEASON_IMAGES.map((img, idx) => (
-          <motion.div 
-            key={`blur-${idx}`}
-            initial={false}
-            animate={{ opacity: idx === currentSeason ? 1 : 0 }}
-            transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
-            style={{ 
-              position: 'absolute', inset: -20, 
-              backgroundImage: `url(${img})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(40px) brightness(0.4) saturate(1.2)',
-              zIndex: 0
-            }}
-          />
-        ))}
+        {/* Blurred Full-Bleed Background for Edges — only render active season */}
+        {SEASON_IMAGES.map((img, idx) => {
+          const show = idx === currentSeason || idx === (currentSeason + 3) % 4;
+          if (!show) return null;
+          return (
+            <motion.div
+              key={`blur-${idx}`}
+              initial={false}
+              animate={{ opacity: idx === currentSeason ? 1 : 0 }}
+              transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
+              style={{
+                position: 'absolute', inset: -20,
+                backgroundImage: `url(${img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'blur(40px) brightness(0.4) saturate(1.2)',
+                zIndex: 0
+              }}
+            />
+          );
+        })}
 
-        {/* Sharp Center Background */}
-        {SEASON_IMAGES.map((img, idx) => (
-          <motion.div 
-            key={`sharp-${idx}`}
-            initial={false}
-            animate={{ opacity: idx === currentSeason ? 1 : 0 }}
-            transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
-            style={{ 
-              position: 'absolute', inset: 0, 
-              backgroundImage: `url(${img})`,
-              backgroundSize: 'cover', // Using cover but keeping the aspect centered
-              backgroundPosition: 'center center',
-              zIndex: 1
-            }}
-          />
-        ))}
+        {/* Sharp Center Background — only render active season */}
+        {SEASON_IMAGES.map((img, idx) => {
+          const show = idx === currentSeason || idx === (currentSeason + 3) % 4;
+          if (!show) return null;
+          return (
+            <motion.div
+              key={`sharp-${idx}`}
+              initial={false}
+              animate={{ opacity: idx === currentSeason ? 1 : 0 }}
+              transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
+              style={{
+                position: 'absolute', inset: 0,
+                backgroundImage: `url(${img})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                zIndex: 1
+              }}
+            />
+          );
+        })}
 
         {/* Ambient Color Glow Overlay */}
         <motion.div
