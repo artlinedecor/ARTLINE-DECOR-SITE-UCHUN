@@ -86,7 +86,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, transition: 'all 0.3s ease' }}>
+    <header className="site-header" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, transition: 'all 0.3s ease' }}>
       {/* Top Bar */}
       <div className="navbar-topbar" style={{
         background: '#05070f', borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
@@ -144,16 +144,19 @@ export default function Navbar() {
           background: 'linear-gradient(90deg, transparent, rgba(217,154,108,0.5), transparent)',
           opacity: scrolled ? 1 : 0.35, transition: 'opacity 0.3s ease', pointerEvents: 'none',
         }} />
+        {/* Animated gold shimmer line — mobile only */}
+        <div className="navbar-shimmer" aria-hidden />
 
         <div className="container navbar-inner">
           <a href={pathname === '/' ? '#hero' : '/'} className="navbar-logo" aria-label="Artline Decor">
+            <div className="logo-glow" />
             <Image
               src="/logo.png"
               alt="Artline Decor"
               width={scrolled ? 56 : 68}
               height={scrolled ? 56 : 68}
               priority
-              style={{ objectFit: 'contain', transition: 'width 0.3s ease, height 0.3s ease' }}
+              style={{ objectFit: 'contain', transition: 'width 0.3s ease, height 0.3s ease', position: 'relative', zIndex: 1 }}
             />
           </a>
 

@@ -1432,16 +1432,100 @@ select.input-field option { background: var(--bg-secondary); color: var(--text-p
   .interactive-map-grid svg { min-height: 220px; }
 }
 
-/* ---- Mobile: topbar compact ---- */
+/* ---- Navbar wow elements (hidden on desktop) ---- */
+.navbar-shimmer, .logo-glow { display: none; }
+
+/* ---- Mobile: topbar compact + wow effects ---- */
 @media (max-width: 768px) {
-  .navbar-topbar { font-size: 0.68rem !important; padding: 4px 0 !important; }
-  .navbar-topbar-inner { flex-wrap: wrap; gap: 4px; justify-content: center !important; }
-  .navbar-topbar-left { gap: 8px !important; justify-content: center; width: 100%; }
-  .navbar-topbar-right { gap: 6px !important; justify-content: center; width: 100%; }
+  /* Topbar → single row: phone + socials + lang */
+  .navbar-topbar {
+    font-size: 0.68rem !important;
+    padding: 5px 0 !important;
+    background: linear-gradient(90deg, #05070f, #0d1225, #05070f) !important;
+    border-bottom: none !important;
+    position: relative;
+    overflow: visible !important;
+    max-height: 36px !important;
+    opacity: 1 !important;
+  }
+  .navbar-topbar::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+    background: linear-gradient(90deg, transparent 5%, var(--accent-gold) 50%, transparent 95%);
+    opacity: 0.4;
+  }
+  .navbar-topbar-inner { flex-wrap: nowrap !important; gap: 0 !important; justify-content: space-between !important; }
+  .navbar-topbar-left { gap: 0 !important; width: auto !important; flex-shrink: 0; }
+  .navbar-topbar-right { gap: 6px !important; width: auto !important; flex-shrink: 0; }
   .navbar-topbar-address { display: none !important; }
   .navbar-topbar-hours { display: none !important; }
-  .navbar-topbar-phone { font-size: 0.72rem; }
+  .navbar-topbar-phone {
+    font-size: 0.72rem;
+    background: rgba(217,154,108,0.08);
+    padding: 3px 10px;
+    border-radius: 100px;
+    border: 1px solid rgba(217,154,108,0.15);
+  }
   .navbar-topbar-socials { border-left: none !important; padding-left: 0 !important; }
   .navbar-topbar-socials a { width: 22px !important; height: 22px !important; }
   .navbar-topbar-socials svg { width: 11px; height: 11px; }
+
+  /* Navbar entrance animation */
+  .site-header {
+    animation: headerSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes headerSlideIn {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Logo glow pulse */
+  .navbar-logo { position: relative; }
+  .logo-glow {
+    display: block !important;
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(217,154,108,0.25) 0%, transparent 70%);
+    animation: logoGlow 2.5s ease-in-out infinite alternate;
+    z-index: 0;
+    pointer-events: none;
+  }
+  @keyframes logoGlow {
+    from { opacity: 0.4; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* Gold shimmer line across navbar bottom */
+  .navbar-shimmer {
+    display: block !important;
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-gold), var(--accent-warm), var(--accent-gold), transparent);
+    background-size: 200% 100%;
+    animation: shimmerSlide 3s ease-in-out infinite;
+    z-index: 2;
+  }
+  @keyframes shimmerSlide {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Mobile menu wow entrance */
+  .navbar .mobile-menu-btn {
+    position: relative;
+  }
+  .navbar .mobile-menu-btn::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 8px;
+    border: 1px solid rgba(217,154,108,0.2);
+    animation: menuBtnPulse 2s ease-in-out infinite;
+  }
+  @keyframes menuBtnPulse {
+    0%, 100% { border-color: rgba(217,154,108,0.1); transform: scale(1); }
+    50% { border-color: rgba(217,154,108,0.35); transform: scale(1.08); }
+  }
 }
