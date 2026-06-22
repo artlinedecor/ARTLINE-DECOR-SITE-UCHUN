@@ -23,8 +23,9 @@ const SEASON_IMAGES = [
 export default function Hero() {
   const { t } = useT();
   const [currentSeason, setCurrentSeason] = useState(0);
+  const [canvasFade, setCanvasFade] = useState(1);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   const currentSeasonRef = useRef(0);
   currentSeasonRef.current = currentSeason;
 
@@ -53,9 +54,17 @@ export default function Hero() {
       img.src = src;
     });
 
+    // Smooth season cycle: fade canvas out, swap season, fade canvas back in
     const interval = setInterval(() => {
-      setCurrentSeason((prev) => (prev + 1) % 4);
-    }, 12000); // 12s per season — slower, more majestic, no jarring re-mount feel
+      setCanvasFade(0);
+      const swap = setTimeout(() => {
+        setCurrentSeason((prev) => (prev + 1) % 4);
+        const fadeBack = setTimeout(() => setCanvasFade(1), 60);
+        // store cleanup refs on window? not needed — short timers always run within interval
+        void fadeBack;
+      }, 1400);
+      void swap;
+    }, 12000);
 
     return () => clearInterval(interval);
   }, []);
@@ -310,7 +319,12 @@ export default function Hero() {
         {/* Dynamic Canvas Particles (Rain/Snow/Leaves/Sun) */}
         <canvas
           ref={canvasRef}
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 3 }}
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            pointerEvents: 'none', zIndex: 3,
+            opacity: canvasFade,
+            transition: 'opacity 1.4s ease-in-out',
+          }}
         />
       </motion.div>
 
