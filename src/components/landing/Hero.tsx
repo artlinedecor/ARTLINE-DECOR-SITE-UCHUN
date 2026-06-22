@@ -55,7 +55,7 @@ export default function Hero() {
 
     const interval = setInterval(() => {
       setCurrentSeason((prev) => (prev + 1) % 4);
-    }, 8000); // 8 seconds per season for a majestic feel
+    }, 12000); // 12s per season — slower, more majestic, no jarring re-mount feel
 
     return () => clearInterval(interval);
   }, []);
@@ -260,7 +260,7 @@ export default function Hero() {
             key={`blur-${idx}`}
             initial={false}
             animate={{ opacity: idx === currentSeason ? 1 : 0 }}
-            transition={{ duration: 2.5, ease: "easeInOut" }}
+            transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
             style={{ 
               position: 'absolute', inset: -20, 
               backgroundImage: `url(${img})`,
@@ -278,7 +278,7 @@ export default function Hero() {
             key={`sharp-${idx}`}
             initial={false}
             animate={{ opacity: idx === currentSeason ? 1 : 0 }}
-            transition={{ duration: 2.5, ease: "easeInOut" }}
+            transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
             style={{ 
               position: 'absolute', inset: 0, 
               backgroundImage: `url(${img})`,
@@ -290,9 +290,9 @@ export default function Hero() {
         ))}
 
         {/* Ambient Color Glow Overlay */}
-        <motion.div 
+        <motion.div
           animate={{ background: `radial-gradient(circle at 50% 40%, ${activeSeason.glow} 0%, transparent 75%)` }}
-          transition={{ duration: 2.0 }}
+          transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
           style={{ position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none' }}
         />
 
@@ -303,8 +303,8 @@ export default function Hero() {
               ? 'linear-gradient(to bottom, rgba(255,200,100,0.1) 0%, rgba(10,10,15,0.4) 60%, rgba(10,10,15,0.85) 100%)' // Summer: warmer top
               : 'linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0.5) 50%, rgba(10,10,15,0.9) 100%)'
           }}
-          transition={{ duration: 2.5 }}
-          style={{ position: 'absolute', inset: 0, zIndex: 2 }} 
+          transition={{ duration: 4, ease: [0.4, 0, 0.2, 1] }}
+          style={{ position: 'absolute', inset: 0, zIndex: 2 }}
         />
 
         {/* Dynamic Canvas Particles (Rain/Snow/Leaves/Sun) */}
