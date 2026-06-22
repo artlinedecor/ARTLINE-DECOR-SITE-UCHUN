@@ -11,6 +11,7 @@ import { getPortfolioProjects } from '@/lib/store';
 import type { PortfolioProject } from '@/lib/types';
 import BeforeAfterSlider from './BeforeAfterSlider';
 import { useFancyEffects } from '@/lib/use-fancy-effects';
+import { useT } from '@/lib/i18n';
 
 // YouTube linkini embed formatga o'giradi
 function getYouTubeEmbedUrl(url: string): string | null {
@@ -330,6 +331,7 @@ function PortfolioCard({ project, onClick }: { project: PortfolioProject; onClic
 
 // ---- Main Portfolio Component ----
 export default function Portfolio() {
+  const { t } = useT();
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
   const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -351,13 +353,13 @@ export default function Portfolio() {
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <div className="badge badge-gold" style={{ marginBottom: 16 }}>
-            500+ bajarilgan loyiha
+            {t('pf.badge')}
           </div>
           <h2 className="section-title" style={{ display: 'inline-block' }}>
-            Premium Portfolio
+            {t('pf.title')}
           </h2>
           <p className="section-subtitle" style={{ margin: '16px auto 0' }}>
-            Har bir loyiha — bizning mahorat va sifatimizning isboti. Bosing va batafsil ko&apos;ring.
+            {t('pf.subtitle')}
           </p>
         </div>
 
@@ -377,18 +379,18 @@ export default function Portfolio() {
         {/* CTA Section */}
         <div className="portfolio-bottom-cta" style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center', textAlign: 'center' }}>
           <div>
-            <p style={{ marginBottom: 16 }}>Sizning uyingiz ham shunday chiroyli bo&apos;lishi mumkin</p>
+            <p style={{ marginBottom: 16 }}>{t('pf.cta.text')}</p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
               <a href="#calculator" className="btn btn-primary btn-lg" onClick={(e) => {
                 e.preventDefault();
                 (window as any).openEstimateModal?.();
               }}>
                 <Zap size={18} />
-                Bepul smeta hisoblash
+                {t('pf.cta.btn')}
               </a>
               <a href="/ARTLINE_DECOR_Architectural_Catalog.pdf" target="_blank" rel="noopener noreferrer" className="btn btn-outline btn-lg" style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <FileText size={18} />
-                Fasad katalogini ko'rish (PDF)
+                {t('pf.cta.catalog')}
               </a>
             </div>
           </div>

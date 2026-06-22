@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Building, Calendar, CheckCircle2 } from 'lucide-react';
+import { useT } from '@/lib/i18n';
 
 interface MapRegion {
   id: string;
@@ -149,7 +150,8 @@ const REGIONS_DATA: MapRegion[] = [
 ];
 
 export default function InteractiveMap() {
-  const [activeRegion, setActiveRegion] = useState<MapRegion | null>(REGIONS_DATA[7]); // Toshkent active by default
+  const { t } = useT();
+  const [activeRegion, setActiveRegion] = useState<MapRegion | null>(REGIONS_DATA[7]);
 
   return (
     <section className="section" style={{ background: '#000', color: '#fff', position: 'relative', overflow: 'hidden' }}>
@@ -170,12 +172,12 @@ export default function InteractiveMap() {
           transition={{ duration: 0.6 }}
           style={{ textAlign: 'center', marginBottom: '64px' }}
         >
-          <span className="badge badge-gold" style={{ marginBottom: '16px' }}>Keng qamrovli xizmat</span>
+          <span className="badge badge-gold" style={{ marginBottom: '16px' }}>{t('map.badge')}</span>
           <h2 style={{ fontSize: '2.5rem', fontWeight: 700, fontFamily: 'var(--font-heading)', marginBottom: '16px' }}>
-            Butun O'zbekiston Bo'ylab <span style={{ color: 'var(--accent-gold)' }}>Loyihalar</span>
+            {t('map.title.1')} <span style={{ color: 'var(--accent-gold)' }}>{t('map.title.2')}</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '700px', margin: '0 auto', lineHeight: 1.6 }}>
-            Bizning jamoamiz Respublikamizning barcha viloyatlarida yuzlab premium fasad obyektlarini yakunlagan. Istalgan hududni bosing va bajarilgan ishlarimiz tafsiloti bilan tanishing.
+            {t('map.subtitle')}
           </p>
         </motion.div>
 
@@ -314,7 +316,7 @@ export default function InteractiveMap() {
                       <h4 style={{ margin: 0, fontSize: '1.25rem', fontFamily: 'var(--font-heading)', color: '#fff' }}>
                         {activeRegion.name}
                       </h4>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>O'zbekiston Respublikasi</span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('map.country')}</span>
                     </div>
                   </div>
 
@@ -322,19 +324,19 @@ export default function InteractiveMap() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px' }}>
                       <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Building size={16} /> Bajarilgan loyihalar:
+                        <Building size={16} /> {t('map.row.projects')}
                       </span>
-                      <span style={{ fontWeight: 700, color: '#fff' }}>{activeRegion.projectsCount} ta</span>
+                      <span style={{ fontWeight: 700, color: '#fff' }}>{activeRegion.projectsCount}{t('map.count.suffix')}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px' }}>
                       <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Calendar size={16} /> O'rtacha muddat:
+                        <Calendar size={16} /> {t('map.row.duration')}
                       </span>
                       <span style={{ fontWeight: 700, color: '#fff' }}>{activeRegion.avgDuration}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px' }}>
                       <span style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <CheckCircle2 size={16} /> Eng ko'p tanlangan:
+                        <CheckCircle2 size={16} /> {t('map.row.popular')}
                       </span>
                       <span style={{ fontWeight: 700, color: 'var(--accent-gold)' }}>{activeRegion.popularStyle}</span>
                     </div>
@@ -348,12 +350,12 @@ export default function InteractiveMap() {
                     className="btn btn-outline"
                     style={{ width: '100%', justifyContent: 'center', padding: '12px', borderRadius: '10px' }}
                   >
-                    Bu hudud uchun buyurtma berish
+                    {t('map.cta')}
                   </button>
                 </motion.div>
               ) : (
                 <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 0' }}>
-                  Hududni tanlang
+                  {t('map.choose')}
                 </div>
               )}
             </AnimatePresence>
@@ -369,12 +371,12 @@ export default function InteractiveMap() {
               gap: '16px'
             }}>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>Barcha obyektlar:</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>{t('map.stat.objects')}</div>
                 <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-heading)' }}>500+</div>
               </div>
               <div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>Kafolat:</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-gold)', fontFamily: 'var(--font-heading)' }}>10 yil</div>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>{t('map.stat.warranty')}</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-gold)', fontFamily: 'var(--font-heading)' }}>{t('map.stat.warranty.val')}</div>
               </div>
             </div>
           </div>

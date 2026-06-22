@@ -4,32 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Cpu, Ruler, FileCheck, Download, CheckCircle } from 'lucide-react';
 import TiltCard from '@/components/effects/TiltCard';
+import { useT } from '@/lib/i18n';
 
-const TRUST_ITEMS = [
-  {
-    icon: <Cpu size={22} />,
-    title: 'Yuqori zichlikdagi xomashyo',
-    desc: 'ПСБ-С-25Ф va ПСБ-С-35Ф markali penopolistirol uyingiz devorlarini mustahkam qoplaydi va deformatsiyalanmaydi.',
-    badge: 'Maksimal izolyatsiya',
-  },
-  {
-    icon: <Shield size={22} />,
-    title: 'Ekologik va yong\'inga chidamli',
-    desc: 'Tarkibida zaharli kimyoviy moddalar yo\'q. Mahsulot o\'z-o\'zidan o\'chuvchi (samozatuxayushchiy) xususiyatga ega.',
-    badge: '100% xavfsiz',
-  },
-  {
-    icon: <Ruler size={22} />,
-    title: 'Avtomatik stanoklar aniqligi',
-    desc: 'Barcha elementlar avtomatlashtirilgan "protyajka" dastgohlarida tayyorlanadi. Geometriyada 1 mm ham xatolik bo\'lmaydi.',
-    badge: 'Ideal geometriya',
-  },
-  {
-    icon: <FileCheck size={22} />,
-    title: 'Professional montaj standarti',
-    desc: 'Burchaklar 45° aniqlikda kesiladi, choklar ko\'rinmaydi. Fasad harorat o\'zgarishlariga to\'liq chidamli bo\'ladi.',
-    badge: 'Sifat kafolati',
-  },
+const TRUST_KEYS = [
+  { icon: <Cpu size={22} />, titleKey: 'trust.item1.title', descKey: 'trust.item1.desc', badgeKey: 'trust.item1.badge' },
+  { icon: <Shield size={22} />, titleKey: 'trust.item2.title', descKey: 'trust.item2.desc', badgeKey: 'trust.item2.badge' },
+  { icon: <Ruler size={22} />, titleKey: 'trust.item3.title', descKey: 'trust.item3.desc', badgeKey: 'trust.item3.badge' },
+  { icon: <FileCheck size={22} />, titleKey: 'trust.item4.title', descKey: 'trust.item4.desc', badgeKey: 'trust.item4.badge' },
 ];
 
 function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: string }) {
@@ -88,14 +69,18 @@ function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: str
 }
 
 export default function TrustElements() {
+  const { t } = useT();
+  const TRUST_ITEMS = TRUST_KEYS.map(it => ({
+    icon: it.icon, title: t(it.titleKey), desc: t(it.descKey), badge: t(it.badgeKey),
+  }));
   return (
     <section className="section" id="trust" style={{ background: 'var(--bg-secondary)' }}>
       <div className="container">
         <div style={{ textAlign: 'center', marginBottom: 64 }}>
-          <div className="badge badge-gold" style={{ marginBottom: 12 }}>Sifat va Texnologiya</div>
-          <h2 className="section-title" style={{ display: 'inline-block' }}>Nima uchun aynan Artline Decor?</h2>
+          <div className="badge badge-gold" style={{ marginBottom: 12 }}>{t('trust.badge')}</div>
+          <h2 className="section-title" style={{ display: 'inline-block' }}>{t('trust.title')}</h2>
           <p className="section-subtitle" style={{ margin: '16px auto 0' }}>
-            Biz fasad termo-panellarini nafaqat ishlab chiqaramiz, balki ularning uzoq yillar xizmat qilishini kafolatlaymiz.
+            {t('trust.subtitle')}
           </p>
         </div>
 
@@ -170,19 +155,19 @@ export default function TrustElements() {
         {/* Stats counters */}
         <div className="stats-grid" style={{ marginTop: 64 }}>
           <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
-            <div className="stat-label">Rasmiy kafolat</div>
-            <AnimatedCounter target={10} suffix=" yil" />
+            <div className="stat-label">{t('trust.stat.warranty')}</div>
+            <AnimatedCounter target={10} suffix={t('trust.stat.warranty.suffix')} />
           </TiltCard>
           <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
-            <div className="stat-label">Xomashyo zichligi</div>
+            <div className="stat-label">{t('trust.stat.density')}</div>
             <AnimatedCounter target={35} suffix=" kg/m³" />
           </TiltCard>
           <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
-            <div className="stat-label">Buyurtma tayyor bo&apos;lishi</div>
-            <AnimatedCounter target={3} suffix=" kun" />
+            <div className="stat-label">{t('trust.stat.ready')}</div>
+            <AnimatedCounter target={3} suffix={t('trust.stat.ready.suffix')} />
           </TiltCard>
           <TiltCard className="stat-card" max={5} scale={1.03} style={{ textAlign: 'center' }}>
-            <div className="stat-label">Akril qoplama qalinligi</div>
+            <div className="stat-label">{t('trust.stat.acrylic')}</div>
             <AnimatedCounter target={4} suffix=" mm+" />
           </TiltCard>
         </div>
@@ -191,21 +176,21 @@ export default function TrustElements() {
         <div style={{ textAlign: 'center', marginTop: 48 }}>
           <a href="/ARTLINE_DECOR_Architectural_Catalog.pdf" download className="btn btn-outline">
             <Download size={16} />
-            Katalog va Sertifikatlarni yuklab olish (PDF)
+            {t('trust.dl')}
           </a>
         </div>
 
         {/* Montaj rules highlight */}
         <div className="glass-card" style={{ marginTop: 48, display: 'flex', gap: 32, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, minWidth: 280 }}>
-            <h3 style={{ marginBottom: 12, color: 'var(--accent-gold)' }}>Biz amal qiladigan Montaj Standartlari</h3>
+            <h3 style={{ marginBottom: 12, color: 'var(--accent-gold)' }}>{t('trust.mont.title')}</h3>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
-                'Professional burchakli kesim (45°) — birikish choklari umuman ko\'rinmaydi.',
-                'Har bir chok (стык) maxsus pena-kley bilan zich to\'ldirilib qotiriladi, bu esa issiqlikni saqlaydi.',
-                'Maxsus sovuqqa va issiqqa chidamli yelimlar ishlatiladi — ko\'chib ketish xavfi yo\'q.',
-                'Ustki akril qoplama quyoshning ultrabinafsha nurlaridan va qor-yomg\'irdan toliq himoyalaydi.',
-                'Mahsulot ustidagi AMK qoplamamiz ham zarbalardan, ham tashqi haroratdan himoya qiladi va dekorativ bo\'yoq yoki suyuq travertin bilan juda yaxshi kirishadi (kontakt zo\'r bo\'ladi).',
+                t('trust.mont.r1'),
+                t('trust.mont.r2'),
+                t('trust.mont.r3'),
+                t('trust.mont.r4'),
+                t('trust.mont.r5'),
               ].map((rule, i) => (
                 <li key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', color: 'var(--text-secondary)', fontSize: '0.92rem' }}>
                   <CheckCircle size={16} style={{ color: 'var(--success)', flexShrink: 0, marginTop: 4 }} />
@@ -223,8 +208,8 @@ export default function TrustElements() {
             <div style={{ fontFamily: 'var(--font-heading)', fontSize: '4.5rem', fontWeight: 700, color: 'var(--accent-gold)', lineHeight: 1 }}>
               45°
             </div>
-            <div style={{ color: 'var(--text-primary)', fontWeight: 500, fontSize: '1.1rem', marginTop: 16 }}>Burchakli kesim standarti</div>
-            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: 8 }}>Choklar zichligi va ideal ko&apos;rinish kafolati</div>
+            <div style={{ color: 'var(--text-primary)', fontWeight: 500, fontSize: '1.1rem', marginTop: 16 }}>{t('trust.angle.title')}</div>
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: 8 }}>{t('trust.angle.sub')}</div>
           </div>
         </div>
       </div>

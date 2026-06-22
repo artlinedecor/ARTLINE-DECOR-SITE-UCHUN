@@ -5,6 +5,7 @@ import { Play, X, ChevronLeft, ChevronRight, Film, CheckCircle2, Maximize2 } fro
 import { getVideos } from '@/lib/store';
 import type { ShowcaseVideo } from '@/lib/types';
 import TiltCard from '@/components/effects/TiltCard';
+import { useT } from '@/lib/i18n';
 
 // Extract YouTube ID from various YouTube URL formats
 function getYouTubeId(url: string): string | null {
@@ -30,6 +31,7 @@ function getYouTubeThumbnail(url: string): string {
 }
 
 export default function VideoShowcase() {
+  const { t } = useT();
   const [videos, setVideos] = useState<ShowcaseVideo[]>([]);
   const [activeIdx, setActiveIdx] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
@@ -72,8 +74,8 @@ export default function VideoShowcase() {
     return (
       <section className="section" id="videos" style={{ background: 'var(--bg-primary)', borderTop: '1px solid var(--border)' }}>
         <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
-          <div className="badge badge-gold" style={{ marginBottom: 12 }}>Video Obzorlar</div>
-          <h2 className="section-title">Yuklanmoqda...</h2>
+          <div className="badge badge-gold" style={{ marginBottom: 12 }}>{t('vs.badge')}</div>
+          <h2 className="section-title">{t('vs.loading')}</h2>
         </div>
       </section>
     );
@@ -91,10 +93,10 @@ export default function VideoShowcase() {
         
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div className="badge badge-gold" style={{ marginBottom: 12 }}>Video Obzorlar</div>
-          <h2 className="section-title">Mahsulotlarimiz bilan albatta tanishib chiqing!</h2>
+          <div className="badge badge-gold" style={{ marginBottom: 12 }}>{t('vs.badge')}</div>
+          <h2 className="section-title">{t('vs.title')}</h2>
           <p className="section-subtitle" style={{ margin: '16px auto 0', maxWidth: '750px' }}>
-            Artline Decor termo-panellari qanday tayyorlanadi, g&apos;isht ustiga qanday montaj qilinadi va yakunda qanday hashamatli ko&apos;rinish oladi? Barchasini vertikal videolarda tomosha qiling.
+            {t('vs.subtitle')}
           </p>
         </div>
 
@@ -193,10 +195,10 @@ export default function VideoShowcase() {
               <CheckCircle2 size={28} style={{ color: 'var(--success)', flexShrink: 0 }} />
               <div>
                 <h4 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: 6, fontWeight: 600 }}>
-                  10 Yillik Rasmiy Kafolat
+                  {t('vs.guarantee.title')}
                 </h4>
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                  Akril tosh qoplamamiz quyoshda yemirilmaydi, yomg&apos;ir suvini o&apos;tkazmaydi va sovuqda yorilib ketmaydi.
+                  {t('vs.guarantee.text')}
                 </p>
               </div>
             </div>

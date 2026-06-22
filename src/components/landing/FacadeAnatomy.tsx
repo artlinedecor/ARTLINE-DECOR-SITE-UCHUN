@@ -3,64 +3,24 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Thermometer, CloudRain, Hammer } from 'lucide-react';
+import { useT } from '@/lib/i18n';
 
-/* ══════════════════════════════════════════════════════════════
-   HOTSPOT KOORDINATALARI — drag qilib o'zgartiring!
-   ══════════════════════════════════════════════════════════════ */
-const INITIAL_PRODUCTS = [
-  {
-    id: 'ostirma',
-    title: 'O\'STIRMA (TRAVERTIN)',
-    subtitle: 'Tom osti qismi uchun (alkabont o\'rniga) travertinli qoplama.',
-    img: '/product-travertin.png',
-    hotspot: { x: 23, y: 23 },
-    side: 'left' as const,
-  },
-  {
-    id: 'karniz',
-    title: 'KARNIZ (PROFIL)',
-    subtitle: 'Binoning uslubini to\'ldiradi va himoya vazifasini bajaradi.',
-    img: '/product-cornice.png',
-    hotspot: { x: 37, y: 51 },
-    side: 'left' as const,
-  },
-  {
-    id: 'pianino',
-    title: 'REYKASIMON KARNIZ',
-    subtitle: 'Fasadga nafis va zamonaviy ko\'rinish bag\'ishlaydi.',
-    img: '/product-fluted-cornice.png',
-    hotspot: { x: 18, y: 53 },
-    side: 'left' as const,
-  },
-  {
-    id: 'oyna',
-    title: 'OYNA KARNIZLARI',
-    subtitle: 'Derazalarni bezatish va ramkalash uchun profillar.',
-    img: '/product-window.png',
-    hotspot: { x: 86, y: 31 },
-    side: 'right' as const,
-  },
-  {
-    id: 'kolonna',
-    title: 'KOLONNA (KAPITEL)',
-    subtitle: 'Binoning ulug\'vorligini va klassik jozibasini ta\'kidlaydi.',
-    img: '/product-column.png',
-    hotspot: { x: 66, y: 36 },
-    side: 'right' as const,
-  },
-  {
-    id: 'termopanel',
-    title: 'TERMO PANEL',
-    subtitle: 'Issiqlikni saqlaydi, ovoz va namlikdan himoya qiladi.',
-    img: '/portfolio/termo-panel-razrezi.jpg',
-    hotspot: { x: 62, y: 44 },
-    side: 'right' as const,
-  },
+const PRODUCT_KEYS = [
+  { id: 'ostirma', titleKey: 'fa.p1.title', subKey: 'fa.p1.sub', img: '/product-travertin.png', hotspot: { x: 23, y: 23 }, side: 'left' as const },
+  { id: 'karniz', titleKey: 'fa.p2.title', subKey: 'fa.p2.sub', img: '/product-cornice.png', hotspot: { x: 37, y: 51 }, side: 'left' as const },
+  { id: 'pianino', titleKey: 'fa.p3.title', subKey: 'fa.p3.sub', img: '/product-fluted-cornice.png', hotspot: { x: 18, y: 53 }, side: 'left' as const },
+  { id: 'oyna', titleKey: 'fa.p4.title', subKey: 'fa.p4.sub', img: '/product-window.png', hotspot: { x: 86, y: 31 }, side: 'right' as const },
+  { id: 'kolonna', titleKey: 'fa.p5.title', subKey: 'fa.p5.sub', img: '/product-column.png', hotspot: { x: 66, y: 36 }, side: 'right' as const },
+  { id: 'termopanel', titleKey: 'fa.p6.title', subKey: 'fa.p6.sub', img: '/portfolio/termo-panel-razrezi.jpg', hotspot: { x: 62, y: 44 }, side: 'right' as const },
 ];
 
 export default function FacadeAnatomy() {
+  const { t } = useT();
+  const products = PRODUCT_KEYS.map(p => ({
+    id: p.id, title: t(p.titleKey), subtitle: t(p.subKey),
+    img: p.img, hotspot: p.hotspot, side: p.side,
+  }));
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [products, setProducts] = useState(INITIAL_PRODUCTS);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -112,7 +72,7 @@ export default function FacadeAnatomy() {
   };
 
   /* ── Mahsulot kartochkasi ── */
-  const renderCard = (prod: typeof INITIAL_PRODUCTS[0], align: 'left' | 'right') => (
+  const renderCard = (prod: typeof products[0], align: 'left' | 'right') => (
     <div
       key={prod.id}
       onClick={() => handleClick(prod.id)}
@@ -197,14 +157,14 @@ export default function FacadeAnatomy() {
             textTransform: 'uppercase',
             marginBottom: '8px'
           }}>
-            Fasad Anatomiyasi
+            {t('fa.section')}
           </div>
           <br />
           <h2 className="section-title" style={{ display: 'inline-block', fontSize: 'clamp(2rem, 3.5vw, 2.8rem)', margin: 0 }}>
-            MAHSULOTLAR
+            {t('fa.title')}
           </h2>
           <p className="section-subtitle" style={{ margin: '14px auto 0', color: 'var(--text-secondary)', maxWidth: '560px' }}>
-            Artline Decor premium fasad tizimlari — har bir element o&apos;z joyida. <strong style={{ color: 'var(--accent-gold)' }}>Ko&apos;rish uchun mahsulot ustiga bosing.</strong>
+            {t('fa.subtitle.1')} <strong style={{ color: 'var(--accent-gold)' }}>{t('fa.subtitle.2')}</strong>
           </p>
         </div>
 
@@ -359,14 +319,14 @@ export default function FacadeAnatomy() {
                 fontFamily: 'var(--font-heading)', color: 'var(--accent-gold)',
                 fontSize: '0.85rem', fontWeight: 800, letterSpacing: '0.06em', marginBottom: '12px',
               }}>
-                AFZALLIKLARI:
+                {t('fa.adv.title')}
               </h5>
               <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px', listStyle: 'none', padding: 0, margin: 0 }}>
                 {[
-                  { icon: <Shield size={15} />, text: 'Sifatli va mustahkam material' },
-                  { icon: <Thermometer size={15} />, text: 'Issiqlik va ovoz izolyatsiyasi' },
-                  { icon: <CloudRain size={15} />, text: 'Ob-havo sharoitiga chidamli' },
-                  { icon: <Hammer size={15} />, text: 'Oson o\'rnatiladi, uzoq xizmat qiladi' },
+                  { icon: <Shield size={15} />, text: t('fa.adv.1') },
+                  { icon: <Thermometer size={15} />, text: t('fa.adv.2') },
+                  { icon: <CloudRain size={15} />, text: t('fa.adv.3') },
+                  { icon: <Hammer size={15} />, text: t('fa.adv.4') },
                 ].map((item, idx) => (
                   <li key={idx} style={{ display: 'flex', alignItems: 'center', gap: '9px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
                     <span style={{ color: 'var(--accent-gold)', display: 'flex', alignItems: 'center' }}>{item.icon}</span>

@@ -4,31 +4,19 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
 import TiltCard from '@/components/effects/TiltCard';
+import { useT } from '@/lib/i18n';
 
-const faqs = [
-  {
-    question: "Fasad panellari yomg'ir va qorga chidamlimi?",
-    answer: "Ha, bizning panellarimiz maxsus himoya qatlami bilan qoplangan bo'lib, har qanday ob-havo sharoitlariga, jumladan qor, yomg'ir va kuchli sovuqqa bardoshli. Namlikni o'ziga tortmaydi va shaklini yo'qotmaydi."
-  },
-  {
-    question: "O'rnatish jarayoni qancha vaqt oladi?",
-    answer: "Obyektning o'lchamiga qarab, o'rtacha hovli uylar (200-300 kv.m) uchun o'rnatish jarayoni 5 kundan 10 kungacha davom etadi. Panellar tayyor holda kelgani uchun jarayon juda tez kechadi."
-  },
-  {
-    question: "Suvoqsiz g'isht ustiga to'g'ridan-to'g'ri o'rnatsa bo'ladimi?",
-    answer: "Albatta! Bizning texnologiyamizning eng katta afzalligi ham shunda. Siz uyni suvoq qilishingiz shart emas. Panellarimiz to'g'ridan-to'g'ri g'isht yoki beton ustiga qotiriladi, bu esa vaqt va mablag'ingizni tejaydi."
-  },
-  {
-    question: "Panellar uyning issiqlikni saqlashiga yordam beradimi?",
-    answer: "Ha, Artline Decor panellari yuqori zichlikdagi penoplast asosiga ega bo'lib, ular mukammal issiqlik izolyatsiyasini ta'minlaydi. Qishda issiqni, yozda salqinni saqlab, energiya sarfini kamaytiradi."
-  },
-  {
-    question: "Kafolat muddati qancha?",
-    answer: "Biz o'z mahsulotlarimiz sifatiga 100% ishonamiz, shuning uchun panellarga va ularning rangi o'zgarmasligiga 10 yillik rasmiy kafolat beramiz."
-  }
+const faqKeys = [
+  { qKey: 'faq.q1', aKey: 'faq.a1' },
+  { qKey: 'faq.q2', aKey: 'faq.a2' },
+  { qKey: 'faq.q3', aKey: 'faq.a3' },
+  { qKey: 'faq.q4', aKey: 'faq.a4' },
+  { qKey: 'faq.q5', aKey: 'faq.a5' },
 ];
 
 export default function FAQ() {
+  const { t } = useT();
+  const faqs = faqKeys.map(f => ({ question: t(f.qKey), answer: t(f.aKey) }));
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleAccordion = (index: number) => {
@@ -46,10 +34,10 @@ export default function FAQ() {
           style={{ textAlign: 'center', marginBottom: '64px' }}
         >
           <h2 style={{ fontSize: '2.5rem', fontWeight: 700, fontFamily: 'var(--font-heading)', marginBottom: '16px' }}>
-            Ko'p Beriladigan <span style={{ color: 'rgba(255,255,255,0.4)' }}>Savollar</span>
+            {t('faq.title.1')} <span style={{ color: 'rgba(255,255,255,0.4)' }}>{t('faq.title.2')}</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>
-            Mijozlarimiz tomonidan eng ko'p beriladigan savollarga javoblar. Agar sizning savolingiz ro'yxatda bo'lmasa, biz bilan bog'laning.
+            {t('faq.subtitle')}
           </p>
         </motion.div>
 
