@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { deleteOrder, getOrders, updateOrderStatus, upsertOrder } from '@/lib/server-data';
 import { isAdminRequest } from '@/lib/server-auth';
 import type { OrderStatus } from '@/lib/types';
+import { syncOrderToERPNext, syncOrderStatusToERPNext, syncDeleteOrderToERPNext } from '@/lib/erpnext';
 
 const STATUSES: OrderStatus[] = ['new', 'measurement', 'design', 'sold'];
 
@@ -29,6 +30,12 @@ export async function POST(request: Request) {
   }
 
   const orders = upsertOrder(order);
+  
+  // Sync to ERPNext asynchronously
+  syncOrderToERPNext(order).catch((err) => {
+    console.error('ERPNext: Sync failed in POST:', err);
+  });
+
   return NextResponse.json({ success: true, orders });
 }
 
@@ -46,9 +53,16 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ success: false, error: 'Invalid payload' }, { status: 400 });
   }
 
+  const orders = updateOrderStatus(payload.id, payload.status);
+
+  // Sync status update to ERPNext asynchronously
+  syncOrderStatusToERPNext(payload.id, payload.status).catch((err) => {
+    console.error('ERPNext: Status sync failed in PATCH:', err);
+  });
+
   return NextResponse.json({
     success: true,
-    orders: updateOrderStatus(payload.id, payload.status),
+    orders,
   });
 }
 
@@ -63,5 +77,12 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true, orders: deleteOrder(id) });
+  const orders = deleteOrder(id);
+
+  // Delete lead in ERPNext asynchronously
+  syncDeleteOrderToERPNext(id).catch((err) => {
+    console.error('ERPNext: Delete sync failed in DELETE:', err);
+  });
+
+  return NextResponse.json({ success: true, orders });
 }

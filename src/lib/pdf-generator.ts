@@ -1,7 +1,7 @@
 // ============================================================
 // Artline Decor — PDF Smeta Generator (jsPDF)
 // ============================================================
-import type { CalculatorResult, Order } from './types';
+import type { CalculatorResult, Order, CalculatorInput } from './types';
 import { getPricing } from './store';
 
 function cyrillicToLatin(text: string): string {
@@ -23,7 +23,8 @@ function cyrillicToLatin(text: string): string {
 
 export async function generateEstimatePDF(
   result: CalculatorResult,
-  clientInfo?: { name: string; phone: string; address: string }
+  clientInfo?: { name: string; phone: string; address: string },
+  inputs?: CalculatorInput[]
 ): Promise<void> {
   const { jsPDF } = await import('jspdf');
   const { default: autoTable } = await import('jspdf-autotable');
@@ -86,39 +87,56 @@ export async function generateEstimatePDF(
   doc.text('Smeta tafsiloti', margin, y);
   y += 6;
 
-  const tableBody = result.items.map((item, idx) => [
-    (idx + 1).toString(),
-    cyrillicToLatin(item.name),
-    cyrillicToLatin(item.dimensions),
-    item.volume > 0 ? `${item.volume} m3` : '-',
-    item.quantity.toString(),
-    `${item.unitPrice.toLocaleString()} so'm`,
-    `${item.totalPrice.toLocaleString()} so'm`,
-  ]);
+  const pricing = getPricing();
+  const tableBody = result.items.map((item, idx) => {
+    const elMeta = pricing.elements?.find(el => el.id === item.elementType);
+    const unitText = elMeta ? elMeta.unit : '';
+    const isVol = elMeta ? elMeta.calculationType === 'volume' : false;
+
+    const inputVal: Partial<CalculatorInput> = inputs?.[idx] || {};
+    const defaultL = inputVal.pieceLength !== undefined && inputVal.pieceLength !== '' ? Number(inputVal.pieceLength) : (elMeta?.defaultLength || 2.0);
+    const displayWidth = inputVal.width !== undefined && inputVal.width !== '' ? Math.round(Number(inputVal.width) * 100) : (elMeta?.width ? Math.round(elMeta.width * 100) : 0);
+    const displayHeight = inputVal.height !== undefined && inputVal.height !== '' ? Math.round(Number(inputVal.height) * 100) : (elMeta?.height ? Math.round(elMeta.height * 100) : 0);
+
+    return [
+      (idx + 1).toString(),
+      cyrillicToLatin(item.name),
+      isVol ? `${defaultL} m` : '—',
+      isVol ? `${displayHeight} sm` : '—',
+      isVol ? `${displayWidth} sm` : '—',
+      `${item.quantity.toString()} ${unitText}`,
+      `${item.unitPrice.toLocaleString()} so'm`,
+      `${item.totalPrice.toLocaleString()} so'm`,
+    ];
+  });
 
   autoTable(doc, {
     startY: y,
-    head: [['#', 'Element', "O'lcham", 'Hajm', 'Soni', 'Birlik narxi', 'Jami']],
+    head: [['#', 'Mahsulot Nomi', 'Uzunligi (m)', 'Bo\'rtishi (sm)', 'Yuzasi (sm)', 'Buyurtma Metri', '1m / Dona narxi', 'Jami']],
     body: tableBody,
     theme: 'grid',
     headStyles: {
       fillColor: [10, 10, 15],
       textColor: [201, 168, 76],
-      fontSize: 9,
+      fontSize: 8.5,
       fontStyle: 'bold',
     },
     bodyStyles: {
-      fontSize: 9,
+      fontSize: 8,
       textColor: [40, 40, 40],
     },
     alternateRowStyles: {
       fillColor: [248, 248, 248],
     },
     columnStyles: {
-      0: { cellWidth: 10, halign: 'center' },
+      0: { cellWidth: 8, halign: 'center' },
       1: { cellWidth: 35 },
-      2: { cellWidth: 35 },
-      6: { halign: 'right', fontStyle: 'bold' },
+      2: { cellWidth: 22, halign: 'center' },
+      3: { cellWidth: 22, halign: 'center' },
+      4: { cellWidth: 22, halign: 'center' },
+      5: { cellWidth: 25, halign: 'right' },
+      6: { cellWidth: 23, halign: 'right' },
+      7: { cellWidth: 23, halign: 'right', fontStyle: 'bold' },
     },
     margin: { left: margin, right: margin },
   });
@@ -200,8 +218,11 @@ export async function generateOrderPDF(order: Order): Promise<void> {
     items: order.items.map((item) => {
       const elMeta = pricing.elements.find(el => el.id === item.elementType);
       const isUnit = elMeta ? elMeta.calculationType === 'unit' : false;
-      const dimensions = (isUnit && elMeta) ? (elMeta.unit || 'dona') : `${item.length} × ${item.width} × ${item.height} m`;
-      const volume = isUnit ? 0 : item.length * item.width * item.height;
+      const defaultL = item.pieceLength !== undefined ? item.pieceLength : (elMeta?.defaultLength || 2.0);
+      const wCm = Math.round((item.width || 0) * 100);
+      const hCm = Math.round((item.height || 0) * 100);
+      const dimensions = (isUnit && elMeta) ? (elMeta.unit || 'dona') : `(${defaultL} metr uzunlik, devordan bo'rtib chiqishi ${hCm} sm, yuzasi balandligi ${wCm} sm)`;
+      const volume = isUnit ? 0 : defaultL * item.width * item.height * item.quantity;
       return {
         elementType: item.elementType,
         name: item.name,
@@ -217,9 +238,19 @@ export async function generateOrderPDF(order: Order): Promise<void> {
     total: order.totalPrice,
   };
 
+  const inputsMapped = order.items.map(item => ({
+    elementType: item.elementType,
+    length: item.quantity,
+    width: item.width,
+    height: item.height,
+    quantity: item.quantity,
+    pieceLength: item.pieceLength,
+    customPrice: item.unitPrice,
+  }));
+
   await generateEstimatePDF(result, {
     name: order.clientName,
     phone: order.phone,
     address: order.address,
-  });
+  }, inputsMapped);
 }

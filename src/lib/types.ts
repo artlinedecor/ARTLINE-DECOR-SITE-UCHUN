@@ -29,6 +29,7 @@ export interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  pieceLength?: number;
 }
 
 export type FacadeElementType = string;
@@ -40,8 +41,13 @@ export interface FacadeElement {
   description: string;
   rules: string;  // Artline standart qoidalari
   pricePerUnit: number; // in USD
-  unit: string;   // m, m², dona
+  unit: string;   // m, m², dona, P/M, M²
   calculationType: 'volume' | 'unit';
+  width?: number;
+  height?: number;
+  defaultLength?: number;
+  productionCostPerCubicMeter?: number;
+  volume?: number;
 }
 
 export interface PricingConfig {
@@ -53,11 +59,14 @@ export interface PricingConfig {
 
 export interface CalculatorInput {
   elementType: string;
+  model?: string;
   length: number | "";
   width: number | "";
   height: number | "";
   quantity: number | "";
   customPrice?: number | "";
+  usdPrice?: number | "";
+  pieceLength?: number | "";
 }
 
 export interface CalculatorResult {
@@ -136,3 +145,76 @@ export interface ShowcaseVideo {
   src: string;
   duration: string;
 }
+
+// ---- Inventory & BOM Types ----
+export interface InventoryItem {
+  id: string;
+  name: string;
+  type: 'raw' | 'production' | 'finished';
+  quantity: number;
+  unit: string;
+  threshold: number; // Minimum Stock
+  cost?: number;
+  supplier?: string;
+}
+
+export interface InventoryTransaction {
+  id: string;
+  itemId: string;
+  type: 'inbound' | 'outbound' | 'production_use' | 'correction';
+  quantity: number;
+  date: string;
+  notes: string;
+}
+
+export interface BOMMaterialRequirement {
+  itemId: string;
+  quantityRequired: number;
+}
+
+export interface BOMRecipe {
+  id: string;
+  productId: string;
+  materials: BOMMaterialRequirement[];
+  steps: string[];
+  updatedAt: string;
+}
+
+export interface ProductionOrder {
+  id: string;
+  recipeId: string;
+  productName: string;
+  quantity: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  date: string;
+  notes?: string;
+}
+
+// ---- HR & Payroll Types ----
+export interface Employee {
+  id: string;
+  name: string;
+  role: string;
+  salaryType: 'fixed' | 'piece' | 'kpi';
+  rate: number;
+  kpiPercent: number;
+  active: boolean;
+}
+
+export interface AdvancePayment {
+  id: string;
+  employeeId: string;
+  amount: number;
+  date: string;
+  notes: string;
+  type?: 'advance' | 'bonus' | 'penalty';
+}
+
+export interface WorkLog {
+  id: string;
+  employeeId: string;
+  date: string;
+  hoursOrPieces: number;
+  description: string;
+}
+

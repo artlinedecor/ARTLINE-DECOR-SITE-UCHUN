@@ -100,7 +100,7 @@ export default function Navbar() {
             <span className="navbar-topbar-address" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <MapPin size={13} style={{ color: 'var(--accent-gold)' }} />
               <span>{t('top.showroom')} </span>
-              <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>{t('top.map')}</a>
+              <a href="https://yandex.uz/maps/10335/tashkent/?ll=69.417834%2C41.304172&mode=search&sll=69.417834%2C41.304172&sspn=0.000858%2C0.000486&text=artlinedecor&z=17" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'underline' }}>{t('top.map')}</a>
             </span>
             <a href="tel:+998991020200" className="navbar-topbar-phone" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', textDecoration: 'none', whiteSpace: 'nowrap' }}>
               <Phone size={13} style={{ color: 'var(--accent-gold)' }} />

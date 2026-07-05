@@ -48,3 +48,4 @@ next-env.d.ts
 /scratch/
 /scratch_extract.js
 /.artline-data/
+/artifacts/

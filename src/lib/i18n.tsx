@@ -437,15 +437,33 @@ const LangContext = createContext<{
   t: (key: string) => string;
 }>({ lang: 'uz', setLang: () => {}, t: (k) => k });
 
-export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('uz');
+export function LangProvider({ children, defaultLang }: { children: React.ReactNode; defaultLang?: Lang }) {
+  const [lang, setLangState] = useState<Lang>(defaultLang || 'uz');
+
+  useEffect(() => {
+    if (defaultLang) {
+      setLangState(defaultLang);
+      try { localStorage.setItem('artline-lang', defaultLang); } catch {}
+    } else {
+      try {
+        const saved = localStorage.getItem('artline-lang') as Lang | null;
+        if (saved === 'ru' || saved === 'uz') setLangState(saved);
+      } catch {}
+    }
+  }, [defaultLang]);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('artline-lang') as Lang | null;
-      if (saved === 'ru' || saved === 'uz') setLangState(saved);
+      if (!defaultLang) {
+        const params = new URLSearchParams(window.location.search);
+        const urlLang = params.get('lang') as Lang | null;
+        if (urlLang === 'ru' || urlLang === 'uz') {
+          setLangState(urlLang);
+          localStorage.setItem('artline-lang', urlLang);
+        }
+      }
     } catch {}
-  }, []);
+  }, [defaultLang]);
 
   useEffect(() => {
     try { document.documentElement.lang = lang; } catch {}
@@ -454,6 +472,11 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
     try { localStorage.setItem('artline-lang', l); } catch {}
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('lang', l);
+      window.history.pushState(null, '', url.pathname + url.search);
+    } catch {}
   }, []);
 
   const t = useCallback((key: string) => {

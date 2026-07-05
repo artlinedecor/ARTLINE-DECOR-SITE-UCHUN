@@ -30,7 +30,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Карниз',
       description: 'Tom va fasad tutashgan joylar uchun dekorativ karniz',
       rules: 'Tom osti qismiga o\'rnatiladi. Standart uzunlik — 2m.',
-      pricePerUnit: 15,
+      width: 0.30,
+      height: 0.12,
+      defaultLength: 2.0,
+      productionCostPerCubicMeter: 250,
+      volume: 0.072,
+      pricePerUnit: 18,
       unit: 'P/M',
       calculationType: 'volume'
     },
@@ -40,7 +45,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Колонна',
       description: 'Bino kirish qismi va dahlizlar uchun klassik ustunlar',
       rules: 'Tayanch va dekorativ maqsadlarda ishlatiladi.',
-      pricePerUnit: 25,
+      width: 0.40,
+      height: 0.40,
+      defaultLength: 3.0,
+      productionCostPerCubicMeter: 250,
+      volume: 0.48,
+      pricePerUnit: 120,
       unit: 'DONA',
       calculationType: 'volume'
     },
@@ -50,7 +60,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Пилястра',
       description: 'Fasad devorlarining tekis yuzasini bezash uchun yassi ustun',
       rules: 'Deraza atrofida yoki burchaklarda devorga yopishtiriladi.',
-      pricePerUnit: 20,
+      width: 0.30,
+      height: 0.10,
+      defaultLength: 3.0,
+      productionCostPerCubicMeter: 250,
+      volume: 0.09,
+      pricePerUnit: 22.5,
       unit: 'DONA',
       calculationType: 'volume'
     },
@@ -60,7 +75,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Архивольт',
       description: 'Deraza va eshik arkalarini bezash uchun dekorativ profil',
       rules: 'Yarim doira yoki murakkab shakldagi arkalarda ishlatiladi.',
-      pricePerUnit: 30,
+      width: 0.20,
+      height: 0.08,
+      defaultLength: 2.0,
+      productionCostPerCubicMeter: 250,
+      volume: 0.032,
+      pricePerUnit: 8,
       unit: 'P/M',
       calculationType: 'volume'
     },
@@ -70,7 +90,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Кронштейн',
       description: 'Karnizlar, tokchalar yoki deraza oynalari ostidagi tayanch',
       rules: 'Karnizlarning ostki qismiga yoki dahliz burchaklariga qotiriladi.',
-      pricePerUnit: 12,
+      width: 0.15,
+      height: 0.25,
+      defaultLength: 0.20,
+      productionCostPerCubicMeter: 250,
+      volume: 0.0075,
+      pricePerUnit: 1.88,
       unit: 'DONA',
       calculationType: 'volume'
     },
@@ -80,7 +105,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Молдинг',
       description: 'Fasad yuzasida ramkalar va chiziqlar yaratish uchun profil',
       rules: 'Devor sirtidagi rang va material o\'tish joylarini yopish uchun.',
-      pricePerUnit: 10,
+      width: 0.15,
+      height: 0.05,
+      defaultLength: 2.0,
+      productionCostPerCubicMeter: 250,
+      volume: 0.015,
+      pricePerUnit: 3.75,
       unit: 'P/M',
       calculationType: 'volume'
     },
@@ -90,7 +120,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Рустик',
       description: 'Bino burchaklarini bezash va himoya qilish uchun burchak toshlari',
       rules: 'Binoning tashqi burchaklariga shaxmat yoki ketma-ket tartibda o\'rnatiladi.',
-      pricePerUnit: 18,
+      width: 0.40,
+      height: 0.30,
+      defaultLength: 0.05,
+      productionCostPerCubicMeter: 250,
+      volume: 0.006,
+      pricePerUnit: 1.5,
       unit: 'DONA',
       calculationType: 'volume'
     },
@@ -100,7 +135,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Медальон',
       description: 'Fasadning markaziy yoki yuqori qismidagi doiraviy dekorativ element',
       rules: 'Fasadning eng ko\'zga tashlanadigan qismiga qotiriladi.',
-      pricePerUnit: 35,
+      width: 0.60,
+      height: 0.60,
+      defaultLength: 0.08,
+      productionCostPerCubicMeter: 250,
+      volume: 0.0288,
+      pricePerUnit: 7.2,
       unit: 'DONA',
       calculationType: 'volume'
     },
@@ -110,7 +150,12 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Балюстрада',
       description: 'Zinapoyalar, balkonlar va terrasalar uchun dekorativ to\'siqlar',
       rules: 'Alohida ustunchalar yordamida yig\'iladi. Mustahkam asos talab qiladi.',
-      pricePerUnit: 28,
+      width: 0.20,
+      height: 0.20,
+      defaultLength: 0.80,
+      productionCostPerCubicMeter: 250,
+      volume: 0.032,
+      pricePerUnit: 8,
       unit: 'DONA',
       calculationType: 'volume'
     },
@@ -120,8 +165,28 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Замковый камень',
       description: 'Arka yoki deraza tepasidagi markaziy dekorativ tosh',
       rules: 'Deraza profili yoki arkaning markaziy yuqori nuqtasiga o\'rnatiladi.',
-      pricePerUnit: 22,
+      width: 0.20,
+      height: 0.25,
+      defaultLength: 0.15,
+      productionCostPerCubicMeter: 250,
+      volume: 0.0075,
+      pricePerUnit: 1.88,
       unit: 'DONA',
+      calculationType: 'volume'
+    },
+    {
+      id: 'podokonik',
+      nameUz: 'Deraza tokchasi (Podokonik)',
+      nameRu: 'Подоконник',
+      description: 'Deraza ostiga o\'rnatiladigan dekorativ tokcha',
+      rules: 'Deraza osti qismiga mustahkamlab o\'rnatiladi. Standart uzunlik — 2m.',
+      width: 0.15,
+      height: 0.06,
+      defaultLength: 2.0,
+      productionCostPerCubicMeter: 250,
+      volume: 0.018,
+      pricePerUnit: 4.5,
+      unit: 'P/M',
       calculationType: 'volume'
     },
     {
@@ -130,7 +195,17 @@ export const DEFAULT_PRICING: PricingConfig = {
       nameRu: 'Термопанель - 3см',
       description: 'Issiqlik izolyatsiyasi va fasad bezagi uchun dekorativ panel',
       rules: 'Fasad devorlariga yopishtirilib, mustahkamlanadi.',
-      pricePerUnit: 7.9,
+      pricePerUnit: 7.9051383,
+      unit: 'M²',
+      calculationType: 'unit'
+    },
+    {
+      id: 'termopanel_5sm',
+      nameUz: 'Termo panel - 5sm',
+      nameRu: 'Термопанель - 5см',
+      description: 'Issiqlik izolyatsiyasi va fasad bezagi uchun dekorativ panel - 5sm',
+      rules: 'Fasad devorlariga yopishtirilib, mustahkamlanadi.',
+      pricePerUnit: 11.8577075,
       unit: 'M²',
       calculationType: 'unit'
     },
@@ -151,6 +226,16 @@ export const DEFAULT_PRICING: PricingConfig = {
       description: 'Fasad yuzasini bo\'yoq va emulsiya bilan qoplash',
       rules: 'Tashqi fasad bo\'yash ishlari.',
       pricePerUnit: 0.95,
+      unit: 'M²',
+      calculationType: 'unit'
+    },
+    {
+      id: 'travertin',
+      nameUz: 'Travertin xizmati',
+      nameRu: 'Услуги травертина',
+      description: 'Fasadga travertin suvoq va ishlov berish xizmati',
+      rules: 'Tashqi fasad travertin ishlari.',
+      pricePerUnit: 6.3241106,
       unit: 'M²',
       calculationType: 'unit'
     }
@@ -230,6 +315,30 @@ export function getPricing(): PricingConfig {
     pricing.elements = DEFAULT_PRICING.elements.map(def => {
       const price = legacy[def.id];
       return price !== undefined ? { ...def, pricePerUnit: price } : def;
+    });
+  } else {
+    // Append any default elements that are missing in the active database
+    DEFAULT_PRICING.elements.forEach(def => {
+      if (!pricing.elements.some(el => el.id === def.id)) {
+        pricing.elements.push(def);
+      }
+    });
+
+    // Fill in missing default values like width, height, productionCostPerCubicMeter
+    pricing.elements = pricing.elements.map(el => {
+      const def = DEFAULT_PRICING.elements.find(d => d.id === el.id);
+      if (def) {
+        return {
+          ...def,
+          ...el,
+          width: el.width !== undefined ? el.width : def.width,
+          height: el.height !== undefined ? el.height : def.height,
+          defaultLength: el.defaultLength !== undefined ? el.defaultLength : def.defaultLength,
+          productionCostPerCubicMeter: el.productionCostPerCubicMeter !== undefined ? el.productionCostPerCubicMeter : def.productionCostPerCubicMeter,
+          volume: el.volume !== undefined ? el.volume : def.volume,
+        };
+      }
+      return el;
     });
   }
   return pricing;

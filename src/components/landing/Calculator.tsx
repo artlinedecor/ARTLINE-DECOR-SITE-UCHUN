@@ -9,9 +9,9 @@ import type { FacadeElementType, CalculatorInput, CalculatorResult } from '@/lib
 
 const EMPTY_INPUT: CalculatorInput = {
   elementType: 'cornice',
-  length: 1,
-  width: 0.15,
-  height: 0.15,
+  length: 10,
+  width: 0.30,
+  height: 0.12,
   quantity: 1,
 };
 
@@ -19,9 +19,9 @@ export default function Calculator() {
   const [elements, setElements] = useState<any[]>([]);
   const [inputs, setInputs] = useState<CalculatorInput[]>([{
     elementType: 'cornice',
-    length: 1,
-    width: 0.15,
-    height: 0.15,
+    length: 10,
+    width: 0.30,
+    height: 0.12,
     quantity: 1,
   }]);
   const [result, setResult] = useState<CalculatorResult | null>(null);
@@ -36,9 +36,9 @@ export default function Calculator() {
       if (pricing.elements.length > 0) {
         setInputs([{
           elementType: pricing.elements[0].id,
-          length: 1,
-          width: 0.15,
-          height: 0.15,
+          length: 10,
+          width: pricing.elements[0].width || 0.30,
+          height: pricing.elements[0].height || 0.12,
           quantity: 1,
         }]);
       }
@@ -55,11 +55,12 @@ export default function Calculator() {
 
   const addItem = () => {
     const defaultType = elements[0]?.id || 'cornice';
+    const selectedProd = elements.find(el => el.id === defaultType);
     setInputs(prev => [...prev, {
       elementType: defaultType,
-      length: 1,
-      width: 0.15,
-      height: 0.15,
+      length: 10,
+      width: selectedProd?.width || 0.30,
+      height: selectedProd?.height || 0.12,
       quantity: 1,
     }]);
   };
@@ -78,7 +79,7 @@ export default function Calculator() {
     if (!result) return;
     await generateEstimatePDF(result, clientName ? {
       name: clientName, phone: clientPhone, address: clientAddress,
-    } : undefined);
+    } : undefined, inputs);
   };
 
   return (
@@ -147,12 +148,7 @@ export default function Calculator() {
                       </select>
                     </div>
                     {isVolumeBased && (
-                      <div className="calc-row">
-                        <div className="input-group">
-                          <label>Uzunlik (m)</label>
-                          <input type="number" className="input-field" step="0.01"
-                            value={input.length} onChange={e => updateInput(idx, 'length', e.target.value === '' ? '' : +e.target.value)} />
-                        </div>
+                      <div className="calc-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                         <div className="input-group">
                           <label>Kenglik (m)</label>
                           <input type="number" className="input-field" step="0.01"
@@ -165,16 +161,11 @@ export default function Calculator() {
                         </div>
                       </div>
                     )}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+                    <div style={{ marginTop: 12 }}>
                       <div className="input-group">
-                        <label>Miqdori / Soni {elMeta ? `(${elMeta.unit})` : ''}</label>
+                        <label>Buyurtma Metri / Soni {elMeta ? `(${elMeta.unit})` : ''}</label>
                         <input type="number" className="input-field"
-                          value={input.quantity} onChange={e => updateInput(idx, 'quantity', e.target.value === '' ? '' : +e.target.value)} />
-                      </div>
-                      <div className="input-group">
-                        <label>Birlik narxi (so&apos;m, ixtiyoriy)</label>
-                        <input type="number" className="input-field" placeholder="Standart narx"
-                          value={input.customPrice ?? ''} onChange={e => updateInput(idx, 'customPrice', e.target.value === '' ? '' : +e.target.value)} />
+                          value={input.length} onChange={e => updateInput(idx, 'length', e.target.value === '' ? '' : +e.target.value)} />
                       </div>
                     </div>
                   </div>
@@ -206,23 +197,27 @@ export default function Calculator() {
             ) : (
               <>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24 }}>
-                  {result.items.map((item, idx) => (
-                    <div key={idx} style={{
-                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                      padding: '10px 12px', borderRadius: 'var(--radius-sm)',
-                      background: 'var(--bg-glass)', fontSize: '0.9rem',
-                    }}>
-                      <div>
-                        <strong>{item.name}</strong>
-                        <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: '0.8rem' }}>
-                          {item.dimensions} × {item.quantity} dona
+                  {result.items.map((item, idx) => {
+                    const elMeta = elements.find(e => e.id === item.elementType);
+                    const inputVal = inputs[idx] || { length: 0 };
+                    return (
+                      <div key={idx} style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '10px 12px', borderRadius: 'var(--radius-sm)',
+                        background: 'var(--bg-glass)', fontSize: '0.9rem',
+                      }}>
+                        <div>
+                          <strong>{item.name}</strong>
+                          <span style={{ color: 'var(--text-muted)', marginLeft: 8, fontSize: '0.8rem' }}>
+                            ({item.unitPrice.toLocaleString()}&nbsp;so&apos;m × {item.quantity}&nbsp;{elMeta?.unit || 'm'})
+                          </span>
+                        </div>
+                        <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold)' }}>
+                          {item.totalPrice.toLocaleString()}&nbsp;so&apos;m
                         </span>
                       </div>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-gold)' }}>
-                        {item.totalPrice.toLocaleString()}&nbsp;so&apos;m
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: 8 }}>

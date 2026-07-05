@@ -272,11 +272,21 @@ export default function DashboardPage() {
       vat: (order.totalPrice / 1.12) * 0.12,
       total: order.totalPrice
     };
+    
+    // Map OrderItems to CalculatorInputs
+    const inputsMapped = order.items.map(item => ({
+      elementType: item.elementType,
+      length: item.quantity,
+      width: item.width,
+      height: item.height,
+      quantity: item.quantity,
+    }));
+
     await generateEstimatePDF(result, {
       name: order.clientName,
       phone: order.phone,
       address: order.address
-    });
+    }, inputsMapped);
     setPdfLoading(false);
   };
 

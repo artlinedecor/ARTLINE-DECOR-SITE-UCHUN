@@ -79,7 +79,7 @@ export default function Footer() {
             <ul className="footer-links">
               <li style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                 <MapPin size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--accent-gold)' }} />
-                <a href="https://yandex.uz/maps/org/artlinedecor/138602828044/"
+                <a href="https://yandex.uz/maps/10335/tashkent/?ll=69.417834%2C41.304172&mode=search&sll=69.417834%2C41.304172&sspn=0.000858%2C0.000486&text=artlinedecor&z=17"
                    target="_blank" rel="noopener noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}>
                   {t('foot.address')}
                 </a>
