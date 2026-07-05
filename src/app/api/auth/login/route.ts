@@ -28,6 +28,6 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ success: true });
-  response.cookies.set(AUTH_COOKIE, createSessionValue(), authCookieOptions);
+  response.cookies.set(AUTH_COOKIE, await createSessionValue(), authCookieOptions);
   return response;
 }

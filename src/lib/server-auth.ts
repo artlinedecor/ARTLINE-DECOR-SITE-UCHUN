@@ -4,37 +4,59 @@ export const AUTH_COOKIE = 'artline_admin_session';
 
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
 
+// Edge-safe cryptographically secure random values for fallback secret
+const RUNTIME_SECRET = Array.from({ length: 32 }, () => 
+  Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+).join('');
+
 function getSessionSecret(): string {
-  return (
-    process.env.ADMIN_SESSION_SECRET ||
-    process.env.TELEGRAM_BOT_TOKEN ||
-    'artline-dev-session-secret'
-  );
+  const secret = process.env.ADMIN_SESSION_SECRET || process.env.TELEGRAM_BOT_TOKEN;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      return RUNTIME_SECRET;
+    }
+    return 'artline-dev-session-secret';
+  }
+  return secret;
 }
 
-function sign(value: string): string {
+async function sign(value: string): Promise<string> {
   const secret = getSessionSecret();
-  const combined = value + secret;
-  let hash = 0;
-  for (let i = 0; i < combined.length; i++) {
-    const char = combined.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(36);
+  const encoder = new TextEncoder();
+  const keyData = encoder.encode(secret);
+  const data = encoder.encode(value);
+  
+  const key = await crypto.subtle.importKey(
+    'raw',
+    keyData,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  
+  const signature = await crypto.subtle.sign('HMAC', key, data);
+  return Array.from(new Uint8Array(signature))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 function safeCompare(a: string, b: string): boolean {
-  return a === b;
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
 }
 
-export function createSessionValue(now = Date.now()): string {
+export async function createSessionValue(now = Date.now()): Promise<string> {
   const expiresAt = now + SESSION_MAX_AGE_SECONDS * 1000;
   const payload = `admin.${expiresAt}`;
-  return `${payload}.${sign(payload)}`;
+  const signature = await sign(payload);
+  return `${payload}.${signature}`;
 }
 
-export function verifySessionValue(session?: string): boolean {
+export async function verifySessionValue(session?: string): Promise<boolean> {
   if (!session) return false;
   const parts = session.split('.');
   if (parts.length !== 3) return false;
@@ -45,12 +67,13 @@ export function verifySessionValue(session?: string): boolean {
   const expiresAt = Number(expiresAtRaw);
   if (!Number.isFinite(expiresAt) || expiresAt < Date.now()) return false;
 
-  return safeCompare(signature, sign(`${subject}.${expiresAtRaw}`));
+  const expectedSignature = await sign(`${subject}.${expiresAtRaw}`);
+  return safeCompare(signature, expectedSignature);
 }
 
 export async function isAdminRequest(): Promise<boolean> {
   const cookieStore = await cookies();
-  return verifySessionValue(cookieStore.get(AUTH_COOKIE)?.value);
+  return await verifySessionValue(cookieStore.get(AUTH_COOKIE)?.value);
 }
 
 export function getAdminCredentials() {

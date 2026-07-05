@@ -29,6 +29,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: 'Invalid payload' }, { status: 400 });
   }
 
+  const isAdmin = await isAdminRequest();
+  if (!isAdmin) {
+    // If not admin, check if this order already exists (prevent hijacking)
+    const existing = getOrders().find(o => o.id === order.id);
+    if (existing) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+    // Force status to 'new' for public leads
+    order.status = 'new';
+  }
+
   const orders = upsertOrder(order);
   
   // Sync to ERPNext asynchronously

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AUTH_COOKIE, verifySessionValue } from '@/lib/server-auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (pathname === '/dashboard/login') {
@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.startsWith('/dashboard')) {
-    const isAuthenticated = verifySessionValue(
+    const isAuthenticated = await verifySessionValue(
       request.cookies.get(AUTH_COOKIE)?.value
     );
 
