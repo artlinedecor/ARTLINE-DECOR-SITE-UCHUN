@@ -30,12 +30,52 @@ export async function POST(request: Request) {
     let notes = body.notes || 'Instagram orqali kelgan lead.';
 
     // Meta Webhook nested extraction fallback (for actual FB/IG ads webhook connection)
-    if (body.entry?.[0]?.changes?.[0]?.value) {
-      const changeValue = body.entry[0].changes[0].value;
-      clientName = changeValue.lead_name || changeValue.name || clientName;
-      phone = changeValue.lead_phone || changeValue.phone || phone;
-      address = `Instagram Form: ${changeValue.form_id || 'Instagram Leads'}`;
-      notes = `Kompaniya: ${changeValue.campaign_name || 'Instagram Reklama'}`;
+    const webhookVal = body.entry?.[0]?.changes?.[0]?.value;
+    if (webhookVal) {
+      const leadgenId = webhookVal.leadgen_id;
+      const accessToken = process.env.META_ACCESS_TOKEN;
+      
+      clientName = webhookVal.lead_name || webhookVal.name || clientName;
+      phone = webhookVal.lead_phone || webhookVal.phone || phone;
+      address = `Instagram Form: ${webhookVal.form_id || 'Instagram Leads'}`;
+      notes = `Kompaniya: ${webhookVal.campaign_name || 'Instagram Reklama'}`;
+
+      if (leadgenId && accessToken) {
+        try {
+          const fbRes = await fetch(`https://graph.facebook.com/v20.0/${leadgenId}?access_token=${accessToken}`);
+          if (fbRes.ok) {
+            const fbData = await fbRes.json();
+            if (fbData.field_data) {
+              const nameField = fbData.field_data.find((f: any) => 
+                f.name === 'full_name' || f.name === 'name' || f.name.toLowerCase().includes('name')
+              );
+              const phoneField = fbData.field_data.find((f: any) => 
+                f.name === 'phone_number' || f.name === 'phone' || f.name.toLowerCase().includes('phone')
+              );
+              
+              if (nameField?.values?.[0]) {
+                clientName = nameField.values[0];
+              }
+              if (phoneField?.values?.[0]) {
+                phone = phoneField.values[0];
+              }
+
+              // Extract other fields/answers if any
+              const customFields = fbData.field_data
+                .filter((f: any) => f.name !== 'full_name' && f.name !== 'phone_number')
+                .map((f: any) => `${f.name}: ${f.values?.join(', ')}`)
+                .join('\n');
+              if (customFields) {
+                notes = `${notes}\n\nQo'shimcha ma'lumotlar:\n${customFields}`;
+              }
+            }
+          } else {
+            console.error('[Instagram Webhook] Meta Graph API error response:', await fbRes.text());
+          }
+        } catch (fbErr) {
+          console.error('[Instagram Webhook] Fetching lead details from Meta failed:', fbErr);
+        }
+      }
     }
 
     const order = {
