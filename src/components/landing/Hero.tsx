@@ -385,7 +385,7 @@ export default function Hero() {
       </motion.div>
 
       {/* Main Content Overlay */}
-      <motion.div className="container" style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 'clamp(150px, 18vh, 200px)', paddingBottom: 'clamp(90px, 12vh, 130px)', rotateX, rotateY, x: contentX, y: contentY, transformStyle: 'preserve-3d' }}>
+      <motion.div className="container" style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 'clamp(110px, 11vh, 140px)', paddingBottom: 'clamp(60px, 7vh, 85px)', rotateX, rotateY, x: contentX, y: contentY, transformStyle: 'preserve-3d' }}>
         
         {/* Season Indicator Pill */}
         <motion.div
@@ -403,8 +403,8 @@ export default function Hero() {
             background: 'rgba(10, 15, 25, 0.6)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
             borderRadius: '100px',
-            padding: '8px 12px',
-            marginBottom: '40px',
+            padding: '6px 12px',
+            marginBottom: '20px',
             backdropFilter: 'blur(12px)',
             boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
           }}
@@ -448,7 +448,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
           style={{
-            marginBottom: '48px',
+            marginBottom: '24px',
             maxWidth: '960px',
             display: 'flex',
             flexDirection: 'column',
@@ -463,7 +463,7 @@ export default function Hero() {
               fontWeight: 800,
               lineHeight: 1.12,
               color: '#ffffff',
-              marginBottom: '24px',
+              marginBottom: '12px',
               textShadow: '0 2px 6px rgba(0,0,0,0.55), 0 8px 30px rgba(0,0,0,0.9)',
               letterSpacing: '-0.02em',
               position: 'relative',
@@ -564,10 +564,10 @@ export default function Hero() {
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '20px',
+            gap: '16px',
             width: '100%',
             maxWidth: '1000px',
-            marginTop: '80px'
+            marginTop: '36px'
           }}
         >
           {[
@@ -584,7 +584,7 @@ export default function Hero() {
                 backdropFilter: 'blur(16px)',
                 border: '1px solid',
                 borderRadius: '24px',
-                padding: '32px 20px',
+                padding: '16px 20px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
