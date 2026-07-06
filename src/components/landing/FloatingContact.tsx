@@ -9,28 +9,17 @@ const PHONE = '998991020200';
 
 export default function FloatingContact() {
   const { t } = useT();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const WA_TEXT = encodeURIComponent("Assalomu alaykum! Fasad / termo-panel bo'yicha ma'lumot va narx olmoqchiman.");
   const ACTIONS = [
-    { label: t('fc.whatsapp'), href: `https://wa.me/${PHONE}?text=${WA_TEXT}`, bg: '#25D366', icon: <MessageCircle size={22} /> },
-    { label: t('fc.telegram'), href: 'https://t.me/Art_linedecor', bg: '#229ED9', icon: <Send size={20} /> },
-    { label: t('fc.call'), href: `tel:+${PHONE}`, bg: '#d99a6c', icon: <Phone size={20} /> },
+    { label: t('fc.whatsapp'), href: `https://wa.me/${PHONE}?text=${WA_TEXT}`, bg: '#25D366', icon: <MessageCircle className="fc-icon-wa" size={22} /> },
+    { label: t('fc.telegram'), href: 'https://t.me/Art_linedecor', bg: '#229ED9', icon: <Send className="fc-icon-tg" size={20} /> },
+    { label: t('fc.call'), href: `tel:+${PHONE}`, bg: '#d99a6c', icon: <Phone className="fc-icon-call" size={20} /> },
   ];
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 24,
-        right: 24,
-        zIndex: 1500,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 14,
-      }}
-    >
+    <div className="floating-contact-wrapper">
       <AnimatePresence>
         {open &&
           ACTIONS.map((a, i) => (
@@ -46,22 +35,11 @@ export default function FloatingContact() {
               transition={{ duration: 0.2, delay: i * 0.05 }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.95 }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                background: a.bg,
-                color: '#fff',
-                padding: '11px 18px 11px 16px',
-                borderRadius: 100,
-                fontSize: '0.92rem',
-                fontWeight: 600,
-                boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
-                textDecoration: 'none',
-              }}
+              className="floating-contact-link"
+              style={{ background: a.bg }}
             >
               {a.icon}
-              {a.label}
+              <span>{a.label}</span>
             </motion.a>
           ))}
       </AnimatePresence>
@@ -72,20 +50,8 @@ export default function FloatingContact() {
         aria-label={open ? 'Yopish' : "Biz bilan bog'lanish"}
         aria-expanded={open}
         whileTap={{ scale: 0.92 }}
-        style={{
-          position: 'relative',
-          width: 60,
-          height: 60,
-          borderRadius: '50%',
-          border: 'none',
-          cursor: 'pointer',
-          background: open ? '#1a1f2e' : '#25D366',
-          color: '#fff',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
-        }}
+        className="floating-contact-toggle"
+        style={{ background: open ? '#1a1f2e' : '#25D366' }}
       >
         {/* Pulsing ring (only when closed) */}
         {!open && (
@@ -107,7 +73,7 @@ export default function FloatingContact() {
           animate={{ rotate: 0, opacity: 1 }}
           style={{ display: 'flex' }}
         >
-          {open ? <X size={26} /> : <MessageCircle size={28} />}
+          {open ? <X size={26} className="fc-toggle-icon" /> : <MessageCircle size={28} className="fc-toggle-icon" />}
         </motion.span>
       </motion.button>
     </div>

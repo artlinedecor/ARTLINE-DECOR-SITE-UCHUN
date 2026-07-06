@@ -78,8 +78,8 @@ export async function isAdminRequest(): Promise<boolean> {
 
 export function getAdminCredentials() {
   return {
-    login: process.env.ADMIN_LOGIN || 'artline',
-    password: process.env.ADMIN_PASSWORD || 'artline2024',
+    login: process.env.ADMIN_LOGIN || process.env.NEXT_PUBLIC_ADMIN_LOGIN || 'artline',
+    password: process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'artline2024',
   };
 }
 
