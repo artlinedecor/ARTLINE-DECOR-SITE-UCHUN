@@ -10,10 +10,14 @@ const RUNTIME_SECRET = Array.from({ length: 32 }, () =>
 ).join('');
 
 function getSessionSecret(): string {
-  const secret = process.env.ADMIN_SESSION_SECRET || process.env.TELEGRAM_BOT_TOKEN;
+  const secret =
+    process.env.ADMIN_SESSION_SECRET ||
+    process.env.TELEGRAM_BOT_TOKEN ||
+    process.env.ADMIN_PASSWORD ||
+    process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
   if (!secret) {
     if (process.env.NODE_ENV === 'production') {
-      return RUNTIME_SECRET;
+      return 'artline-decor-fallback-session-secret-2024-prod';
     }
     return 'artline-dev-session-secret';
   }
