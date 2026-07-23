@@ -8,7 +8,8 @@ import type {
   ProductionOrder, 
   Employee, 
   AdvancePayment, 
-  WorkLog 
+  WorkLog,
+  PricingConfig,
 } from './types';
 
 type DataShape = {
@@ -20,6 +21,7 @@ type DataShape = {
   employees: Employee[];
   advances: AdvancePayment[];
   workLogs: WorkLog[];
+  pricing?: PricingConfig;
 };
 
 const DEFAULT_DATA: DataShape = {
@@ -365,4 +367,16 @@ export function deleteWorkLog(id: string): WorkLog[] {
   data.workLogs = data.workLogs.filter(w => w.id !== id);
   writeData(data);
   return data.workLogs;
+}
+
+// ---- Pricing Config ----
+export function getPricingConfig(): PricingConfig | null {
+  return readData().pricing || null;
+}
+
+export function savePricingConfig(pricing: PricingConfig): PricingConfig {
+  const data = readData();
+  data.pricing = { ...pricing, updatedAt: new Date().toISOString() };
+  writeData(data);
+  return data.pricing;
 }
