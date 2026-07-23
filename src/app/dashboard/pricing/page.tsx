@@ -88,7 +88,7 @@ export default function PricingPage() {
     }
   };
 
-  const handleAddElement = (e: React.FormEvent) => {
+  const handleAddElement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNameUz || !newNameRu) {
       toast.error("Iltimos, o'zbekcha va ruscha nomlarni kiriting!");
@@ -122,15 +122,26 @@ export default function PricingPage() {
       volume: volume
     };
 
-    setConfig(prev => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        elements: [...prev.elements, newElement]
-      };
-    });
+    const updatedConfig = {
+      ...config,
+      elements: [...config.elements, newElement]
+    };
 
-    toast.success("Yangi mahsulot muvaffaqiyatli qo'shildi!");
+    setConfig(updatedConfig);
+
+    // ✅ Immediately save to localStorage so Zamer page can read it
+    savePricing(updatedConfig);
+
+    // ✅ Also save to server
+    try {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedConfig),
+      });
+    } catch { /* server save failed — localStorage still has it */ }
+
+    toast.success("Yangi mahsulot qo'shildi va saqlandi! Zamerni yangilang.");
 
     // Reset form
     setNewId('');
@@ -145,6 +156,7 @@ export default function PricingPage() {
     setNewPrice(10.0);
     setShowAddForm(false);
   };
+
 
   const handleDeleteElement = (id: string) => {
     if (window.confirm("Ushbu mahsulotni o'chirishni xohlaysizmi?")) {

@@ -34,20 +34,9 @@ export default function ZamerPage() {
   const [calcImages, setCalcImages] = useState<string[]>([]);
 
   useEffect(() => {
-    // Load from server first (source of truth), fallback to localStorage
-    const loadPricing = async () => {
-      let pricing = getPricing(); // localStorage fallback
-      try {
-        const res = await fetch('/api/config');
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.config && data.config.elements) {
-            pricing = { ...pricing, ...data.config };
-            savePricing(pricing); // sync to localStorage
-          }
-        }
-      } catch {}
-
+    // 1. Load from localStorage immediately (sync — shows instantly)
+    const localPricing = getPricing();
+    const applyPricing = (pricing: typeof localPricing) => {
       if (pricing.usdToUzsRate) setUsdToUzsRate(pricing.usdToUzsRate);
       if (pricing.pricePerCubicMeter) setGlobalCostPerCubic(pricing.pricePerCubicMeter);
       if (pricing.elements && pricing.elements.length > 0) {
@@ -67,8 +56,28 @@ export default function ZamerPage() {
         ]);
       }
     };
-    loadPricing();
+
+    applyPricing(localPricing); // apply immediately from localStorage
+
+    // 2. Then try server — if server has MORE elements, merge and update
+    fetch('/api/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.config?.elements && data.config.elements.length > 0) {
+          const serverPricing = { ...localPricing, ...data.config };
+          // Only update if server has different/more elements
+          const serverIds = new Set<string>(serverPricing.elements.map((e: { id: string }) => e.id));
+          const localIds = new Set<string>(localPricing.elements.map(e => e.id));
+          const hasNew = [...serverIds].some(id => !localIds.has(id));
+          if (hasNew) {
+            savePricing(serverPricing);
+            applyPricing(serverPricing);
+          }
+        }
+      })
+      .catch(() => { /* server unavailable, localStorage is enough */ });
   }, []);
+
 
 
   // Run calculation automatically whenever inputs change
