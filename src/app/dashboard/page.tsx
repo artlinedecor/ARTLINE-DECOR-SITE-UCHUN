@@ -162,11 +162,25 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadOrders();
-    const pricing = getPricing();
-    if (pricing && pricing.elements) {
-      setElements(pricing.elements);
-    }
+    // Load elements from server first, fallback to localStorage
+    const loadElements = async () => {
+      let pricing = getPricing();
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.config?.elements) {
+            pricing = { ...pricing, ...data.config };
+          }
+        }
+      } catch {}
+      if (pricing && pricing.elements) {
+        setElements(pricing.elements);
+      }
+    };
+    loadElements();
   }, [loadOrders]);
+
 
   const stats = calculateDashboardStats(orders);
 

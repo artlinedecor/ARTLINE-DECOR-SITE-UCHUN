@@ -28,7 +28,19 @@ export default function PricingPage() {
   const [newPrice, setNewPrice] = useState<number>(10.0);
 
   useEffect(() => {
-    setConfig(getPricing());
+    // Try to load from server first (source of truth), fallback to localStorage
+    fetch('/api/config')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.config && data.config.elements) {
+          const merged = { ...getPricing(), ...data.config };
+          setConfig(merged);
+          savePricing(merged); // sync to localStorage
+        } else {
+          setConfig(getPricing());
+        }
+      })
+      .catch(() => setConfig(getPricing()));
   }, []);
 
   if (!config) return null;
@@ -42,16 +54,36 @@ export default function PricingPage() {
     ? Math.round((computedPrice / newLength) * 100) / 100
     : computedPrice;
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // Save to localStorage
     savePricing(config);
-    setSaved(true);
-    toast.success("Narxlar va valyuta kursi muvaffaqiyatli saqlandi!");
-    setTimeout(() => setSaved(false), 2500);
+    // Save to server (persists across all devices)
+    try {
+      await fetch('/api/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      });
+      setSaved(true);
+      toast.success("Narxlar va valyuta kursi muvaffaqiyatli saqlandi!");
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      toast.error("Serverga saqlashda xatolik. Iltimos qayta urinib ko'ring.");
+    }
   };
 
-  const handleResetToDefault = () => {
+  const handleResetToDefault = async () => {
     if (window.confirm("Barcha narxlar va mahsulotlarni standart zavod sozlamalariga qaytarishni xohlaysizmi?")) {
-      setConfig({ ...DEFAULT_PRICING });
+      const reset = { ...DEFAULT_PRICING };
+      setConfig(reset);
+      savePricing(reset);
+      try {
+        await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reset),
+        });
+      } catch {}
       toast.success("Zavod sozlamalariga qaytarildi.");
     }
   };

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, Download, Printer, Ruler, Save, User, Phone, MapPin, Grid, PlusCircle, ArrowRight, Table } from 'lucide-react';
 import { calculateEstimate, generateModelCode } from '@/lib/calculator';
 import { generateEstimatePDF } from '@/lib/pdf-generator';
-import { generateId, getPricing } from '@/lib/store';
+import { generateId, getPricing, savePricing } from '@/lib/store';
 import type { CalculatorInput, CalculatorResult, Order } from '@/lib/types';
 import { saveOrderClient } from '@/lib/orders-sync';
 import toast from 'react-hot-toast';
@@ -34,34 +34,42 @@ export default function ZamerPage() {
   const [calcImages, setCalcImages] = useState<string[]>([]);
 
   useEffect(() => {
-    const pricing = getPricing();
-    if (pricing) {
-      if (pricing.usdToUzsRate) {
-        setUsdToUzsRate(pricing.usdToUzsRate);
-      }
-      if (pricing.pricePerCubicMeter) {
-        setGlobalCostPerCubic(pricing.pricePerCubicMeter);
-      }
-      if (pricing.elements) {
-        setElements(pricing.elements);
-        if (pricing.elements.length > 0) {
-          const defaultEl = pricing.elements[0];
-          const autoModel = generateModelCode(defaultEl.id, defaultEl.height || 0.12, defaultEl.width || 0.30);
-          setInputs([
-            {
-              elementType: defaultEl.id,
-              model: autoModel || '',
-              length: defaultEl.defaultLength || 2.0,
-              width: defaultEl.width || 0.30,
-              height: defaultEl.height || 0.12,
-              quantity: 10,
-              pieceLength: defaultEl.defaultLength || 2.0,
-            }
-          ]);
+    // Load from server first (source of truth), fallback to localStorage
+    const loadPricing = async () => {
+      let pricing = getPricing(); // localStorage fallback
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.config && data.config.elements) {
+            pricing = { ...pricing, ...data.config };
+            savePricing(pricing); // sync to localStorage
+          }
         }
+      } catch {}
+
+      if (pricing.usdToUzsRate) setUsdToUzsRate(pricing.usdToUzsRate);
+      if (pricing.pricePerCubicMeter) setGlobalCostPerCubic(pricing.pricePerCubicMeter);
+      if (pricing.elements && pricing.elements.length > 0) {
+        setElements(pricing.elements);
+        const defaultEl = pricing.elements[0];
+        const autoModel = generateModelCode(defaultEl.id, defaultEl.height || 0.12, defaultEl.width || 0.30);
+        setInputs([
+          {
+            elementType: defaultEl.id,
+            model: autoModel || '',
+            length: defaultEl.defaultLength || 2.0,
+            width: defaultEl.width || 0.30,
+            height: defaultEl.height || 0.12,
+            quantity: 10,
+            pieceLength: defaultEl.defaultLength || 2.0,
+          }
+        ]);
       }
-    }
+    };
+    loadPricing();
   }, []);
+
 
   // Run calculation automatically whenever inputs change
   useEffect(() => {
