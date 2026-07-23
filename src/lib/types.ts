@@ -30,6 +30,7 @@ export interface OrderItem {
   unitPrice: number;
   totalPrice: number;
   pieceLength?: number;
+  customPrice?: number;
 }
 
 export type FacadeElementType = string;

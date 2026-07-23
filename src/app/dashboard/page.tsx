@@ -515,29 +515,154 @@ export default function DashboardPage() {
                 </div>
               </div>
 
+
               {/* Right Column: Element Details & Images */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {/* Element details */}
-                {editOrder.items && editOrder.items.length > 0 && (
-                  <div className="glass-card" style={{ padding: 12 }}>
-                    <h4 style={{ fontSize: '0.85rem', color: 'var(--accent-gold)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                {/* Element details — editable */}
+                <div className="glass-card" style={{ padding: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <h4 style={{ fontSize: '0.85rem', color: 'var(--accent-gold)', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
                       <FileText size={14} /> Elementlar ro&apos;yxati
                     </h4>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 120, overflowY: 'auto', fontSize: '0.78rem' }}>
-                      {editOrder.items.map((item, idx) => {
-                        const elMeta = elements.find(el => el.id === item.elementType);
-                        const isUnit = elMeta ? elMeta.calculationType === 'unit' : false;
-                        const specText = isUnit ? (elMeta.unit || 'dona') : `${item.length}x${item.width}x${item.height}m`;
-                        return (
-                          <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 6px', background: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
-                            <span>{item.name} ({specText})</span>
-                            <span style={{ fontWeight: 600, color: 'var(--accent-gold)' }}>{item.quantity} dona - {item.totalPrice.toLocaleString()} so&apos;m</span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <button
+                      className="btn btn-ghost btn-xs"
+                      style={{ fontSize: '0.7rem', padding: '2px 8px', color: 'var(--accent-gold)', border: '1px solid var(--border-gold)' }}
+                      onClick={() => {
+                        const firstEl = elements[0];
+                        if (!firstEl) return;
+                        setEditOrder(prev => {
+                          if (!prev) return null;
+                          return {
+                            ...prev,
+                            items: [...prev.items, {
+                              id: Math.random().toString(36).slice(2),
+                              elementType: firstEl.id,
+                              name: firstEl.nameUz,
+                              length: 0,
+                              width: firstEl.width || 0,
+                              height: firstEl.height || 0,
+                              quantity: 1,
+                              unitPrice: 0,
+                              totalPrice: 0,
+                            }]
+                          };
+                        });
+                      }}
+                    >
+                      + Qo&apos;shish
+                    </button>
                   </div>
-                )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 220, overflowY: 'auto', fontSize: '0.78rem' }}>
+                    {(editOrder.items || []).length === 0 && (
+                      <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: 8 }}>Element yo&apos;q</div>
+                    )}
+                    {(editOrder.items || []).map((item, idx) => {
+                      const elMeta = elements.find(el => el.id === item.elementType);
+                      return (
+                        <div key={idx} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 80px 24px', gap: 4, alignItems: 'center', padding: '4px 4px', background: 'rgba(255,255,255,0.02)', borderRadius: 4 }}>
+                          {/* Element type selector */}
+                          <select
+                            value={item.elementType}
+                            style={{ background: 'transparent', border: '1px solid var(--border)', color: '#fff', borderRadius: 4, padding: '2px 4px', fontSize: '0.78rem', width: '100%' }}
+                            onChange={e => {
+                              const newType = e.target.value;
+                              const newMeta = elements.find(el => el.id === newType);
+                              setEditOrder(prev => {
+                                if (!prev) return null;
+                                const updatedItems = prev.items.map((it, i) => i === idx ? {
+                                  ...it,
+                                  elementType: newType,
+                                  name: newMeta?.nameUz || newType,
+                                  width: newMeta?.width ?? it.width,
+                                  height: newMeta?.height ?? it.height,
+                                } : it);
+                                return { ...prev, items: updatedItems };
+                              });
+                            }}
+                          >
+                            {elements.map(el => (
+                              <option key={el.id} value={el.id} style={{ background: '#0a0d18', color: '#fff' }}>
+                                {el.nameUz}
+                              </option>
+                            ))}
+                          </select>
+                          {/* Quantity */}
+                          <input
+                            type="number"
+                            min={0}
+                            value={item.quantity}
+                            style={{ background: 'transparent', border: '1px solid var(--border)', color: '#fff', borderRadius: 4, padding: '2px 4px', fontSize: '0.78rem', width: '100%', textAlign: 'center' }}
+                            onChange={e => {
+                              const qty = Number(e.target.value) || 0;
+                              setEditOrder(prev => {
+                                if (!prev) return null;
+                                const updatedItems = prev.items.map((it, i) => i === idx ? {
+                                  ...it,
+                                  quantity: qty,
+                                  totalPrice: Math.round(it.unitPrice * qty),
+                                } : it);
+                                return {
+                                  ...prev,
+                                  items: updatedItems,
+                                  totalPrice: updatedItems.reduce((s, it) => s + it.totalPrice, 0),
+                                };
+                              });
+                            }}
+                            placeholder="Soni"
+                          />
+                          {/* Unit price */}
+                          <input
+                            type="number"
+                            min={0}
+                            value={item.unitPrice}
+                            style={{ background: 'transparent', border: '1px solid var(--border)', color: 'var(--accent-gold)', borderRadius: 4, padding: '2px 4px', fontSize: '0.78rem', width: '100%', textAlign: 'right' }}
+                            onChange={e => {
+                              const price = Number(e.target.value) || 0;
+                              setEditOrder(prev => {
+                                if (!prev) return null;
+                                const updatedItems = prev.items.map((it, i) => i === idx ? {
+                                  ...it,
+                                  unitPrice: price,
+                                  totalPrice: Math.round(price * it.quantity),
+                                } : it);
+                                return {
+                                  ...prev,
+                                  items: updatedItems,
+                                  totalPrice: updatedItems.reduce((s, it) => s + it.totalPrice, 0),
+                                };
+                              });
+                            }}
+                            placeholder="Narx"
+                          />
+                          {/* Delete row */}
+                          <button
+                            onClick={() => {
+                              setEditOrder(prev => {
+                                if (!prev) return null;
+                                const updatedItems = prev.items.filter((_, i) => i !== idx);
+                                return {
+                                  ...prev,
+                                  items: updatedItems,
+                                  totalPrice: updatedItems.reduce((s, it) => s + it.totalPrice, 0),
+                                };
+                              });
+                            }}
+                            style={{ background: 'transparent', border: 'none', color: 'var(--error)', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Total */}
+                  {(editOrder.items || []).length > 0 && (
+                    <div style={{ marginTop: 8, paddingTop: 6, borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'flex-end', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-gold)' }}>
+                      Jami: {(editOrder.items || []).reduce((s, it) => s + it.totalPrice, 0).toLocaleString()} so&apos;m
+                    </div>
+                  )}
+                </div>
+
 
                 {/* Photos upload & galleries */}
                 <div className="glass-card" style={{ padding: 12 }}>
