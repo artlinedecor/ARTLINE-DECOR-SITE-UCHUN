@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification-placeholder",
     yandex: process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION || "yandex-verification-placeholder",
+    other: {
+      "facebook-domain-verification": "dy5861pz6txmweo70s36l123ldnwbg",
+    },
   },
 };
 
