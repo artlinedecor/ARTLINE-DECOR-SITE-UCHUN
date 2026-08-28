@@ -198,7 +198,9 @@ export default async function Home({ searchParams }: PageProps) {
       />
       
       <Navbar />
-      <main>
+      <main
+      <h1 className="sr-only">ArTLINEDECOER - Asosiy Sahifa</h1>
+>
         <Hero />
         <ScrollReveal><FacadeAnatomy /></ScrollReveal>
         <ScrollReveal><TrustElements /></ScrollReveal>

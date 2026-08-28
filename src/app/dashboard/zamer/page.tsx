@@ -655,7 +655,7 @@ export default function ZamerPage() {
                   {objectImages.map((img, idx) => (
                     <div key={idx} style={{ position: 'relative', width: 50, height: 50, border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={img} alt="Rasm" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <button style={{ position: 'absolute', top: 0, right: 0, background: 'red', color: 'white', border: 'none', cursor: 'pointer', fontSize: 9 }}
                         onClick={() => setObjectImages(p => p.filter((_, i) => i !== idx))}>×</button>
                     </div>
@@ -674,7 +674,7 @@ export default function ZamerPage() {
                   {calcImages.map((img, idx) => (
                     <div key={idx} style={{ position: 'relative', width: 50, height: 50, border: '1px solid var(--border)', borderRadius: 4, overflow: 'hidden' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={img} alt="Rasm" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <button style={{ position: 'absolute', top: 0, right: 0, background: 'red', color: 'white', border: 'none', cursor: 'pointer', fontSize: 9 }}
                         onClick={() => setCalcImages(p => p.filter((_, i) => i !== idx))}>×</button>
                     </div>
