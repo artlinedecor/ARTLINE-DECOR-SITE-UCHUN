@@ -198,9 +198,8 @@ export default async function Home({ searchParams }: PageProps) {
       />
       
       <Navbar />
-      <main
-      <h1 className="sr-only">ArTLINEDECOER - Asosiy Sahifa</h1>
->
+      <main>
+        <h1 className="sr-only">Artline Decor — fasad dekor, travertin va issiqlik izolyatsiyasi</h1>
         <Hero />
         <ScrollReveal><FacadeAnatomy /></ScrollReveal>
         <ScrollReveal><TrustElements /></ScrollReveal>
