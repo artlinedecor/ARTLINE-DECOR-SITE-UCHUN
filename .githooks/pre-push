@@ -1,0 +1,23 @@
+#!/bin/sh
+# Push oldidan build tekshiruvi.
+# Sabab: 2026-08-28 da sintaksis xatosi push qilindi va production
+# deploylari 11 soat davomida yiqilib turdi. Build lokal tekshirilmagan edi.
+#
+# Chetlab o'tish (faqat zarur bo'lganda):  git push --no-verify
+
+echo "pre-push: build tekshirilmoqda..."
+
+if ! npm run build >/tmp/prepush-build.log 2>&1; then
+  echo
+  echo "  PUSH TO'XTATILDI — build yiqildi."
+  echo "  ────────────────────────────────────────"
+  tail -25 /tmp/prepush-build.log
+  echo "  ────────────────────────────────────────"
+  echo "  To'liq log: /tmp/prepush-build.log"
+  echo "  Tuzatib qaytadan urinib ko'ring."
+  echo
+  exit 1
+fi
+
+echo "pre-push: build muvaffaqiyatli, push davom etmoqda."
+exit 0
