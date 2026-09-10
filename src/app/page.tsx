@@ -32,7 +32,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       alternates: {
         canonical: "https://artlinedecor.uz/?lang=ru",
         languages: {
-          'uz-UZ': 'https://artlinedecor.uz/?lang=uz',
+          'uz-UZ': 'https://artlinedecor.uz',
           'ru-RU': 'https://artlinedecor.uz/?lang=ru',
           'x-default': 'https://artlinedecor.uz',
         }
@@ -66,9 +66,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       description: "Artline Decor — fasad panellari, travertin qoplama, issiqlik izolyatsiyasi, karniz, molding, ustun, pilyastr ishlab chiqaruvchi. 3-in-1 texnologiya: dekor + izolyatsiya + himoya. PSB-S-25F/35F xomashyo, 10 yillik kafolat. Toshkent, O'zbekiston.",
       keywords: "fasad dekor Toshkent, fasad panellari narxi, travertin qoplama, travertin fasad, issiqlik izolyatsiya fasad, termo panel narxi, karniz dekor, molding fasad, ustun dekor, pilyastr, penoplast dekor, fasad bezak, fasad dizayn, uy fasadi, binolar fasadi, arxitektura dekor, fasad ta'mirlash, fasad montaj",
       alternates: {
-        canonical: "https://artlinedecor.uz/?lang=uz",
+        canonical: "https://artlinedecor.uz",
         languages: {
-          'uz-UZ': 'https://artlinedecor.uz/?lang=uz',
+          'uz-UZ': 'https://artlinedecor.uz',
           'ru-RU': 'https://artlinedecor.uz/?lang=ru',
           'x-default': 'https://artlinedecor.uz',
         }
@@ -76,7 +76,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       openGraph: {
         title: "Artline Decor — Fasad Dekor, Travertin, Izolyatsiya | Toshkent",
         description: "Fasad panellari, travertin, karniz, molding — 10 yillik rasmiy kafolat. 3-in-1: dekor + izolyatsiya + himoya.",
-        url: "https://artlinedecor.uz/?lang=uz",
+        url: "https://artlinedecor.uz",
         siteName: "Artline Decor",
         locale: "uz_UZ",
         type: "website",
@@ -119,19 +119,21 @@ export default async function Home({ searchParams }: PageProps) {
     "sameAs": [
       "https://t.me/Art_linedecor",
       "https://www.instagram.com/artlinedecor.uz?igsh=MWR4c2JoaGtobTl1Nw==",
-      "https://www.youtube.com/@art.linedecor"
+      "https://www.youtube.com/@art.linedecor",
+      "https://yandex.uz/maps/org/artlinedecor/138602828044/?ll=69.417322%2C41.303890"
     ]
   };
 
   const businessSchema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": "HomeAndConstructionBusiness",
     "name": "Artline Decor",
     "image": "https://artlinedecor.uz/logo.png",
     "@id": "https://artlinedecor.uz/#localbusiness",
     "url": "https://artlinedecor.uz",
     "telephone": "+998991020200",
     "priceRange": "$$",
+    "hasMap": "https://yandex.uz/maps/org/artlinedecor/138602828044/?ll=69.417322%2C41.303890",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": lang === 'ru' ? "ул. Икбол, Яшнабадский район" : "Iqbol ko'chasi, Yashnabod tumani",
@@ -142,8 +144,8 @@ export default async function Home({ searchParams }: PageProps) {
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 41.304217,
-      "longitude": 69.417816
+      "latitude": 41.303890,
+      "longitude": 69.417322
     },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
@@ -199,7 +201,6 @@ export default async function Home({ searchParams }: PageProps) {
       
       <Navbar />
       <main>
-        <h1 className="sr-only">Artline Decor — fasad dekor, travertin va issiqlik izolyatsiyasi</h1>
         <Hero />
         <ScrollReveal><FacadeAnatomy /></ScrollReveal>
         <ScrollReveal><TrustElements /></ScrollReveal>

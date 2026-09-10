@@ -31,9 +31,11 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     description: article.description[lang],
     keywords: article.keywords[lang],
     alternates: {
-      canonical: `https://artlinedecor.uz/blog/${article.slug}?lang=${lang}`,
+      canonical: lang === 'ru' 
+        ? `https://artlinedecor.uz/blog/${article.slug}?lang=ru` 
+        : `https://artlinedecor.uz/blog/${article.slug}`,
       languages: {
-        'uz-UZ': `https://artlinedecor.uz/blog/${article.slug}?lang=uz`,
+        'uz-UZ': `https://artlinedecor.uz/blog/${article.slug}`,
         'ru-RU': `https://artlinedecor.uz/blog/${article.slug}?lang=ru`,
         'x-default': `https://artlinedecor.uz/blog/${article.slug}`,
       }
@@ -41,7 +43,9 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     openGraph: {
       title: article.title[lang],
       description: article.description[lang],
-      url: `https://artlinedecor.uz/blog/${article.slug}?lang=${lang}`,
+      url: lang === 'ru' 
+        ? `https://artlinedecor.uz/blog/${article.slug}?lang=ru` 
+        : `https://artlinedecor.uz/blog/${article.slug}`,
       type: 'article',
       publishedTime: article.date,
       authors: ['Artline Decor'],

@@ -24,7 +24,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       alternates: {
         canonical: "https://artlinedecor.uz/blog?lang=ru",
         languages: {
-          'uz-UZ': 'https://artlinedecor.uz/blog?lang=uz',
+          'uz-UZ': 'https://artlinedecor.uz/blog',
           'ru-RU': 'https://artlinedecor.uz/blog?lang=ru',
           'x-default': 'https://artlinedecor.uz/blog',
         }
@@ -36,9 +36,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       description: "Toshkentda uy fasadini izolyatsiya qilish, travertin qoplama, karniz va pilyastr montaj qilish bo'yicha yo'riqnomalar va professional maslahatlar.",
       keywords: "fasad izolyatsiya, travertin qoplama, fasad montaj Toshkent, penoplast dekor, binolar fasadi dizayni",
       alternates: {
-        canonical: "https://artlinedecor.uz/blog?lang=uz",
+        canonical: "https://artlinedecor.uz/blog",
         languages: {
-          'uz-UZ': 'https://artlinedecor.uz/blog?lang=uz',
+          'uz-UZ': 'https://artlinedecor.uz/blog',
           'ru-RU': 'https://artlinedecor.uz/blog?lang=ru',
           'x-default': 'https://artlinedecor.uz/blog',
         }

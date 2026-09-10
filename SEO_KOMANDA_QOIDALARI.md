@@ -21,9 +21,9 @@ O'zbekistonda qidiruv tizimlarida (ayniqsa Yandex va Google'da) kirill/lotin ara
 *   **Asosiy kalit so'zlar:** `toshkent atir sotib olish`, `original atirlar`, `erkaklar atiri`, `ayollar atiri`, `dostavka atir`, `parfyumeriya toshkent`, `dubay atirlari`.
 *   *Amaliyot:* Komponent yozayotganda, biron bir atir rasmiga `alt="Chanel atir"` deb yozmang. O'rniga `alt="Toshkentda original Chanel ayollar atiri sotib olish"` deb uzunroq va qidiriladigan gap yozing.
 
-**2. Artline Decor (Uy Dekori)**
-*   **Asosiy kalit so'zlar:** `uy dekoratsiyasi`, `interyer dizayn toshkent`, `jalyuzi narxlari`, `parda tikish`, `remont uchun dizayn`, `artline decor toshkent`.
-*   *Amaliyot:* Xonaning rasmi qo'yildimi? `alt="xona"` demang. `alt="Toshkentda zamonaviy uy dekoratsiyasi va interyer dizayn"` deb yozing. H2 sarlavhalarda quruq "Bizning xizmatlar" o'rniga "Toshkent bo'ylab uy dekoratsiyasi xizmatlari" ni ishlating.
+**2. Artline Decor (Fasad Dekori, Termo Panellar va Travertin Qoplama)**
+*   **Asosiy kalit so'zlar:** `fasad dekor toshkent`, `artline decor`, `termo panellar`, `travertin qoplama`, `fasad izolyatsiya`, `karniz va molding`, `penoplast dekor`, `ustun va pilyastr`, `arxitektura dekor`, `fasad panellari narxi`, `3-in-1 fasad tizimi`.
+*   *Amaliyot:* Fasad yoki mahsulot rasmi qo'yildimi? `alt="fasad"` demang. `alt="Toshkentda zamonaviy termo panellar va travertin fasad dekor montaji — Artline Decor"` deb yozing. H2 sarlavhalarda quruq "Bizning xizmatlar" o'rniga "Toshkent bo'ylab fasad dekor va termo panellar o'rnatish xizmatlari" ni ishlating.
 
 **3. Asia Way (Kvartira / Turizm)**
 *   **Asosiy kalit so'zlar:** `toshkentda kvartira arenda`, `sutkaga kvartira toshkent`, `mehmonxona toshkent`, `apartments in tashkent`, `arzon kvartira ijarasi`.

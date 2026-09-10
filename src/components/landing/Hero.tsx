@@ -470,6 +470,7 @@ export default function Hero() {
               zIndex: 2,
             }}
           >
+            <span className="sr-only">Artline Decor — fasad dekor, travertin va issiqlik izolyatsiyasi. </span>
             {t('hero.title.1')} <br />
             <motion.span
               animate={{ color: activeSeason.color }}
