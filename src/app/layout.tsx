@@ -46,7 +46,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CursorGlow />
           {children}
         </LangProvider>
-        <img src="https://vercel-dashboard-amber-pi.vercel.app/api/track?site=artlinedecor" style={{ display: "none" }} alt="" />
+        <img src="https://vercel-dashboard-amber-pi.vercel.app/api/track?site=artlinedecor" style={{ display: "none" }} alt="uy dekoratsiyasi interyer
+parda jalyuzilar dizayn
+zamonaviy uy interyeri" />
       </body>
     </html>
   );
