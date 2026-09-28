@@ -200,9 +200,7 @@ export default async function Home({ searchParams }: PageProps) {
       />
       
       <Navbar />
-      <main
-      <h1 className="sr-only">O'zbekde Uy dekoratsiyasi, interyer dizayn va pardag'a-jalyuzar aralashmasini tahlil qiluvchi mavzuni</h1>
->
+      <main>
         <Hero />
         <ScrollReveal><FacadeAnatomy /></ScrollReveal>
         <ScrollReveal><TrustElements /></ScrollReveal>
