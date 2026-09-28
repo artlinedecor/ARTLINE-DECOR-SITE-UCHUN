@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
 import TiltCard from '@/components/effects/TiltCard';
 import { useT } from '@/lib/i18n';
@@ -76,26 +76,41 @@ export default function FAQ() {
                 </span>
               </button>
               
-              <AnimatePresence>
-                {openIndex === index && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div style={{
-                      padding: '0 24px 24px 24px',
-                      color: 'var(--text-secondary)',
-                      lineHeight: 1.6,
-                      borderTop: '1px solid rgba(255,255,255,0.05)',
-                      paddingTop: '16px'
-                    }}>
-                      {faq.answer}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/*
+                Javob HAR DOIM DOMda turadi, faqat balandligi bilan
+                yopiladi. Avval `{openIndex === index && ...}` edi - ya'ni
+                javob matni ochilmaguncha HTMLda umuman yo'q edi.
+
+                Natijasi: besh savolning bittasiga ham javob serverdan
+                kelmasdi. "Kafolat muddati qancha?" degan savol HTMLda
+                bor, javobi esa yo'q. JavaScript ishlatmaydigan botlar
+                (GPTBot, ClaudeBot, PerplexityBot) va bosishni taqlid
+                qilmaydigan hech bir indekslovchi javoblarni ko'rmasdi -
+                aynan mijoz so'raydigan savollar javobsiz qolgan.
+
+                Endi matn birinchi javobda keladi, foydalanuvchi uchun
+                esa ko'rinish o'zgarmaydi.
+              */}
+              <motion.div
+                initial={false}
+                animate={{
+                  height: openIndex === index ? 'auto' : 0,
+                  opacity: openIndex === index ? 1 : 0,
+                }}
+                transition={{ duration: 0.3 }}
+                style={{ overflow: 'hidden' }}
+                aria-hidden={openIndex !== index}
+              >
+                <div style={{
+                  padding: '0 24px 24px 24px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                  borderTop: '1px solid rgba(255,255,255,0.05)',
+                  paddingTop: '16px'
+                }}>
+                  {faq.answer}
+                </div>
+              </motion.div>
             </TiltCard>
             </motion.div>
           ))}

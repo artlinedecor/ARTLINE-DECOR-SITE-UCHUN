@@ -4,6 +4,7 @@ import Footer from '@/components/landing/Footer';
 import EstimateModal from '@/components/landing/EstimateModal';
 import FloatingContact from '@/components/landing/FloatingContact';
 import { LangProvider } from '@/lib/i18n';
+import BlogCtaButton from '@/components/blog/BlogCtaButton';
 import { ARTICLES } from '@/lib/blog-data';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -270,35 +271,13 @@ export default async function BlogPostPage({ params, searchParams }: PageProps) 
             <p style={{ color: '#a0aec0', fontSize: '1rem', lineHeight: '1.6', marginBottom: '28px', maxWidth: '580px', margin: '0 auto 28px' }}>
               {t.ctaText}
             </p>
-            <button
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  (window as any).openEstimateModal?.();
-                }
-              }}
-              style={{
-                padding: '14px 32px',
-                borderRadius: '100px',
-                background: 'linear-gradient(135deg, var(--accent-gold), var(--accent-warm))',
-                color: '#0a0a0a',
-                border: 'none',
-                fontWeight: 700,
-                fontSize: '1rem',
-                cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(217, 154, 108, 0.3)',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(217, 154, 108, 0.45)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(217, 154, 108, 0.3)';
-              }}
-            >
-              {t.ctaBtn}
-            </button>
+            {/*
+              Tugma alohida klient komponentida. Bu yerda to'g'ridan-to'g'ri
+              onClick yozilsa sahifa HTTP 500 beradi - Server Component'da
+              hodisa ishlovchisi bo'lishi mumkin emas. Aynan shu xato
+              uchta maqolani ham ochilmas qilib qo'ygan edi.
+            */}
+            <BlogCtaButton label={t.ctaBtn} />
           </section>
 
           {/* Quick link back */}
