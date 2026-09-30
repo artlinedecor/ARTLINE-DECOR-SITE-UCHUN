@@ -1,0 +1,55 @@
+name: Build tekshiruvi
+
+# NEGA BU KERAK
+#
+# 2026-09-11 da avtomatik "AI Smart SEO Agent" skripti src/app/page.tsx ga
+# <h1> ni <main> tegining o'rtasiga qo'yib yubordi. Bu ecmascript parse
+# xatosi. Natijada master 18 KUN davomida build bo'lmadi va hech qanday
+# deploy o'tmadi - jonli sayt 10-sentabrdagi versiyada qolib ketdi.
+#
+# Eng yomoni: hech kim sezmadi. Vercel deploylari jimgina yiqilaverdi,
+# jonli sayt esa eski versiyani ko'rsatib turgani uchun "hammasi joyida"
+# ko'rinardi. Blog sahifalaridagi HTTP 500 xatosi ham shu sababdan
+# tuzalmadi - tuzatishlar prodga chiqmadi.
+#
+# `.githooks/pre-push` mahalliy himoya bor, lekin u faqat o'sha
+# sozlamasi bor checkout uchun ishlaydi. Boshqa nusxadan yoki
+# `--no-verify` bilan push qilinsa chetlab o'tiladi.
+#
+# Bu workflow GitHub tomonida ishlaydi, ya'ni chetlab o'tib bo'lmaydi:
+# master ga har push da build yuriladi va yiqilsa GitHub'da qizil
+# belgi chiqadi. Maqsad - deployni to'xtatish emas (Vercel buni
+# o'zi qiladi), balki nosozlikni KO'RINADIGAN qilish.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Paketlarni o'rnatish
+        run: npm ci
+
+      - name: TypeScript tekshiruvi
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+        env:
+          # Build vaqtida kerak bo'lishi mumkin bo'lgan ommaviy qiymatlar.
+          # Sir emas: NEXT_PUBLIC_* baribir brauzerga chiqadi.
+          # Yo'q bo'lsa build o'zi zaxira qiymatdan foydalanadi.
+          NEXT_TELEMETRY_DISABLED: '1'
