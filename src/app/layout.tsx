@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     // Google public/googleeb653e1b8a542f6c.html fayli orqali tasdiqlangan.
     // Kod berilmasa teg chiqmaydi — soxta "placeholder" teg qidiruvchilarni chalg'itadi.
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
-    yandex: process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION || undefined,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION || "12e1a28bd3783e96",
     other: {
       "facebook-domain-verification": "dy5861pz6txmweo70s36l123ldnwbg",
     },
