@@ -30,8 +30,10 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "google-site-verification-placeholder",
-    yandex: process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION || "yandex-verification-placeholder",
+    // Google public/googleeb653e1b8a542f6c.html fayli orqali tasdiqlangan.
+    // Kod berilmasa teg chiqmaydi — soxta "placeholder" teg qidiruvchilarni chalg'itadi.
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_SITE_VERIFICATION || undefined,
     other: {
       "facebook-domain-verification": "dy5861pz6txmweo70s36l123ldnwbg",
     },
