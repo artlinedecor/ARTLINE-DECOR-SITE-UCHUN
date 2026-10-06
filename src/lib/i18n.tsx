@@ -211,6 +211,7 @@ const UZ: Dict = {
   'foot.address': "Toshkent sh., Yashnabod tumani, Iqbol ko'chasi (Yandex Xarita)",
   'foot.hours': 'Dush-Shan: 09:00 — 18:00',
   'foot.copy': 'Barcha huquqlar himoyalangan.',
+  'foot.madeBy': 'Sayt ishlab chiquvchisi:',
 
   // Common
   'common.lang.uz': "O'zbekcha",
@@ -423,6 +424,7 @@ const RU: Dict = {
   'foot.address': 'г. Ташкент, Яшнабадский р-н, ул. Икбол (Яндекс Карта)',
   'foot.hours': 'Пн-Сб: 09:00 — 18:00',
   'foot.copy': 'Все права защищены.',
+  'foot.madeBy': 'Разработка сайта:',
 
   // Common
   'common.lang.uz': "O'zbekcha",

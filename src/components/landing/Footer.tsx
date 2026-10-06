@@ -97,7 +97,11 @@ export default function Footer() {
         </div>
 
         <div className="footer-bottom">
-          © {new Date().getFullYear()} Artline Decor. {t('foot.copy')}
+          © {new Date().getFullYear()} Artline Decor. {t('foot.copy')}{' '}
+          {t('foot.madeBy')}{' '}
+          <a href="https://archmind.dev" target="_blank" rel="noopener" style={{ color: 'var(--accent-gold)' }}>
+            ArchMind
+          </a>
         </div>
       </div>
     </footer>
