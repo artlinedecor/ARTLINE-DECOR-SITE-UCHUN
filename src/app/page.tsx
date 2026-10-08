@@ -26,8 +26,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
   if (lang === 'ru') {
     return {
-      title: "Artline Decor — Фасадный Декор, Травертин, Термопанели | Ташкент",
-      description: "Artline Decor — производство и монтаж фасадных панелей, облицовка травертином, утепление фасада, карнизы, молдинги, колонны в Ташкенте. Технология 3-в-1: декор + изоляция + защита. Официальная гарантия 10 лет.",
+      title: "Artline Decor: фасадный декор, травертин, утепление, Ташкент",
+      description: "Производство и монтаж фасадных панелей, облицовка травертином, утепление фасада, карнизы и молдинги в Ташкенте. Технология 3-в-1, гарантия 10 лет.",
       keywords: "фасадный декор Ташкент, травертин фасад, термопанели цена Узбекистан, утепление фасада Ташкент, карниз фасадный, молдинг декоративный, фасадные панели купить, пенопласт декор фасад, колонны декоративные, пилястры фасадные, архитектурный декор, облицовка фасада травертином, фасадная изоляция, декор дома снаружи, термопанели с травертином, фасадные работы Ташкент",
       alternates: {
         canonical: "https://artlinedecor.uz/?lang=ru",
@@ -47,8 +47,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
         images: [
           {
             url: "https://artlinedecor.uz/logo.png",
-            width: 512,
-            height: 512,
+            width: 1024,
+            height: 1024,
             alt: "Artline Decor",
           }
         ]
@@ -62,8 +62,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     };
   } else {
     return {
-      title: "Artline Decor — Fasad Dekor, Travertin, Issiqlik Izolyatsiyasi | Toshkent",
-      description: "Artline Decor — fasad panellari, travertin qoplama, issiqlik izolyatsiyasi, karniz, molding, ustun, pilyastr ishlab chiqaruvchi. 3-in-1 texnologiya: dekor + izolyatsiya + himoya. PSB-S-25F/35F xomashyo, 10 yillik kafolat. Toshkent, O'zbekiston.",
+      title: "Artline Decor: fasad dekor, travertin, izolyatsiya, Toshkent",
+      description: "Artline Decor — fasad panellari, travertin, issiqlik izolyatsiyasi, karniz, molding ishlab chiqaruvchi. 3-in-1: dekor + izolyatsiya + himoya, 10 yillik kafolat.",
       keywords: "fasad dekor Toshkent, fasad panellari narxi, travertin qoplama, travertin fasad, issiqlik izolyatsiya fasad, termo panel narxi, karniz dekor, molding fasad, ustun dekor, pilyastr, penoplast dekor, fasad bezak, fasad dizayn, uy fasadi, binolar fasadi, arxitektura dekor, fasad ta'mirlash, fasad montaj",
       alternates: {
         canonical: "https://artlinedecor.uz",
@@ -83,8 +83,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
         images: [
           {
             url: "https://artlinedecor.uz/logo.png",
-            width: 512,
-            height: 512,
+            width: 1024,
+            height: 1024,
             alt: "Artline Decor",
           }
         ]
@@ -103,9 +103,20 @@ export default async function Home({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const lang = resolvedSearchParams.lang === 'ru' ? 'ru' : 'uz';
 
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://artlinedecor.uz/#website",
+    "name": "Artline Decor",
+    "url": "https://artlinedecor.uz",
+    "inLanguage": ["uz", "ru"],
+    "publisher": { "@id": "https://artlinedecor.uz/#organization" }
+  };
+
   const orgSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": "https://artlinedecor.uz/#organization",
     "name": "Artline Decor",
     "url": "https://artlinedecor.uz",
     "logo": "https://artlinedecor.uz/logo.png",
@@ -131,6 +142,8 @@ export default async function Home({ searchParams }: PageProps) {
     "image": "https://artlinedecor.uz/logo.png",
     "@id": "https://artlinedecor.uz/#localbusiness",
     "url": "https://artlinedecor.uz",
+    "parentOrganization": { "@id": "https://artlinedecor.uz/#organization" },
+    "areaServed": { "@type": "City", "name": lang === 'ru' ? "Ташкент" : "Toshkent" },
     "telephone": "+998991020200",
     "priceRange": "$$",
     "hasMap": "https://yandex.uz/maps/org/artlinedecor/138602828044/?ll=69.417322%2C41.303890",
@@ -186,6 +199,10 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <LangProvider defaultLang={lang}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}

@@ -207,7 +207,7 @@ function ProjectModal({
                 project.afterVideo ? (
                   <div className="portfolio-modal-video-compare">
                     <div className="video-compare-box">
-                      <img src={project.beforeImage} alt="Oldingi holat" className="video-compare-media" />
+                      <img src={project.beforeImage} alt="Oldingi holat" className="video-compare-media" loading="lazy" />
                       <span className="video-compare-badge badge-oldin">OLDIN (G'isht)</span>
                     </div>
                     <div className="video-compare-box">
@@ -366,6 +366,7 @@ function PortfolioCard({ project, onClick }: { project: PortfolioProject; onClic
           src={project.images[0].src}
           alt={project.images[0].alt}
           className="portfolio-card-img"
+          loading="lazy"
         />
         {/* Cursor glare */}
         {fancy && (

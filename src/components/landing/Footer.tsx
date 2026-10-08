@@ -13,7 +13,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div>
             <div className="footer-logo" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <img src="/logo.webp" alt="Artline Decor Logo" width={48} height={48} style={{ objectFit: 'contain' }} />
+              <img src="/logo.webp" alt="Artline Decor Logo" width={48} height={48} loading="lazy" style={{ objectFit: 'contain' }} />
               ARTLINE DECOR
             </div>
             <p className="footer-desc">{t('foot.desc')}</p>

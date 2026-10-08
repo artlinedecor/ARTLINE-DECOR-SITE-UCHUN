@@ -9,21 +9,31 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Artline Decor — Fasad Dekor, Travertin, Izolyatsiya, Karniz, Molding | Toshkent",
+  // Nisbiy OG/canonical manzillar shu domen bo'yicha to'liq URL'ga aylanadi.
+  metadataBase: new URL("https://artlinedecor.uz"),
+  title: "Artline Decor: fasad dekor, travertin, izolyatsiya, Toshkent",
   description:
-    "Artline Decor — fasad panellari, travertin qoplama, issiqlik izolyatsiyasi, karniz, molding, ustun, pilyastr. 3-in-1 texnologiya: dekor + izolyatsiya + himoya. PSB-S-25F/35F import xomashyo, 10 yillik kafolat. Toshkent, O'zbekiston.",
+    "Artline Decor — fasad panellari, travertin qoplama, issiqlik izolyatsiyasi, karniz va molding. 3-in-1: dekor + izolyatsiya + himoya, 10 yillik kafolat.",
   keywords: "fasad dekor, fasad panellari, travertin, travertin qoplama, issiqlik izolyatsiya, fasad izolyatsiya, karniz, molding, ustun, pilyastr, penoplast dekor, artline decor, fasad dizayn, fasad tizimi, termo panel, fasad bezak, dekorativ karniz, arxitektura dekor, fasad Toshkent, fasad O'zbekiston, фасад декор, травертин, карниз, молдинг, фасадные панели, утепление фасада, термопанели, декор фасада Ташкент",
+  applicationName: "Artline Decor",
   openGraph: {
     title: "Artline Decor — Fasad Dekor, Travertin, Izolyatsiya | Toshkent",
     description: "Fasad panellari, travertin, karniz, molding — 10 yillik kafolat. 3-in-1: dekor + izolyatsiya + himoya.",
-    url: "https://artlinedecor.uz",
     siteName: "Artline Decor",
     locale: "uz_UZ",
+    alternateLocale: ["ru_RU"],
     type: "website",
+    images: [{ url: "/logo.png", width: 1024, height: 1024, alt: "Artline Decor" }],
   },
-  alternates: {
-    canonical: "https://artlinedecor.uz",
+  twitter: {
+    card: "summary",
+    title: "Artline Decor — Fasad Dekor, Travertin, Izolyatsiya | Toshkent",
+    description: "Fasad panellari, travertin, karniz, molding — 10 yillik kafolat. 3-in-1: dekor + izolyatsiya + himoya.",
+    images: ["/logo.png"],
   },
+  // Canonical bu yerda berilmaydi: aks holda o'z canonical'i yo'q har qanday
+  // sahifa (masalan 404) bosh sahifaga "canonical" bo'lib qolardi. Har bir
+  // ommaviy sahifa canonical'ini o'zi belgilaydi.
   robots: {
     index: true,
     follow: true,
@@ -48,9 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CursorGlow />
           {children}
         </LangProvider>
-        <img src="https://vercel-dashboard-amber-pi.vercel.app/api/track?site=artlinedecor" style={{ display: "none" }} alt="uy dekoratsiyasi interyer
-parda jalyuzilar dizayn
-zamonaviy uy interyeri" />
+        <img src="https://vercel-dashboard-amber-pi.vercel.app/api/track?site=artlinedecor" style={{ display: "none" }} alt="" aria-hidden="true" />
       </body>
     </html>
   );
