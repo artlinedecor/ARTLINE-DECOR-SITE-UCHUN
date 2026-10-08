@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/dashboard/', '/api/', '/portal/'],
+      disallow: ['/dashboard/', '/api/', '/portal/', '/tijorat-taklifi.html'],
     },
     sitemap: 'https://artlinedecor.uz/sitemap.xml',
     // Yandex uchun asosiy ko'zgu (Host direktivasi).
