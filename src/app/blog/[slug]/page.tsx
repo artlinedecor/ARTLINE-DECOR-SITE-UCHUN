@@ -48,22 +48,24 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         ? `https://artlinedecor.uz/blog/${article.slug}?lang=ru` 
         : `https://artlinedecor.uz/blog/${article.slug}`,
       type: 'article',
+      siteName: 'Artline Decor',
+      locale: lang === 'ru' ? 'ru_RU' : 'uz_UZ',
       publishedTime: article.date,
       authors: ['Artline Decor'],
       images: [
         {
-          url: "https://artlinedecor.uz/og-image.jpg",
-          width: 1200,
-          height: 630,
+          url: "https://artlinedecor.uz/logo.png",
+          width: 1024,
+          height: 1024,
           alt: article.title[lang],
         }
       ]
     },
     twitter: {
-      card: "summary_large_image",
+      card: "summary",
       title: article.title[lang],
       description: article.description[lang],
-      images: ["https://artlinedecor.uz/og-image.jpg"],
+      images: ["https://artlinedecor.uz/logo.png"],
     }
   };
 }
@@ -78,12 +80,15 @@ export default async function BlogPostPage({ params, searchParams }: PageProps) 
   }
 
   const lang = resolvedSearchParams.lang === 'ru' ? 'ru' : 'uz';
+  // O'zbekcha versiya canonical'i parametrsiz — ichki havolalar ham shunday.
+  const langQuery = lang === 'ru' ? '?lang=ru' : '';
+  const pageUrl = `https://artlinedecor.uz/blog/${article.slug}${langQuery}`;
 
   const blogPostSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": article.title[lang],
-    "image": "https://artlinedecor.uz/og-image.jpg",
+    "image": "https://artlinedecor.uz/logo.png",
     "datePublished": article.date,
     "dateModified": article.date,
     "author": {
@@ -102,8 +107,34 @@ export default async function BlogPostPage({ params, searchParams }: PageProps) 
     "description": article.description[lang],
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://artlinedecor.uz/blog/${article.slug}?lang=${lang}`
-    }
+      "@id": pageUrl
+    },
+    "inLanguage": lang
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'ru' ? "Главная" : "Bosh sahifa",
+        "item": lang === 'ru' ? "https://artlinedecor.uz/?lang=ru" : "https://artlinedecor.uz"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": `https://artlinedecor.uz/blog${langQuery}`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": article.title[lang],
+        "item": pageUrl
+      }
+    ]
   };
 
   const translations = {
@@ -133,6 +164,10 @@ export default async function BlogPostPage({ params, searchParams }: PageProps) 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <Navbar />
 
       <main style={{ minHeight: '100vh', paddingTop: '140px', paddingBottom: '80px', background: '#05070f', color: '#fff' }}>
@@ -140,7 +175,7 @@ export default async function BlogPostPage({ params, searchParams }: PageProps) 
           
           {/* Back button and breadcrumbs */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-            <a href={`/blog?lang=${lang}`} style={{
+            <a href={`/blog${langQuery}`} style={{
               color: 'var(--accent-gold)',
               textDecoration: 'none',
               fontSize: '0.9rem',
@@ -282,7 +317,7 @@ export default async function BlogPostPage({ params, searchParams }: PageProps) 
 
           {/* Quick link back */}
           <div style={{ marginTop: '48px', textAlign: 'center' }}>
-            <a href={`/blog?lang=${lang}`} style={{ color: '#a0aec0', textDecoration: 'underline', fontSize: '0.92rem' }}>
+            <a href={`/blog${langQuery}`} style={{ color: '#a0aec0', textDecoration: 'underline', fontSize: '0.92rem' }}>
               {lang === 'ru' ? 'Вернуться в блог' : 'Blog sahifasiga qaytish'}
             </a>
           </div>

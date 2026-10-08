@@ -60,14 +60,14 @@ export default function BeforeAfterSlider({
       onTouchMove={handleTouchMove}
     >
       {/* After image (full background) */}
-      <img src={afterImage} alt="After" className="ba-slider-img" draggable={false} />
+      <img src={afterImage} alt="After" className="ba-slider-img" draggable={false} loading="lazy" />
 
       {/* Before image (clipped) */}
       <div
         className="ba-slider-before"
         style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}
       >
-        <img src={beforeImage} alt="Before" className="ba-slider-img" draggable={false} />
+        <img src={beforeImage} alt="Before" className="ba-slider-img" draggable={false} loading="lazy" />
       </div>
 
       {/* Labels */}

@@ -133,7 +133,7 @@ export default function FacadeAnatomy() {
           transition: 'border 0.35s ease',
         }}
       >
-        <img src={prod.img} alt={prod.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <img src={prod.img} alt={prod.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       </motion.div>
 
       {align === 'right' && (
@@ -281,6 +281,7 @@ export default function FacadeAnatomy() {
               <img
                 src="/facade-main.webp"
                 alt="Hashamatli fasad"
+                loading="lazy"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
               <div style={{

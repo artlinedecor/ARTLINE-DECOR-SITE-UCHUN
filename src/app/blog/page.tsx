@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
   if (lang === 'ru') {
     return {
-      title: "Статьи о фасадном декоре и утеплении домов | Блог Artline Decor",
+      title: "Статьи о фасадном декоре и утеплении | Блог Artline Decor",
       description: "Полезные статьи, руководства и советы по облицовке фасадов травертином, монтажу термопанелей и архитектурного декора в Ташкенте и Узбекистане.",
       keywords: "блог фасадный декор, утепление фасада Ташкент, термопанели с травертином, фасадные работы Ташкент, карниз фасадный Ташкент",
       alternates: {
@@ -28,11 +28,26 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
           'ru-RU': 'https://artlinedecor.uz/blog?lang=ru',
           'x-default': 'https://artlinedecor.uz/blog',
         }
+      },
+      openGraph: {
+        title: "Статьи о фасадном декоре и утеплении | Блог Artline Decor",
+        description: "Полезные статьи, руководства и советы по облицовке фасадов травертином, монтажу термопанелей и архитектурного декора в Ташкенте и Узбекистане.",
+        url: "https://artlinedecor.uz/blog?lang=ru",
+        siteName: "Artline Decor",
+        locale: "ru_RU",
+        type: "website",
+        images: [{ url: "https://artlinedecor.uz/logo.png", width: 1024, height: 1024, alt: "Artline Decor" }],
+      },
+      twitter: {
+        card: "summary",
+        title: "Статьи о фасадном декоре и утеплении | Блог Artline Decor",
+        description: "Полезные статьи и советы по облицовке фасадов травертином, монтажу термопанелей и архитектурного декора в Ташкенте.",
+        images: ["https://artlinedecor.uz/logo.png"],
       }
     };
   } else {
     return {
-      title: "Fasad dekoratsiyasi va issiqlik izolyatsiyasi bo'yicha foydali maqolalar | Artline Decor",
+      title: "Fasad dekor va izolyatsiya haqida maqolalar | Artline Decor",
       description: "Toshkentda uy fasadini izolyatsiya qilish, travertin qoplama, karniz va pilyastr montaj qilish bo'yicha yo'riqnomalar va professional maslahatlar.",
       keywords: "fasad izolyatsiya, travertin qoplama, fasad montaj Toshkent, penoplast dekor, binolar fasadi dizayni",
       alternates: {
@@ -42,6 +57,21 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
           'ru-RU': 'https://artlinedecor.uz/blog?lang=ru',
           'x-default': 'https://artlinedecor.uz/blog',
         }
+      },
+      openGraph: {
+        title: "Fasad dekor va izolyatsiya haqida maqolalar | Artline Decor",
+        description: "Toshkentda uy fasadini izolyatsiya qilish, travertin qoplama, karniz va pilyastr montaj qilish bo'yicha yo'riqnomalar va professional maslahatlar.",
+        url: "https://artlinedecor.uz/blog",
+        siteName: "Artline Decor",
+        locale: "uz_UZ",
+        type: "website",
+        images: [{ url: "https://artlinedecor.uz/logo.png", width: 1024, height: 1024, alt: "Artline Decor" }],
+      },
+      twitter: {
+        card: "summary",
+        title: "Fasad dekor va izolyatsiya haqida maqolalar | Artline Decor",
+        description: "Fasad izolyatsiyasi, travertin qoplama, karniz va pilyastr montaji bo'yicha yo'riqnomalar va professional maslahatlar.",
+        images: ["https://artlinedecor.uz/logo.png"],
       }
     };
   }
@@ -50,6 +80,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function BlogPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
   const lang = resolvedSearchParams.lang === 'ru' ? 'ru' : 'uz';
+  // O'zbekcha sahifa canonical'i parametrsiz, shuning uchun ichki havolalar
+  // ham ?lang=uz siz bo'lishi kerak (aks holda dublikat URL paydo bo'ladi).
+  const langQuery = lang === 'ru' ? '?lang=ru' : '';
 
   // JSON-LD structured data for CollectionPage (Blog)
   const blogListSchema = {
@@ -59,7 +92,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
     "description": lang === 'ru' 
       ? "Полезные советы и статьи о фасадном декоре, утеплении и монтаже панелей" 
       : "Fasad bezaklari, issiqlik izolyatsiyasi va montaj ishlari bo'yicha maqolalar va maslahatlar",
-    "url": `https://artlinedecor.uz/blog?lang=${lang}`,
+    "url": lang === 'ru' ? "https://artlinedecor.uz/blog?lang=ru" : "https://artlinedecor.uz/blog",
     "publisher": {
       "@type": "Organization",
       "name": "Artline Decor",
@@ -70,9 +103,28 @@ export default async function BlogPage({ searchParams }: PageProps) {
       "itemListElement": ARTICLES.map((article, idx) => ({
         "@type": "ListItem",
         "position": idx + 1,
-        "url": `https://artlinedecor.uz/blog/${article.slug}?lang=${lang}`
+        "url": `https://artlinedecor.uz/blog/${article.slug}${langQuery}`
       }))
     }
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": lang === 'ru' ? "Главная" : "Bosh sahifa",
+        "item": lang === 'ru' ? "https://artlinedecor.uz/?lang=ru" : "https://artlinedecor.uz"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": `https://artlinedecor.uz/blog${langQuery}`
+      }
+    ]
   };
 
   const translations = {
@@ -101,6 +153,10 @@ export default async function BlogPage({ searchParams }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
       <Navbar />
       
@@ -162,7 +218,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
             marginTop: '40px'
           }}>
             {ARTICLES.map(article => {
-              const url = `/blog/${article.slug}?lang=${lang}`;
+              const url = `/blog/${article.slug}${langQuery}`;
               return (
                 <article key={article.slug} className="blog-card" style={{
                   background: 'rgba(10, 15, 30, 0.55)',
