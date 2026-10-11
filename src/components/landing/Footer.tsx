@@ -3,9 +3,10 @@
 import { Phone, MapPin, Clock, Send, FileText } from 'lucide-react';
 import { useT } from '@/lib/i18n';
 import { usePathname } from 'next/navigation';
+import { SERVICE_PAGES } from '@/lib/service-pages';
 
 export default function Footer() {
-  const { t } = useT();
+  const { t, lang } = useT();
   const pathname = usePathname();
   return (
     <footer className="footer" id="contact">
@@ -71,6 +72,12 @@ export default function Footer() {
                 </a>
               </li>
               <li><a href={pathname === '/' ? '#portfolio' : '/#portfolio'}>{t('foot.docs.projects')}</a></li>
+              <li><a href={lang === 'ru' ? '/xizmatlar?lang=ru' : '/xizmatlar'}>{t('foot.docs.services')}</a></li>
+              {SERVICE_PAGES.map((sp) => (
+                <li key={sp.slug}>
+                  <a href={`/xizmatlar/${sp.slug}${lang === 'ru' ? '?lang=ru' : ''}`}>{sp.breadcrumbName[lang]}</a>
+                </li>
+              ))}
             </ul>
           </div>
 

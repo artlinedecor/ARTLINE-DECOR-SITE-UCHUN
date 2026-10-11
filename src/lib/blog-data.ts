@@ -73,6 +73,7 @@ export const ARTICLES: Article[] = [
         <p>An'anaviy usulda (penoplast yopishtirib, ustidan setka tortib, suvoq va travertin qilish) juda ko'p vaqt va mehnat talab etiladi. Tayyor <strong>termo panel narxi</strong> dastlab qimmatroq tuyulishi mumkin, lekin montaj tezligi, ustalar haqi va materiallarning chidamliligini hisobga olganda, u ancha tejamkordir. Artline Decor taklif etayotgan 3-in-1 tizimi dekorativ ko'rinish, issiqlik izolyatsiyasi va mexanik himoyani o'zida birlashtiradi.</p>
         
         <p>Agar siz Toshkentda yoki O'zbekistonning boshqa hududlarida uyingiz fasadini ta'mirlamoqchi bo'lsangiz, bizning professional jamoamizga murojaat qiling va bepul smeta xizmatidan foydalaning!</p>
+        <p>Tegishli sahifalar: <a href="/xizmatlar/termo-panel-fasad">Fasad termo panel</a> | <a href="/xizmatlar/fasad-dekor-toshkent">Toshkentda fasad dekor</a>.</p>
       `,
       ru: `
         <p>В современных условиях экономия энергоресурсов и поддержание комфортной температуры в доме круглый год — приоритетная задача для каждого домовладельца. Около 30-40% тепла уходит именно через неутепленные стены. Поэтому профессиональная <strong>фасадная изоляция</strong> является первой необходимостью при строительстве и реконструкции зданий.</p>
@@ -104,6 +105,7 @@ export const ARTICLES: Article[] = [
         <p>Классический «мокрый фасад» состоит из 5-6 слоев, каждый из которых требует времени на высыхание. Готовые <strong>термопанели с травертином</strong> или мраморной крошкой монтируются в 3 раза быстрее. Изучая <strong>термопанели цена Узбекистан</strong>, помните, что вы платите за готовое решение: утеплитель + защитный слой + декоративный вид под ключ. Это снижает затраты на оплату работы строителей и исключает риск технологических ошибок.</p>
         
         <p>Если вы ищете качественный <strong>фасадный декор Ташкент</strong> и профессиональный монтаж, свяжитесь со специалистами Artline Decor. Мы сделаем расчет сметы бесплатно!</p>
+        <p>Связанные страницы: <a href="/xizmatlar/termo-panel-fasad?lang=ru">Фасадные термопанели</a> | <a href="/xizmatlar/fasad-dekor-toshkent?lang=ru">Фасадный декор в Ташкенте</a>.</p>
       `
     }
   },
@@ -180,6 +182,7 @@ export const ARTICLES: Article[] = [
         </table>
 
         <p>Xulosa qilib aytganda, zamonaviy texnologiyalar uyingizni ham chiroyli, ham tejamkor qilish imkonini beradi. Artline Decor shourumiga tashrif buyurib, namunalarimizni o'z ko'zingiz bilan ko'ring.</p>
+        <p>Tegishli sahifalar: <a href="/xizmatlar/travertin-fasad-qoplama">Travertin fasad qoplama</a> | <a href="/xizmatlar/termo-panel-fasad">Fasad termo panel</a>.</p>
       `,
       ru: `
         <p>В Узбекистане при отделке фасадов наиболее популярны два направления: классическая <strong>облицовка фасада травертином</strong> (в виде плитки или жидкого нанесения) и современный <strong>пенопласт декор фасад</strong> (готовые термопанели). Каждый материал имеет свои особенности. Давайте объективно сравним их по ключевым показателям.</p>
@@ -236,6 +239,7 @@ export const ARTICLES: Article[] = [
         </table>
 
         <p>Свяжитесь с нами сегодня, чтобы узнать актуальные цены на термопанели и получить профессиональную консультацию по отделке вашего дома в Узбекистане.</p>
+        <p>Связанные страницы: <a href="/xizmatlar/travertin-fasad-qoplama?lang=ru">Травертиновая облицовка фасада</a> | <a href="/xizmatlar/termo-panel-fasad?lang=ru">Фасадные термопанели</a>.</p>
       `
     }
   },
@@ -287,6 +291,7 @@ export const ARTICLES: Article[] = [
         </ul>
         
         <p>Uyingizning <strong>fasad bezak</strong> ishlarini rejalashtirishda bizning arxitektorlarimiz bilan maslahatlashing. Biz sizga uyingiz dizayniga mos keladigan eng chiroyli profil turlarini tanlashda yordam beramiz!</p>
+        <p>Tegishli sahifalar: <a href="/xizmatlar/karniz-fasad">Fasad karniz turlari va o'rnatish</a> | <a href="/xizmatlar/ustun-pilyastr-dekor">Ustun va pilyastr dekor</a>.</p>
       `,
       ru: `
         <p>Декоративные элементы играют решающую роль в придании фасаду здания завершенного, гармоничного и роскошного вида. Именно они превращают обычную кирпичную или бетонную коробку в произведение искусства. Этот стиль формирует <strong>архитектурный декор</strong>, основными элементами которого являются карнизы, молдинги, колонны и пилястры.</p>
@@ -318,6 +323,7 @@ export const ARTICLES: Article[] = [
         </ul>
         
         <p>Сделайте облик вашего дома неповторимым с помощью архитектурного декора Artline Decor. Позвоните нам, и мы поможем подобрать идеальные элементы под ваш дизайн-проект.</p>
+        <p>Связанные страницы: <a href="/xizmatlar/karniz-fasad?lang=ru">Фасадные карнизы: виды и монтаж</a> | <a href="/xizmatlar/ustun-pilyastr-dekor?lang=ru">Колонны и пилястры для фасада</a>.</p>
       `
     }
   }

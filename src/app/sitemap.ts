@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { ARTICLES } from '@/lib/blog-data';
+import { SERVICE_PAGES } from '@/lib/service-pages';
 
 const baseUrl = 'https://artlinedecor.uz';
 
@@ -50,6 +51,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entries.push(
       { url: uzUrl, lastModified: new Date(article.date), changeFrequency: 'monthly', priority: 0.7, alternates: alt },
       { url: ruUrl, lastModified: new Date(article.date), changeFrequency: 'monthly', priority: 0.6, alternates: alt },
+    );
+  });
+
+  // 3b. Mahsulot / xizmat sahifalari (uz + ru). Ro'yxat src/lib/service-pages.ts dan olinadi.
+  const hubAlt = langAlternates(`${baseUrl}/xizmatlar`, `${baseUrl}/xizmatlar?lang=ru`);
+  entries.push(
+    { url: `${baseUrl}/xizmatlar`, lastModified: SITE_UPDATED, changeFrequency: 'weekly', priority: 0.8, alternates: hubAlt },
+    { url: `${baseUrl}/xizmatlar?lang=ru`, lastModified: SITE_UPDATED, changeFrequency: 'weekly', priority: 0.7, alternates: hubAlt },
+  );
+  SERVICE_PAGES.forEach((page) => {
+    const uzUrl = `${baseUrl}/xizmatlar/${page.slug}`;
+    const ruUrl = `${uzUrl}?lang=ru`;
+    const alt = langAlternates(uzUrl, ruUrl);
+    const modified = new Date(page.date);
+    entries.push(
+      { url: uzUrl, lastModified: modified, changeFrequency: 'monthly', priority: 0.8, alternates: alt },
+      { url: ruUrl, lastModified: modified, changeFrequency: 'monthly', priority: 0.7, alternates: alt },
     );
   });
 
