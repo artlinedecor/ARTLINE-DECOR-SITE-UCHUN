@@ -15,6 +15,11 @@ function latestArticleDate(): Date {
   return times.length ? new Date(Math.max(...times)) : SITE_UPDATED;
 }
 
+function latestServiceDate(): Date {
+  const times = SERVICE_PAGES.map((p) => new Date(p.date).getTime()).filter((t) => !Number.isNaN(t));
+  return new Date(Math.max(SITE_UPDATED.getTime(), ...times));
+}
+
 function langAlternates(uzUrl: string, ruUrl: string) {
   return {
     languages: {
@@ -55,10 +60,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   });
 
   // 3b. Mahsulot / xizmat sahifalari (uz + ru). Ro'yxat src/lib/service-pages.ts dan olinadi.
+  // Hub sahifasi xizmat sahifalari ro'yxatini ko'rsatadi: lastmod eng yangi
+  // xizmat sahifasi sanasidan oldin bo'lmasin (aks holda sahifa yaratilishidan
+  // oldingi sana chiqardi).
   const hubAlt = langAlternates(`${baseUrl}/xizmatlar`, `${baseUrl}/xizmatlar?lang=ru`);
+  const hubUpdated = latestServiceDate();
   entries.push(
-    { url: `${baseUrl}/xizmatlar`, lastModified: SITE_UPDATED, changeFrequency: 'weekly', priority: 0.8, alternates: hubAlt },
-    { url: `${baseUrl}/xizmatlar?lang=ru`, lastModified: SITE_UPDATED, changeFrequency: 'weekly', priority: 0.7, alternates: hubAlt },
+    { url: `${baseUrl}/xizmatlar`, lastModified: hubUpdated, changeFrequency: 'weekly', priority: 0.8, alternates: hubAlt },
+    { url: `${baseUrl}/xizmatlar?lang=ru`, lastModified: hubUpdated, changeFrequency: 'weekly', priority: 0.7, alternates: hubAlt },
   );
   SERVICE_PAGES.forEach((page) => {
     const uzUrl = `${baseUrl}/xizmatlar/${page.slug}`;
